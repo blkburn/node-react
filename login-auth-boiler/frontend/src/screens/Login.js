@@ -6,6 +6,7 @@ import Message from '../components/Message'
 import Loader from '../components/Loader'
 import FormContainer from '../components/FormContainer'
 import { login } from '../actions/userActions'
+import { USER_LOGIN_ERROR_CLEAR } from '../constants/userConstants'
 
 const Login = ({ location, history }) => {
   const [email, setEmail] = useState('')
@@ -23,6 +24,10 @@ const Login = ({ location, history }) => {
       history.push(redirect)
     }
   }, [history, userInfo, redirect])
+
+  useEffect(() => {
+    dispatch({ type: USER_LOGIN_ERROR_CLEAR })
+  }, [dispatch])
 
   const submitHandler = (e) => {
     e.preventDefault()

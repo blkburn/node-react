@@ -63,7 +63,7 @@ const USerEdit = ({ match, history }) => {
         ) : (
           <Form onSubmit={submitHandler}>
             <Form.Group controlId='name'>
-              <Form.Label>Name</Form.Label>
+              <Form.Label className='my-2'>Name</Form.Label>
               <Form.Control
                 type='name'
                 placeholder='Enter name'
@@ -73,7 +73,7 @@ const USerEdit = ({ match, history }) => {
             </Form.Group>
 
             <Form.Group controlId='email'>
-              <Form.Label>Email Address</Form.Label>
+              <Form.Label className='my-2'>Email Address</Form.Label>
               <Form.Control
                 type='email'
                 placeholder='Enter email'
@@ -82,7 +82,7 @@ const USerEdit = ({ match, history }) => {
               ></Form.Control>
             </Form.Group>
 
-            <Form.Group controlId='isadmin'>
+            <Form.Group className='my-2' controlId='isadmin'>
               <Form.Check
                 type='checkbox'
                 label='Is Admin'
@@ -91,7 +91,7 @@ const USerEdit = ({ match, history }) => {
               ></Form.Check>
             </Form.Group>
 
-            <Button type='submit' variant='primary'>
+            <Button className='my-2' type='submit' variant='primary'>
               Update
             </Button>
           </Form>

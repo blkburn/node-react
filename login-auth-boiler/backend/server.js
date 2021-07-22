@@ -36,6 +36,15 @@ app.use('/api/users', userRoutes)
 // const __dirname = path.resolve()
 // app.use('/uploads', express.static(path.join(__dirname, '/uploads')))
 
+app.use(function (err, req, res, next) {
+  res.status(err.status || 500)
+  console.error(err.stack)
+  res.json({
+    message: err.message,
+    error: err,
+  })
+})
+
 if (process.env.NODE_ENV === 'production') {
   app.use(express.static(path.join(__dirname, '/frontend/build')))
 

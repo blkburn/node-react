@@ -2,8 +2,11 @@ import React from 'react'
 
 const Home = () => {
   return (
-    <div>
-      <h1>Home</h1>
+    <div className='homepage'>
+      <img
+        src='https://source.unsplash.com/1600x900/?nature,water'
+        alt='homepage pic'
+      ></img>
     </div>
   )
 }

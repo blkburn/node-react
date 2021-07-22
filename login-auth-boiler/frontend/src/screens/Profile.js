@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react'
-import { Table, Form, Button, Row, Col } from 'react-bootstrap'
-import { LinkContainer } from 'react-router-bootstrap'
+import { Form, Button } from 'react-bootstrap'
 import { useDispatch, useSelector } from 'react-redux'
 import Message from '../components/Message'
 import Loader from '../components/Loader'
 import { getUserDetails, updateUserProfile } from '../actions/userActions'
 // import { listMyOrders } from '../actions/orderActions'
 import { USER_UPDATE_PROFILE_RESET } from '../constants/userConstants'
+import FormContainer from '../components/FormContainer'
 
 const Profile = ({ location, history }) => {
   const [name, setName] = useState('')
@@ -54,7 +54,7 @@ const Profile = ({ location, history }) => {
   }
 
   return (
-    <Row>
+    <FormContainer>
       {/* <Col md={3}> */}
       <h2>User Profile</h2>
       {message && <Message variant='danger'>{message}</Message>}
@@ -67,7 +67,7 @@ const Profile = ({ location, history }) => {
       ) : (
         <Form onSubmit={submitHandler}>
           <Form.Group controlId='name'>
-            <Form.Label>Name</Form.Label>
+            <Form.Label className='my-2'>Name</Form.Label>
             <Form.Control
               type='name'
               placeholder='Enter name'
@@ -77,7 +77,7 @@ const Profile = ({ location, history }) => {
           </Form.Group>
 
           <Form.Group controlId='email'>
-            <Form.Label>Email Address</Form.Label>
+            <Form.Label className='my-2'>Email Address</Form.Label>
             <Form.Control
               type='email'
               placeholder='Enter email'
@@ -87,7 +87,7 @@ const Profile = ({ location, history }) => {
           </Form.Group>
 
           <Form.Group controlId='password'>
-            <Form.Label>Password</Form.Label>
+            <Form.Label className='my-2'>Password</Form.Label>
             <Form.Control
               type='password'
               placeholder='Enter password'
@@ -97,7 +97,7 @@ const Profile = ({ location, history }) => {
           </Form.Group>
 
           <Form.Group controlId='confirmPassword'>
-            <Form.Label>Confirm Password</Form.Label>
+            <Form.Label className='my-2'>Confirm Password</Form.Label>
             <Form.Control
               type='password'
               placeholder='Confirm password'
@@ -106,7 +106,7 @@ const Profile = ({ location, history }) => {
             ></Form.Control>
           </Form.Group>
 
-          <Button type='submit' variant='primary'>
+          <Button className='my-3' type='submit' variant='primary'>
             Update
           </Button>
         </Form>
@@ -163,7 +163,7 @@ const Profile = ({ location, history }) => {
           </Table>
         )}
       </Col> */}
-    </Row>
+    </FormContainer>
   )
 }
 

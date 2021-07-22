@@ -6,6 +6,7 @@ import Message from '../components/Message'
 import Loader from '../components/Loader'
 import FormContainer from '../components/FormContainer'
 import { register } from '../actions/userActions'
+import { USER_REGISTER_ERROR_CLEAR } from '../constants/userConstants'
 
 const Register = ({ location, history }) => {
   const [email, setEmail] = useState('')
@@ -26,6 +27,10 @@ const Register = ({ location, history }) => {
       history.push(redirect)
     }
   }, [history, userInfo, redirect])
+
+  useEffect(() => {
+    dispatch({ type: USER_REGISTER_ERROR_CLEAR })
+  }, [dispatch])
 
   const submitHandler = (e) => {
     e.preventDefault()

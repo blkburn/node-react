@@ -2,3 +2,11 @@
 main {
   min-height: 80vh;
 }
+
+.homepage img {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  width: 75%;
+  padding-top: 100px;
+}
