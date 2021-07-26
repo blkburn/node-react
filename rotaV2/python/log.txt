@@ -1,0 +1,45 @@
+reading sheet
+reading Initial sheet
+reading Shifts sheet
+reading Shifts_Setup sheet
+reading Staff sheet
+Generating optimisation file...
+SECTION_HORIZON
+# The horizon length in days:
+91
+
+SECTION_SHIFTS
+# ShiftID, Length in mins, Shifts which cannot follow this shift | separated
+DS,25.0,
+WRM,25.0,WRM
+BS,20.0,DS|WRM|BS
+FS,25.0,DS
+OC,25.0,DS|WRM|BS|WOC|WDS|OC|FS
+WDS,30.0,OC
+WOC,40.0,DS|WRM|BS|OC
+FBS,20.0,
+FOC,25.0,
+
+
+
+SECTION_STAFF
+# ID, MaxShifts, MaxTotalMinutes, MinTotalMinutes, MaxConsecutiveShifts, MinConsecutiveShifts, MinConsecutiveDaysOff, MaxWeekends
+BR,,495,0,3,1,1,3
+NC,,770,0,3,1,1,3
+LJ,,371,0,3,1,1,3
+MC,,500,0,3,1,1,3
+JT,,600,0,3,1,1,3
+SP,,944,0,3,1,1,3
+KS,,742,0,3,1,1,3
+RK,,1040,0,3,1,1,3
+MCW,,630,0,3,1,1,3
+JH,,240,0,3,1,1,3
+FD,,495,0,3,1,1,3
+AD,,800,0,3,1,1,3
+CS,,550,0,3,1,1,3
+EP,,780,0,3,1,1,3
+RA,,0,0,3,1,1,3
+KJ,,864,0,3,1,1,3
+
+
+Sheet locked - skipping optimisationreading Objective sheet

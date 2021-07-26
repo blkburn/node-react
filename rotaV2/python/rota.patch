@@ -1,0 +1,2005 @@
+diff --git a/minimum/linear/colgen/examples/shift_scheduling_colgen.cpp b/minimum/linear/colgen/examples/shift_scheduling_colgen.cpp
+index 26158a7..115951f 100644
+--- a/minimum/linear/colgen/examples/shift_scheduling_colgen.cpp
++++ b/minimum/linear/colgen/examples/shift_scheduling_colgen.cpp
+@@ -198,7 +198,11 @@ int main_program(int num_args, char* args[]) {
+ 	}
+ 
+ 	vector<double> solution_objectives;
+-	for (int i = 1; i <= FLAGS_num_solutions; ++i) {
++    std::filebuf fb;
++    fb.open ("colgen_output.txt",std::ios::out);
++    std::ostream os(&fb);
++
++    for (int i = 1; i <= FLAGS_num_solutions; ++i) {
+ 		colgen_problem.unfix_all();
+ 		auto problem_objective = colgen_problem.solve();
+ 		auto& solution = colgen_problem.get_solution();
+@@ -207,7 +211,8 @@ int main_program(int num_args, char* args[]) {
+ 
+ 		colgen_problem.possibly_save_column_pool();
+ 
+-		auto objective = print_solution(cout, problem, solution);
++        auto objective = print_solution(os, problem, solution, true);
++		objective = print_solution(cout, problem, solution);
+ 		minimum_core_assert(abs(problem_objective - objective) / (abs(objective) + 1e-5) <= 1e-4,
+ 		                    "Objective from colgen does not match the computed one.");
+ 
+diff --git a/minimum/linear/examples/shift_scheduling.cpp b/minimum/linear/examples/shift_scheduling.cpp
+index f953dfa..3ed330a 100644
+--- a/minimum/linear/examples/shift_scheduling.cpp
++++ b/minimum/linear/examples/shift_scheduling.cpp
+@@ -58,7 +58,7 @@ int main_program(int num_args, char* args[]) {
+ 	}
+ 
+ 	bool first_solution = true;
+-	auto print_solution = [&]() {
++	auto print_solution = [&](ostream& out) {
+ 		minimum_core_assert(ip.is_feasible_and_integral());
+ 		double elapsed_time = minimum::core::wall_time() - start_time;
+ 		clog << "Integer solution with objective " << objective.value() << " in " << elapsed_time
+@@ -70,15 +70,21 @@ int main_program(int num_args, char* args[]) {
+ 		first_solution = false;
+ 
+ 		for (int p = 0; p < problem.worker_size(); ++p) {
++//            cout << setw(3) << right << problem.worker(p).id() << ": ";
+ 			for (int d = 0; d < problem.num_days(); ++d) {
++                bool printed = false;
+ 				for (int s = 0; s < problem.shift_size(); ++s) {
+ 					if (x[p][d][s].bool_value()) {
+-						cout << problem.shift(s).id();
++						out << problem.shift(s).id() << ' ';
++                        printed = true;
+ 					}
+ 				}
+-				cout << '\t';
++//				cout << '\t';
++                if (!printed) {
++                    out << setw(2) << ". ";
++                }
+ 			}
+-			cout << endl;
++			out << endl;
+ 		}
+ 	};
+ 
+@@ -111,7 +117,12 @@ int main_program(int num_args, char* args[]) {
+ 		return 2;
+ 	}
+ 
+-	print_solution();
++    std::filebuf fb;
++    fb.open ("colgen_output.txt",std::ios::out);
++    std::ostream os(&fb);
++
++    print_solution(os);
++    print_solution(cout);
+ 
+ 	return 0;
+ }
+diff --git a/minimum/linear/scheduling_util.cpp b/minimum/linear/scheduling_util.cpp
+index fb9d00c..d572c75 100755
+--- a/minimum/linear/scheduling_util.cpp
++++ b/minimum/linear/scheduling_util.cpp
+@@ -637,29 +637,34 @@ vector<vector<vector<int>>> load_solution(
+ 
+ double print_solution(ostream& out,
+                       const minimum::linear::proto::SchedulingProblem& problem,
+-                      const std::vector<std::vector<std::vector<int>>>& solution) {
++                      const std::vector<std::vector<std::vector<int>>>& solution,
++                      bool skip) {
+ 	for (int p = 0; p < problem.worker_size(); ++p) {
+-		out << setw(3) << right << problem.worker(p).id() << ": ";
++//		out << setw(3) << right << problem.worker(p).id() << ": ";
+ 		for (int d = 0; d < problem.num_days(); ++d) {
+ 			bool printed = false;
+ 			for (int s = 0; s < problem.shift_size(); ++s) {
+ 				if (solution[p][d][s] == 1) {
+ 					minimum_core_assert(!printed,
+ 					                    "Solution has more than one shift assigned on one day.");
+-					out << to_string(setw(2), setfill('='), left, problem.shift(s).id());
++					out << problem.shift(s).id() << " ";;
++//                    out << to_string(setw(2), setfill('='), left, problem.shift(s).id()) << " ";;
++//                    out << setw(1) << " ";
+ 					printed = true;
+ 				}
+ 			}
+ 			if (!printed) {
+-				out << setw(2) << ".";
++				out << setw(2) << ". ";
+ 			}
+ 		}
+ 		out << endl;
+ 	}
+ 	auto objective = objective_value(problem, solution);
+-	out << "Final solution (checked for feasibility): " << objective << "\n";
+-	out << "-- Cover costs  : " << cover_cost(problem, solution) << "\n";
+-	out << "-- Roster costs : " << objective - cover_cost(problem, solution) << "\n";
++	if (skip == false) {
++        out << "Final solution (checked for feasibility): " << objective << "\n";
++        out << "-- Cover costs  : " << cover_cost(problem, solution) << "\n";
++        out << "-- Roster costs : " << objective - cover_cost(problem, solution) << "\n";
++    }
+ 	return objective;
+ }
+ 
+diff --git a/minimum/linear/scheduling_util.h b/minimum/linear/scheduling_util.h
+index 18b4a60..c1a2d14 100644
+--- a/minimum/linear/scheduling_util.h
++++ b/minimum/linear/scheduling_util.h
+@@ -32,7 +32,8 @@ MINIMUM_LINEAR_API std::vector<std::vector<std::vector<int>>> load_solution(
+ MINIMUM_LINEAR_API double print_solution(
+     std::ostream& out,
+     const minimum::linear::proto::SchedulingProblem& problem,
+-    const std::vector<std::vector<std::vector<int>>>& solution);
++    const std::vector<std::vector<std::vector<int>>>& solution,
++    bool skip = false);
+ 
+ MINIMUM_LINEAR_API int objective_value(
+     const minimum::linear::proto::SchedulingProblem& problem,
+diff --git a/third-party/L-BFGS-B-C/src/Makefile b/third-party/L-BFGS-B-C/src/Makefile
+index 225d757..d619225 100644
+--- a/third-party/L-BFGS-B-C/src/Makefile
++++ b/third-party/L-BFGS-B-C/src/Makefile
+@@ -1,51 +1,487 @@
+-# Feb 17 2015, converted fortran to C
+-# Stephen Becker, stephen.becker@colorado.edu
++# CMAKE generated file: DO NOT EDIT!
++# Generated by "Unix Makefiles" Generator, CMake Version 3.19
+ 
++# Default target executed when no arguments are given to make.
++default_target: all
+ 
+-FC = gfortran
+-#CC = gcc
+-CC = g++
+-#CC = gcc-4.9
++.PHONY : default_target
+ 
+-#FFLAGS = -O -Wall -fbounds-check -g -Wno-uninitialized 
+-#FFLAGS += -fdefault-integer-8
+-CFLAGS = -O3 -Wall -Wno-uninitialized -lm
+-#CFLAGS = -g -Wall -lm -DDEBUG -Wuninitialized -Wextra -Wno-unused-parameter
+-POSTFLAGS=-lm
++# Allow only one "make -f Makefile2" at a time, but pass parallelism.
++.NOTPARALLEL:
+ 
+-# my f2c.h is here:
+-INCLUDES = -I/usr/include -I. -I/usr/local/include
+-#CFLAGS += $(INCLUDES)
+ 
+-DRIVER1_77 = driver1.c
+-DRIVER2_77 = driver2.c
+-DRIVER3_77 = driver3.c
++#=============================================================================
++# Special targets provided by cmake.
+ 
+-LBFGSB  = lbfgsb.c linesearch.c subalgorithms.c print.c
++# Disable implicit rules so canonical targets will work.
++.SUFFIXES:
+ 
+-LINPACK = linpack.c
+ 
+-BLAS 	= miniCBLAS.c
+-#POSTFLAGS += -D_USE_OPTIMIZED_BLAS -lblas
++# Disable VCS-based implicit rules.
++% : %,v
+ 
+-TIMER   = timer.c
+ 
+-SRC = $(LBFGSB) $(LINPACK) $(BLAS) $(TIMER) $(F2CFILES)
++# Disable VCS-based implicit rules.
++% : RCS/%
+ 
+-default: all test_1
+-all :  lbfgsb_77_1 lbfgsb_77_2 lbfgsb_77_3
+ 
+-lbfgsb_77_1 : $(DRIVER1_77) $(SRC)
+-	$(CC) -o x.lbfgsb_77_1 $(CFLAGS) $(DRIVER1_77) $(SRC) $(POSTFLAGS)
++# Disable VCS-based implicit rules.
++% : RCS/%,v
+ 
+-lbfgsb_77_2 : $(DRIVER2_77) $(LBFGSB) $(LINPACK) $(BLAS) $(TIMER)
+-	$(CC) -o x.lbfgsb_77_2 $(CFLAGS) $(DRIVER2_77) $(SRC) $(POSTFLAGS)
+ 
+-lbfgsb_77_3 : $(DRIVER2_77) $(LBFGSB) $(LINPACK) $(BLAS) $(TIMER)
+-	$(CC) -o x.lbfgsb_77_3 $(CFLAGS) $(DRIVER3_77) $(SRC) $(POSTFLAGS)
++# Disable VCS-based implicit rules.
++% : SCCS/s.%
+ 
+-lbfgsb_77_1_nonstatic : $(SRC)
+-	$(CC) -o x.lbfgsb_77_1_nonstatic $(CFLAGS) driver_nonstatic.c $(SRC) $(POSTFLAGS)
+ 
+-test_1 : x.lbfgsb_77_1
+-	./x.lbfgsb_77_1
++# Disable VCS-based implicit rules.
++% : s.%
++
++
++.SUFFIXES: .hpux_make_needs_suffix_list
++
++
++# Command-line flag to silence nested $(MAKE).
++$(VERBOSE)MAKESILENT = -s
++
++#Suppress display of executed commands.
++$(VERBOSE).SILENT:
++
++# A target that is always out of date.
++cmake_force:
++
++.PHONY : cmake_force
++
++#=============================================================================
++# Set environment variables for the build.
++
++# The shell in which to execute make rules.
++SHELL = /bin/sh
++
++# The CMake executable.
++CMAKE_COMMAND = /home/craig/.local/share/JetBrains/Toolbox/apps/CLion/ch-0/211.7442.42/bin/cmake/linux/bin/cmake
++
++# The command to remove a file.
++RM = /home/craig/.local/share/JetBrains/Toolbox/apps/CLion/ch-0/211.7442.42/bin/cmake/linux/bin/cmake -E rm -f
++
++# Escaping for special characters.
++EQUALS = =
++
++# The top-level source directory on which CMake was run.
++CMAKE_SOURCE_DIR = /home/craig/Documents/code/monolith
++
++# The top-level build directory on which CMake was run.
++CMAKE_BINARY_DIR = /home/craig/Documents/code/monolith
++
++#=============================================================================
++# Targets provided globally by CMake.
++
++# Special rule for the target install/strip
++install/strip: preinstall
++	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Installing the project stripped..."
++	/home/craig/.local/share/JetBrains/Toolbox/apps/CLion/ch-0/211.7442.42/bin/cmake/linux/bin/cmake -DCMAKE_INSTALL_DO_STRIP=1 -P cmake_install.cmake
++.PHONY : install/strip
++
++# Special rule for the target install/strip
++install/strip/fast: preinstall/fast
++	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Installing the project stripped..."
++	/home/craig/.local/share/JetBrains/Toolbox/apps/CLion/ch-0/211.7442.42/bin/cmake/linux/bin/cmake -DCMAKE_INSTALL_DO_STRIP=1 -P cmake_install.cmake
++.PHONY : install/strip/fast
++
++# Special rule for the target install/local
++install/local: preinstall
++	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Installing only the local directory..."
++	/home/craig/.local/share/JetBrains/Toolbox/apps/CLion/ch-0/211.7442.42/bin/cmake/linux/bin/cmake -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake
++.PHONY : install/local
++
++# Special rule for the target install/local
++install/local/fast: preinstall/fast
++	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Installing only the local directory..."
++	/home/craig/.local/share/JetBrains/Toolbox/apps/CLion/ch-0/211.7442.42/bin/cmake/linux/bin/cmake -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake
++.PHONY : install/local/fast
++
++# Special rule for the target install
++install: preinstall
++	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Install the project..."
++	/home/craig/.local/share/JetBrains/Toolbox/apps/CLion/ch-0/211.7442.42/bin/cmake/linux/bin/cmake -P cmake_install.cmake
++.PHONY : install
++
++# Special rule for the target install
++install/fast: preinstall/fast
++	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Install the project..."
++	/home/craig/.local/share/JetBrains/Toolbox/apps/CLion/ch-0/211.7442.42/bin/cmake/linux/bin/cmake -P cmake_install.cmake
++.PHONY : install/fast
++
++# Special rule for the target list_install_components
++list_install_components:
++	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Available install components are: \"Unspecified\" \"libprotobuf\" \"libprotobuf-lite\" \"libprotoc\" \"protobuf-export\" \"protobuf-headers\" \"protobuf-protos\" \"protoc\""
++.PHONY : list_install_components
++
++# Special rule for the target list_install_components
++list_install_components/fast: list_install_components
++
++.PHONY : list_install_components/fast
++
++# Special rule for the target rebuild_cache
++rebuild_cache:
++	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake to regenerate build system..."
++	/home/craig/.local/share/JetBrains/Toolbox/apps/CLion/ch-0/211.7442.42/bin/cmake/linux/bin/cmake --regenerate-during-build -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
++.PHONY : rebuild_cache
++
++# Special rule for the target rebuild_cache
++rebuild_cache/fast: rebuild_cache
++
++.PHONY : rebuild_cache/fast
++
++# Special rule for the target test
++test:
++	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running tests..."
++	/home/craig/.local/share/JetBrains/Toolbox/apps/CLion/ch-0/211.7442.42/bin/cmake/linux/bin/ctest --force-new-ctest-process $(ARGS)
++.PHONY : test
++
++# Special rule for the target test
++test/fast: test
++
++.PHONY : test/fast
++
++# Special rule for the target edit_cache
++edit_cache:
++	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "No interactive CMake dialog available..."
++	/home/craig/.local/share/JetBrains/Toolbox/apps/CLion/ch-0/211.7442.42/bin/cmake/linux/bin/cmake -E echo No\ interactive\ CMake\ dialog\ available.
++.PHONY : edit_cache
++
++# Special rule for the target edit_cache
++edit_cache/fast: edit_cache
++
++.PHONY : edit_cache/fast
++
++# The main all target
++all: cmake_check_build_system
++	cd /home/craig/Documents/code/monolith && $(CMAKE_COMMAND) -E cmake_progress_start /home/craig/Documents/code/monolith/CMakeFiles /home/craig/Documents/code/monolith/third-party/L-BFGS-B-C/src//CMakeFiles/progress.marks
++	cd /home/craig/Documents/code/monolith && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 third-party/L-BFGS-B-C/src/all
++	$(CMAKE_COMMAND) -E cmake_progress_start /home/craig/Documents/code/monolith/CMakeFiles 0
++.PHONY : all
++
++# The main clean target
++clean:
++	cd /home/craig/Documents/code/monolith && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 third-party/L-BFGS-B-C/src/clean
++.PHONY : clean
++
++# The main clean target
++clean/fast: clean
++
++.PHONY : clean/fast
++
++# Prepare targets for installation.
++preinstall: all
++	cd /home/craig/Documents/code/monolith && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 third-party/L-BFGS-B-C/src/preinstall
++.PHONY : preinstall
++
++# Prepare targets for installation.
++preinstall/fast:
++	cd /home/craig/Documents/code/monolith && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 third-party/L-BFGS-B-C/src/preinstall
++.PHONY : preinstall/fast
++
++# clear depends
++depend:
++	cd /home/craig/Documents/code/monolith && $(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 1
++.PHONY : depend
++
++# Convenience name for target.
++third-party/L-BFGS-B-C/src/CMakeFiles/lbfgsb.dir/rule:
++	cd /home/craig/Documents/code/monolith && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 third-party/L-BFGS-B-C/src/CMakeFiles/lbfgsb.dir/rule
++.PHONY : third-party/L-BFGS-B-C/src/CMakeFiles/lbfgsb.dir/rule
++
++# Convenience name for target.
++lbfgsb: third-party/L-BFGS-B-C/src/CMakeFiles/lbfgsb.dir/rule
++
++.PHONY : lbfgsb
++
++# fast build rule for target.
++lbfgsb/fast:
++	cd /home/craig/Documents/code/monolith && $(MAKE) $(MAKESILENT) -f third-party/L-BFGS-B-C/src/CMakeFiles/lbfgsb.dir/build.make third-party/L-BFGS-B-C/src/CMakeFiles/lbfgsb.dir/build
++.PHONY : lbfgsb/fast
++
++# Convenience name for target.
++third-party/L-BFGS-B-C/src/CMakeFiles/lbfgsb_driver1.dir/rule:
++	cd /home/craig/Documents/code/monolith && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 third-party/L-BFGS-B-C/src/CMakeFiles/lbfgsb_driver1.dir/rule
++.PHONY : third-party/L-BFGS-B-C/src/CMakeFiles/lbfgsb_driver1.dir/rule
++
++# Convenience name for target.
++lbfgsb_driver1: third-party/L-BFGS-B-C/src/CMakeFiles/lbfgsb_driver1.dir/rule
++
++.PHONY : lbfgsb_driver1
++
++# fast build rule for target.
++lbfgsb_driver1/fast:
++	cd /home/craig/Documents/code/monolith && $(MAKE) $(MAKESILENT) -f third-party/L-BFGS-B-C/src/CMakeFiles/lbfgsb_driver1.dir/build.make third-party/L-BFGS-B-C/src/CMakeFiles/lbfgsb_driver1.dir/build
++.PHONY : lbfgsb_driver1/fast
++
++driver1.o: driver1.c.o
++
++.PHONY : driver1.o
++
++# target to build an object file
++driver1.c.o:
++	cd /home/craig/Documents/code/monolith && $(MAKE) $(MAKESILENT) -f third-party/L-BFGS-B-C/src/CMakeFiles/lbfgsb_driver1.dir/build.make third-party/L-BFGS-B-C/src/CMakeFiles/lbfgsb_driver1.dir/driver1.c.o
++.PHONY : driver1.c.o
++
++driver1.i: driver1.c.i
++
++.PHONY : driver1.i
++
++# target to preprocess a source file
++driver1.c.i:
++	cd /home/craig/Documents/code/monolith && $(MAKE) $(MAKESILENT) -f third-party/L-BFGS-B-C/src/CMakeFiles/lbfgsb_driver1.dir/build.make third-party/L-BFGS-B-C/src/CMakeFiles/lbfgsb_driver1.dir/driver1.c.i
++.PHONY : driver1.c.i
++
++driver1.s: driver1.c.s
++
++.PHONY : driver1.s
++
++# target to generate assembly for a file
++driver1.c.s:
++	cd /home/craig/Documents/code/monolith && $(MAKE) $(MAKESILENT) -f third-party/L-BFGS-B-C/src/CMakeFiles/lbfgsb_driver1.dir/build.make third-party/L-BFGS-B-C/src/CMakeFiles/lbfgsb_driver1.dir/driver1.c.s
++.PHONY : driver1.c.s
++
++lbfgsb.o: lbfgsb.c.o
++
++.PHONY : lbfgsb.o
++
++# target to build an object file
++lbfgsb.c.o:
++	cd /home/craig/Documents/code/monolith && $(MAKE) $(MAKESILENT) -f third-party/L-BFGS-B-C/src/CMakeFiles/lbfgsb.dir/build.make third-party/L-BFGS-B-C/src/CMakeFiles/lbfgsb.dir/lbfgsb.c.o
++.PHONY : lbfgsb.c.o
++
++lbfgsb.i: lbfgsb.c.i
++
++.PHONY : lbfgsb.i
++
++# target to preprocess a source file
++lbfgsb.c.i:
++	cd /home/craig/Documents/code/monolith && $(MAKE) $(MAKESILENT) -f third-party/L-BFGS-B-C/src/CMakeFiles/lbfgsb.dir/build.make third-party/L-BFGS-B-C/src/CMakeFiles/lbfgsb.dir/lbfgsb.c.i
++.PHONY : lbfgsb.c.i
++
++lbfgsb.s: lbfgsb.c.s
++
++.PHONY : lbfgsb.s
++
++# target to generate assembly for a file
++lbfgsb.c.s:
++	cd /home/craig/Documents/code/monolith && $(MAKE) $(MAKESILENT) -f third-party/L-BFGS-B-C/src/CMakeFiles/lbfgsb.dir/build.make third-party/L-BFGS-B-C/src/CMakeFiles/lbfgsb.dir/lbfgsb.c.s
++.PHONY : lbfgsb.c.s
++
++linesearch.o: linesearch.c.o
++
++.PHONY : linesearch.o
++
++# target to build an object file
++linesearch.c.o:
++	cd /home/craig/Documents/code/monolith && $(MAKE) $(MAKESILENT) -f third-party/L-BFGS-B-C/src/CMakeFiles/lbfgsb.dir/build.make third-party/L-BFGS-B-C/src/CMakeFiles/lbfgsb.dir/linesearch.c.o
++.PHONY : linesearch.c.o
++
++linesearch.i: linesearch.c.i
++
++.PHONY : linesearch.i
++
++# target to preprocess a source file
++linesearch.c.i:
++	cd /home/craig/Documents/code/monolith && $(MAKE) $(MAKESILENT) -f third-party/L-BFGS-B-C/src/CMakeFiles/lbfgsb.dir/build.make third-party/L-BFGS-B-C/src/CMakeFiles/lbfgsb.dir/linesearch.c.i
++.PHONY : linesearch.c.i
++
++linesearch.s: linesearch.c.s
++
++.PHONY : linesearch.s
++
++# target to generate assembly for a file
++linesearch.c.s:
++	cd /home/craig/Documents/code/monolith && $(MAKE) $(MAKESILENT) -f third-party/L-BFGS-B-C/src/CMakeFiles/lbfgsb.dir/build.make third-party/L-BFGS-B-C/src/CMakeFiles/lbfgsb.dir/linesearch.c.s
++.PHONY : linesearch.c.s
++
++linpack.o: linpack.c.o
++
++.PHONY : linpack.o
++
++# target to build an object file
++linpack.c.o:
++	cd /home/craig/Documents/code/monolith && $(MAKE) $(MAKESILENT) -f third-party/L-BFGS-B-C/src/CMakeFiles/lbfgsb.dir/build.make third-party/L-BFGS-B-C/src/CMakeFiles/lbfgsb.dir/linpack.c.o
++.PHONY : linpack.c.o
++
++linpack.i: linpack.c.i
++
++.PHONY : linpack.i
++
++# target to preprocess a source file
++linpack.c.i:
++	cd /home/craig/Documents/code/monolith && $(MAKE) $(MAKESILENT) -f third-party/L-BFGS-B-C/src/CMakeFiles/lbfgsb.dir/build.make third-party/L-BFGS-B-C/src/CMakeFiles/lbfgsb.dir/linpack.c.i
++.PHONY : linpack.c.i
++
++linpack.s: linpack.c.s
++
++.PHONY : linpack.s
++
++# target to generate assembly for a file
++linpack.c.s:
++	cd /home/craig/Documents/code/monolith && $(MAKE) $(MAKESILENT) -f third-party/L-BFGS-B-C/src/CMakeFiles/lbfgsb.dir/build.make third-party/L-BFGS-B-C/src/CMakeFiles/lbfgsb.dir/linpack.c.s
++.PHONY : linpack.c.s
++
++miniCBLAS.o: miniCBLAS.c.o
++
++.PHONY : miniCBLAS.o
++
++# target to build an object file
++miniCBLAS.c.o:
++	cd /home/craig/Documents/code/monolith && $(MAKE) $(MAKESILENT) -f third-party/L-BFGS-B-C/src/CMakeFiles/lbfgsb.dir/build.make third-party/L-BFGS-B-C/src/CMakeFiles/lbfgsb.dir/miniCBLAS.c.o
++.PHONY : miniCBLAS.c.o
++
++miniCBLAS.i: miniCBLAS.c.i
++
++.PHONY : miniCBLAS.i
++
++# target to preprocess a source file
++miniCBLAS.c.i:
++	cd /home/craig/Documents/code/monolith && $(MAKE) $(MAKESILENT) -f third-party/L-BFGS-B-C/src/CMakeFiles/lbfgsb.dir/build.make third-party/L-BFGS-B-C/src/CMakeFiles/lbfgsb.dir/miniCBLAS.c.i
++.PHONY : miniCBLAS.c.i
++
++miniCBLAS.s: miniCBLAS.c.s
++
++.PHONY : miniCBLAS.s
++
++# target to generate assembly for a file
++miniCBLAS.c.s:
++	cd /home/craig/Documents/code/monolith && $(MAKE) $(MAKESILENT) -f third-party/L-BFGS-B-C/src/CMakeFiles/lbfgsb.dir/build.make third-party/L-BFGS-B-C/src/CMakeFiles/lbfgsb.dir/miniCBLAS.c.s
++.PHONY : miniCBLAS.c.s
++
++print.o: print.c.o
++
++.PHONY : print.o
++
++# target to build an object file
++print.c.o:
++	cd /home/craig/Documents/code/monolith && $(MAKE) $(MAKESILENT) -f third-party/L-BFGS-B-C/src/CMakeFiles/lbfgsb.dir/build.make third-party/L-BFGS-B-C/src/CMakeFiles/lbfgsb.dir/print.c.o
++.PHONY : print.c.o
++
++print.i: print.c.i
++
++.PHONY : print.i
++
++# target to preprocess a source file
++print.c.i:
++	cd /home/craig/Documents/code/monolith && $(MAKE) $(MAKESILENT) -f third-party/L-BFGS-B-C/src/CMakeFiles/lbfgsb.dir/build.make third-party/L-BFGS-B-C/src/CMakeFiles/lbfgsb.dir/print.c.i
++.PHONY : print.c.i
++
++print.s: print.c.s
++
++.PHONY : print.s
++
++# target to generate assembly for a file
++print.c.s:
++	cd /home/craig/Documents/code/monolith && $(MAKE) $(MAKESILENT) -f third-party/L-BFGS-B-C/src/CMakeFiles/lbfgsb.dir/build.make third-party/L-BFGS-B-C/src/CMakeFiles/lbfgsb.dir/print.c.s
++.PHONY : print.c.s
++
++subalgorithms.o: subalgorithms.c.o
++
++.PHONY : subalgorithms.o
++
++# target to build an object file
++subalgorithms.c.o:
++	cd /home/craig/Documents/code/monolith && $(MAKE) $(MAKESILENT) -f third-party/L-BFGS-B-C/src/CMakeFiles/lbfgsb.dir/build.make third-party/L-BFGS-B-C/src/CMakeFiles/lbfgsb.dir/subalgorithms.c.o
++.PHONY : subalgorithms.c.o
++
++subalgorithms.i: subalgorithms.c.i
++
++.PHONY : subalgorithms.i
++
++# target to preprocess a source file
++subalgorithms.c.i:
++	cd /home/craig/Documents/code/monolith && $(MAKE) $(MAKESILENT) -f third-party/L-BFGS-B-C/src/CMakeFiles/lbfgsb.dir/build.make third-party/L-BFGS-B-C/src/CMakeFiles/lbfgsb.dir/subalgorithms.c.i
++.PHONY : subalgorithms.c.i
++
++subalgorithms.s: subalgorithms.c.s
++
++.PHONY : subalgorithms.s
++
++# target to generate assembly for a file
++subalgorithms.c.s:
++	cd /home/craig/Documents/code/monolith && $(MAKE) $(MAKESILENT) -f third-party/L-BFGS-B-C/src/CMakeFiles/lbfgsb.dir/build.make third-party/L-BFGS-B-C/src/CMakeFiles/lbfgsb.dir/subalgorithms.c.s
++.PHONY : subalgorithms.c.s
++
++timer.o: timer.c.o
++
++.PHONY : timer.o
++
++# target to build an object file
++timer.c.o:
++	cd /home/craig/Documents/code/monolith && $(MAKE) $(MAKESILENT) -f third-party/L-BFGS-B-C/src/CMakeFiles/lbfgsb.dir/build.make third-party/L-BFGS-B-C/src/CMakeFiles/lbfgsb.dir/timer.c.o
++.PHONY : timer.c.o
++
++timer.i: timer.c.i
++
++.PHONY : timer.i
++
++# target to preprocess a source file
++timer.c.i:
++	cd /home/craig/Documents/code/monolith && $(MAKE) $(MAKESILENT) -f third-party/L-BFGS-B-C/src/CMakeFiles/lbfgsb.dir/build.make third-party/L-BFGS-B-C/src/CMakeFiles/lbfgsb.dir/timer.c.i
++.PHONY : timer.c.i
++
++timer.s: timer.c.s
++
++.PHONY : timer.s
++
++# target to generate assembly for a file
++timer.c.s:
++	cd /home/craig/Documents/code/monolith && $(MAKE) $(MAKESILENT) -f third-party/L-BFGS-B-C/src/CMakeFiles/lbfgsb.dir/build.make third-party/L-BFGS-B-C/src/CMakeFiles/lbfgsb.dir/timer.c.s
++.PHONY : timer.c.s
++
++# Help Target
++help:
++	@echo "The following are some of the valid targets for this Makefile:"
++	@echo "... all (the default if no target is provided)"
++	@echo "... clean"
++	@echo "... depend"
++	@echo "... edit_cache"
++	@echo "... install"
++	@echo "... install/local"
++	@echo "... install/strip"
++	@echo "... list_install_components"
++	@echo "... rebuild_cache"
++	@echo "... test"
++	@echo "... lbfgsb"
++	@echo "... lbfgsb_driver1"
++	@echo "... driver1.o"
++	@echo "... driver1.i"
++	@echo "... driver1.s"
++	@echo "... lbfgsb.o"
++	@echo "... lbfgsb.i"
++	@echo "... lbfgsb.s"
++	@echo "... linesearch.o"
++	@echo "... linesearch.i"
++	@echo "... linesearch.s"
++	@echo "... linpack.o"
++	@echo "... linpack.i"
++	@echo "... linpack.s"
++	@echo "... miniCBLAS.o"
++	@echo "... miniCBLAS.i"
++	@echo "... miniCBLAS.s"
++	@echo "... print.o"
++	@echo "... print.i"
++	@echo "... print.s"
++	@echo "... subalgorithms.o"
++	@echo "... subalgorithms.i"
++	@echo "... subalgorithms.s"
++	@echo "... timer.o"
++	@echo "... timer.i"
++	@echo "... timer.s"
++.PHONY : help
++
++
++
++#=============================================================================
++# Special targets to cleanup operation of make.
++
++# Special rule to run CMake to check the build system integrity.
++# No rule that depends on this can have commands that come from listfiles
++# because they might be regenerated.
++cmake_check_build_system:
++	cd /home/craig/Documents/code/monolith && $(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 0
++.PHONY : cmake_check_build_system
++
+diff --git a/third-party/minisat/Makefile b/third-party/minisat/Makefile
+index ceb9d77..5b2f623 100644
+--- a/third-party/minisat/Makefile
++++ b/third-party/minisat/Makefile
+@@ -1,214 +1,351 @@
+-###################################################################################################
+-
+-.PHONY:	r d p sh cr cd cp csh lr ld lp lsh config all install install-headers install-lib\
+-        install-bin clean distclean
+-all:	r lr lsh
+-
+-## Load Previous Configuration ####################################################################
+-
+--include config.mk
+-
+-## Configurable options ###########################################################################
+-
+-# Directory to store object files, libraries, executables, and dependencies:
+-BUILD_DIR      ?= build
+-
+-# Include debug-symbols in release builds
+-MINISAT_RELSYM ?= -g
+-
+-# Sets of compile flags for different build types
+-MINISAT_REL    ?= -O3 -D NDEBUG
+-MINISAT_DEB    ?= -O0 -D DEBUG 
+-MINISAT_PRF    ?= -O3 -D NDEBUG
+-MINISAT_FPIC   ?= -fpic
+-
+-# GNU Standard Install Prefix
+-prefix         ?= /usr/local
+-
+-## Write Configuration  ###########################################################################
+-
+-config:
+-	@( echo 'BUILD_DIR?=$(BUILD_DIR)'           ; \
+-	   echo 'MINISAT_RELSYM?=$(MINISAT_RELSYM)' ; \
+-	   echo 'MINISAT_REL?=$(MINISAT_REL)'       ; \
+-	   echo 'MINISAT_DEB?=$(MINISAT_DEB)'       ; \
+-	   echo 'MINISAT_PRF?=$(MINISAT_PRF)'       ; \
+-	   echo 'MINISAT_FPIC?=$(MINISAT_FPIC)'     ; \
+-	   echo 'prefix?=$(prefix)'                 ) > config.mk
+-
+-## Configurable options end #######################################################################
+-
+-INSTALL ?= install
+-
+-# GNU Standard Install Variables
+-exec_prefix ?= $(prefix)
+-includedir  ?= $(prefix)/include
+-bindir      ?= $(exec_prefix)/bin
+-libdir      ?= $(exec_prefix)/lib
+-datarootdir ?= $(prefix)/share
+-mandir      ?= $(datarootdir)/man
+-
+-# Target file names
+-MINISAT      = minisat#       Name of MiniSat main executable.
+-MINISAT_CORE = minisat_core#  Name of simplified MiniSat executable (only core solver support).
+-MINISAT_SLIB = lib$(MINISAT).a#  Name of MiniSat static library.
+-MINISAT_DLIB = lib$(MINISAT).so# Name of MiniSat shared library.
+-
+-# Shared Library Version
+-SOMAJOR=2
+-SOMINOR=1
+-SORELEASE?=.0#   Declare empty to leave out from library file name.
+-
+-MINISAT_CXXFLAGS = -I. -D __STDC_LIMIT_MACROS -D __STDC_FORMAT_MACROS -Wall -Wno-parentheses -Wextra
+-MINISAT_LDFLAGS  = -Wall -lz
+-
+-ECHO=@echo
+-ifeq ($(VERB),)
+-VERB=@
+-else
+-VERB=
+-endif
+-
+-SRCS = $(wildcard minisat/core/*.cc) $(wildcard minisat/simp/*.cc) $(wildcard minisat/utils/*.cc)
+-HDRS = $(wildcard minisat/mtl/*.h) $(wildcard minisat/core/*.h) $(wildcard minisat/simp/*.h) $(wildcard minisat/utils/*.h)
+-OBJS = $(filter-out %Main.o, $(SRCS:.cc=.o))
+-
+-r:	$(BUILD_DIR)/release/bin/$(MINISAT)
+-d:	$(BUILD_DIR)/debug/bin/$(MINISAT)
+-p:	$(BUILD_DIR)/profile/bin/$(MINISAT)
+-sh:	$(BUILD_DIR)/dynamic/bin/$(MINISAT)
+-
+-cr:	$(BUILD_DIR)/release/bin/$(MINISAT_CORE)
+-cd:	$(BUILD_DIR)/debug/bin/$(MINISAT_CORE)
+-cp:	$(BUILD_DIR)/profile/bin/$(MINISAT_CORE)
+-csh:	$(BUILD_DIR)/dynamic/bin/$(MINISAT_CORE)
+-
+-lr:	$(BUILD_DIR)/release/lib/$(MINISAT_SLIB)
+-ld:	$(BUILD_DIR)/debug/lib/$(MINISAT_SLIB)
+-lp:	$(BUILD_DIR)/profile/lib/$(MINISAT_SLIB)
+-lsh:	$(BUILD_DIR)/dynamic/lib/$(MINISAT_DLIB).$(SOMAJOR).$(SOMINOR)$(SORELEASE)
+-
+-## Build-type Compile-flags:
+-$(BUILD_DIR)/release/%.o:			MINISAT_CXXFLAGS +=$(MINISAT_REL) $(MINISAT_RELSYM)
+-$(BUILD_DIR)/debug/%.o:				MINISAT_CXXFLAGS +=$(MINISAT_DEB) -g
+-$(BUILD_DIR)/profile/%.o:			MINISAT_CXXFLAGS +=$(MINISAT_PRF) -pg
+-$(BUILD_DIR)/dynamic/%.o:			MINISAT_CXXFLAGS +=$(MINISAT_REL) $(MINISAT_FPIC)
+-
+-## Build-type Link-flags:
+-$(BUILD_DIR)/profile/bin/$(MINISAT):		MINISAT_LDFLAGS += -pg
+-$(BUILD_DIR)/release/bin/$(MINISAT):		MINISAT_LDFLAGS += --static $(MINISAT_RELSYM)
+-$(BUILD_DIR)/profile/bin/$(MINISAT_CORE):	MINISAT_LDFLAGS += -pg
+-$(BUILD_DIR)/release/bin/$(MINISAT_CORE):	MINISAT_LDFLAGS += --static $(MINISAT_RELSYM)
+-
+-## Executable dependencies
+-$(BUILD_DIR)/release/bin/$(MINISAT):	 	$(BUILD_DIR)/release/minisat/simp/Main.o $(BUILD_DIR)/release/lib/$(MINISAT_SLIB)
+-$(BUILD_DIR)/debug/bin/$(MINISAT):	 	$(BUILD_DIR)/debug/minisat/simp/Main.o $(BUILD_DIR)/debug/lib/$(MINISAT_SLIB)
+-$(BUILD_DIR)/profile/bin/$(MINISAT):	 	$(BUILD_DIR)/profile/minisat/simp/Main.o $(BUILD_DIR)/profile/lib/$(MINISAT_SLIB)
+-# need the main-file be compiled with fpic?
+-$(BUILD_DIR)/dynamic/bin/$(MINISAT):	 	$(BUILD_DIR)/dynamic/minisat/simp/Main.o $(BUILD_DIR)/dynamic/lib/$(MINISAT_DLIB)
+-
+-## Executable dependencies (core-version)
+-$(BUILD_DIR)/release/bin/$(MINISAT_CORE):	$(BUILD_DIR)/release/minisat/core/Main.o $(BUILD_DIR)/release/lib/$(MINISAT_SLIB)
+-$(BUILD_DIR)/debug/bin/$(MINISAT_CORE):	 	$(BUILD_DIR)/debug/minisat/core/Main.o $(BUILD_DIR)/debug/lib/$(MINISAT_SLIB)
+-$(BUILD_DIR)/profile/bin/$(MINISAT_CORE):	$(BUILD_DIR)/profile/minisat/core/Main.o $(BUILD_DIR)/profile/lib/$(MINISAT_SLIB)
+-# need the main-file be compiled with fpic?
+-$(BUILD_DIR)/dynamic/bin/$(MINISAT_CORE): 	$(BUILD_DIR)/dynamic/minisat/core/Main.o $(BUILD_DIR)/dynamic/lib/$(MINISAT_DLIB)
+-
+-## Library dependencies
+-$(BUILD_DIR)/release/lib/$(MINISAT_SLIB):	$(foreach o,$(OBJS),$(BUILD_DIR)/release/$(o))
+-$(BUILD_DIR)/debug/lib/$(MINISAT_SLIB):		$(foreach o,$(OBJS),$(BUILD_DIR)/debug/$(o))
+-$(BUILD_DIR)/profile/lib/$(MINISAT_SLIB):	$(foreach o,$(OBJS),$(BUILD_DIR)/profile/$(o))
+-$(BUILD_DIR)/dynamic/lib/$(MINISAT_DLIB).$(SOMAJOR).$(SOMINOR)$(SORELEASE)\
+- $(BUILD_DIR)/dynamic/lib/$(MINISAT_DLIB).$(SOMAJOR)\
+- $(BUILD_DIR)/dynamic/lib/$(MINISAT_DLIB):	$(foreach o,$(OBJS),$(BUILD_DIR)/dynamic/$(o))
+-
+-## Compile rules (these should be unified, buit I have not yet found a way which works in GNU Make)
+-$(BUILD_DIR)/release/%.o:	%.cc
+-	$(ECHO) Compiling: $@
+-	$(VERB) mkdir -p $(dir $@)
+-	$(VERB) $(CXX) $(MINISAT_CXXFLAGS) $(CXXFLAGS) -c -o $@ $< -MMD -MF $(BUILD_DIR)/release/$*.d
+-
+-$(BUILD_DIR)/profile/%.o:	%.cc
+-	$(ECHO) Compiling: $@
+-	$(VERB) mkdir -p $(dir $@)
+-	$(VERB) $(CXX) $(MINISAT_CXXFLAGS) $(CXXFLAGS) -c -o $@ $< -MMD -MF $(BUILD_DIR)/profile/$*.d
+-
+-$(BUILD_DIR)/debug/%.o:	%.cc
+-	$(ECHO) Compiling: $@
+-	$(VERB) mkdir -p $(dir $@)
+-	$(VERB) $(CXX) $(MINISAT_CXXFLAGS) $(CXXFLAGS) -c -o $@ $< -MMD -MF $(BUILD_DIR)/debug/$*.d
+-
+-$(BUILD_DIR)/dynamic/%.o:	%.cc
+-	$(ECHO) Compiling: $@
+-	$(VERB) mkdir -p $(dir $@)
+-	$(VERB) $(CXX) $(MINISAT_CXXFLAGS) $(CXXFLAGS) -c -o $@ $< -MMD -MF $(BUILD_DIR)/dynamic/$*.d
+-
+-## Linking rule
+-$(BUILD_DIR)/release/bin/$(MINISAT) $(BUILD_DIR)/debug/bin/$(MINISAT) $(BUILD_DIR)/profile/bin/$(MINISAT) $(BUILD_DIR)/dynamic/bin/$(MINISAT)\
+-$(BUILD_DIR)/release/bin/$(MINISAT_CORE) $(BUILD_DIR)/debug/bin/$(MINISAT_CORE) $(BUILD_DIR)/profile/bin/$(MINISAT_CORE) $(BUILD_DIR)/dynamic/bin/$(MINISAT_CORE):
+-	$(ECHO) Linking Binary: $@
+-	$(VERB) mkdir -p $(dir $@)
+-	$(VERB) $(CXX) $^ $(MINISAT_LDFLAGS) $(LDFLAGS) -o $@
+-
+-## Static Library rule
+-%/lib/$(MINISAT_SLIB):
+-	$(ECHO) Linking Static Library: $@
+-	$(VERB) mkdir -p $(dir $@)
+-	$(VERB) $(AR) -rcs $@ $^
+-
+-## Shared Library rule
+-$(BUILD_DIR)/dynamic/lib/$(MINISAT_DLIB).$(SOMAJOR).$(SOMINOR)$(SORELEASE)\
+- $(BUILD_DIR)/dynamic/lib/$(MINISAT_DLIB).$(SOMAJOR)\
+- $(BUILD_DIR)/dynamic/lib/$(MINISAT_DLIB):
+-	$(ECHO) Linking Shared Library: $@
+-	$(VERB) mkdir -p $(dir $@)
+-	$(VERB) $(CXX) $(MINISAT_LDFLAGS) $(LDFLAGS) -o $@ -shared -Wl,-soname,$(MINISAT_DLIB).$(SOMAJOR) $^
+-	$(VERB) ln -sf $(MINISAT_DLIB).$(SOMAJOR).$(SOMINOR)$(SORELEASE) $(BUILD_DIR)/dynamic/lib/$(MINISAT_DLIB).$(SOMAJOR)
+-	$(VERB) ln -sf $(MINISAT_DLIB).$(SOMAJOR) $(BUILD_DIR)/dynamic/lib/$(MINISAT_DLIB)
+-
+-install:	install-headers install-lib install-bin
+-install-debug:	install-headers install-lib-debug
+-
+-install-headers:
+-#       Create directories
+-	$(INSTALL) -d $(DESTDIR)$(includedir)/minisat
+-	for dir in mtl utils core simp; do \
+-	  $(INSTALL) -d $(DESTDIR)$(includedir)/minisat/$$dir ; \
+-	done
+-#       Install headers
+-	for h in $(HDRS) ; do \
+-	  $(INSTALL) -m 644 $$h $(DESTDIR)$(includedir)/$$h ; \
+-	done
+-
+-install-lib-debug: $(BUILD_DIR)/debug/lib/$(MINISAT_SLIB)
+-	$(INSTALL) -d $(DESTDIR)$(libdir)
+-	$(INSTALL) -m 644 $(BUILD_DIR)/debug/lib/$(MINISAT_SLIB) $(DESTDIR)$(libdir)
+-
+-install-lib: $(BUILD_DIR)/release/lib/$(MINISAT_SLIB) $(BUILD_DIR)/dynamic/lib/$(MINISAT_DLIB).$(SOMAJOR).$(SOMINOR)$(SORELEASE)
+-	$(INSTALL) -d $(DESTDIR)$(libdir)
+-	$(INSTALL) -m 644 $(BUILD_DIR)/dynamic/lib/$(MINISAT_DLIB).$(SOMAJOR).$(SOMINOR)$(SORELEASE) $(DESTDIR)$(libdir)
+-	ln -sf $(MINISAT_DLIB).$(SOMAJOR).$(SOMINOR)$(SORELEASE) $(DESTDIR)$(libdir)/$(MINISAT_DLIB).$(SOMAJOR)
+-	ln -sf $(MINISAT_DLIB).$(SOMAJOR) $(DESTDIR)$(libdir)/$(MINISAT_DLIB)
+-	$(INSTALL) -m 644 $(BUILD_DIR)/release/lib/$(MINISAT_SLIB) $(DESTDIR)$(libdir)
+-
+-install-bin: $(BUILD_DIR)/dynamic/bin/$(MINISAT)
+-	$(INSTALL) -d $(DESTDIR)$(bindir)
+-	$(INSTALL) -m 755 $(BUILD_DIR)/dynamic/bin/$(MINISAT) $(DESTDIR)$(bindir)
++# CMAKE generated file: DO NOT EDIT!
++# Generated by "Unix Makefiles" Generator, CMake Version 3.19
+ 
++# Default target executed when no arguments are given to make.
++default_target: all
++
++.PHONY : default_target
++
++# Allow only one "make -f Makefile2" at a time, but pass parallelism.
++.NOTPARALLEL:
++
++
++#=============================================================================
++# Special targets provided by cmake.
++
++# Disable implicit rules so canonical targets will work.
++.SUFFIXES:
++
++
++# Disable VCS-based implicit rules.
++% : %,v
++
++
++# Disable VCS-based implicit rules.
++% : RCS/%
++
++
++# Disable VCS-based implicit rules.
++% : RCS/%,v
++
++
++# Disable VCS-based implicit rules.
++% : SCCS/s.%
++
++
++# Disable VCS-based implicit rules.
++% : s.%
++
++
++.SUFFIXES: .hpux_make_needs_suffix_list
++
++
++# Command-line flag to silence nested $(MAKE).
++$(VERBOSE)MAKESILENT = -s
++
++#Suppress display of executed commands.
++$(VERBOSE).SILENT:
++
++# A target that is always out of date.
++cmake_force:
++
++.PHONY : cmake_force
++
++#=============================================================================
++# Set environment variables for the build.
++
++# The shell in which to execute make rules.
++SHELL = /bin/sh
++
++# The CMake executable.
++CMAKE_COMMAND = /home/craig/.local/share/JetBrains/Toolbox/apps/CLion/ch-0/211.7442.42/bin/cmake/linux/bin/cmake
++
++# The command to remove a file.
++RM = /home/craig/.local/share/JetBrains/Toolbox/apps/CLion/ch-0/211.7442.42/bin/cmake/linux/bin/cmake -E rm -f
++
++# Escaping for special characters.
++EQUALS = =
++
++# The top-level source directory on which CMake was run.
++CMAKE_SOURCE_DIR = /home/craig/Documents/code/monolith
++
++# The top-level build directory on which CMake was run.
++CMAKE_BINARY_DIR = /home/craig/Documents/code/monolith
++
++#=============================================================================
++# Targets provided globally by CMake.
++
++# Special rule for the target install/strip
++install/strip: preinstall
++	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Installing the project stripped..."
++	/home/craig/.local/share/JetBrains/Toolbox/apps/CLion/ch-0/211.7442.42/bin/cmake/linux/bin/cmake -DCMAKE_INSTALL_DO_STRIP=1 -P cmake_install.cmake
++.PHONY : install/strip
++
++# Special rule for the target install/strip
++install/strip/fast: preinstall/fast
++	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Installing the project stripped..."
++	/home/craig/.local/share/JetBrains/Toolbox/apps/CLion/ch-0/211.7442.42/bin/cmake/linux/bin/cmake -DCMAKE_INSTALL_DO_STRIP=1 -P cmake_install.cmake
++.PHONY : install/strip/fast
++
++# Special rule for the target install/local
++install/local: preinstall
++	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Installing only the local directory..."
++	/home/craig/.local/share/JetBrains/Toolbox/apps/CLion/ch-0/211.7442.42/bin/cmake/linux/bin/cmake -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake
++.PHONY : install/local
++
++# Special rule for the target install/local
++install/local/fast: preinstall/fast
++	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Installing only the local directory..."
++	/home/craig/.local/share/JetBrains/Toolbox/apps/CLion/ch-0/211.7442.42/bin/cmake/linux/bin/cmake -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake
++.PHONY : install/local/fast
++
++# Special rule for the target install
++install: preinstall
++	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Install the project..."
++	/home/craig/.local/share/JetBrains/Toolbox/apps/CLion/ch-0/211.7442.42/bin/cmake/linux/bin/cmake -P cmake_install.cmake
++.PHONY : install
++
++# Special rule for the target install
++install/fast: preinstall/fast
++	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Install the project..."
++	/home/craig/.local/share/JetBrains/Toolbox/apps/CLion/ch-0/211.7442.42/bin/cmake/linux/bin/cmake -P cmake_install.cmake
++.PHONY : install/fast
++
++# Special rule for the target list_install_components
++list_install_components:
++	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Available install components are: \"Unspecified\" \"libprotobuf\" \"libprotobuf-lite\" \"libprotoc\" \"protobuf-export\" \"protobuf-headers\" \"protobuf-protos\" \"protoc\""
++.PHONY : list_install_components
++
++# Special rule for the target list_install_components
++list_install_components/fast: list_install_components
++
++.PHONY : list_install_components/fast
++
++# Special rule for the target rebuild_cache
++rebuild_cache:
++	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake to regenerate build system..."
++	/home/craig/.local/share/JetBrains/Toolbox/apps/CLion/ch-0/211.7442.42/bin/cmake/linux/bin/cmake --regenerate-during-build -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
++.PHONY : rebuild_cache
++
++# Special rule for the target rebuild_cache
++rebuild_cache/fast: rebuild_cache
++
++.PHONY : rebuild_cache/fast
++
++# Special rule for the target test
++test:
++	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running tests..."
++	/home/craig/.local/share/JetBrains/Toolbox/apps/CLion/ch-0/211.7442.42/bin/cmake/linux/bin/ctest --force-new-ctest-process $(ARGS)
++.PHONY : test
++
++# Special rule for the target test
++test/fast: test
++
++.PHONY : test/fast
++
++# Special rule for the target edit_cache
++edit_cache:
++	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "No interactive CMake dialog available..."
++	/home/craig/.local/share/JetBrains/Toolbox/apps/CLion/ch-0/211.7442.42/bin/cmake/linux/bin/cmake -E echo No\ interactive\ CMake\ dialog\ available.
++.PHONY : edit_cache
++
++# Special rule for the target edit_cache
++edit_cache/fast: edit_cache
++
++.PHONY : edit_cache/fast
++
++# The main all target
++all: cmake_check_build_system
++	cd /home/craig/Documents/code/monolith && $(CMAKE_COMMAND) -E cmake_progress_start /home/craig/Documents/code/monolith/CMakeFiles /home/craig/Documents/code/monolith/third-party/minisat//CMakeFiles/progress.marks
++	cd /home/craig/Documents/code/monolith && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 third-party/minisat/all
++	$(CMAKE_COMMAND) -E cmake_progress_start /home/craig/Documents/code/monolith/CMakeFiles 0
++.PHONY : all
++
++# The main clean target
+ clean:
+-	rm -f $(foreach t, release debug profile dynamic, $(foreach o, $(SRCS:.cc=.o), $(BUILD_DIR)/$t/$o)) \
+-          $(foreach t, release debug profile dynamic, $(foreach d, $(SRCS:.cc=.d), $(BUILD_DIR)/$t/$d)) \
+-	  $(foreach t, release debug profile dynamic, $(BUILD_DIR)/$t/bin/$(MINISAT_CORE) $(BUILD_DIR)/$t/bin/$(MINISAT)) \
+-	  $(foreach t, release debug profile, $(BUILD_DIR)/$t/lib/$(MINISAT_SLIB)) \
+-	  $(BUILD_DIR)/dynamic/lib/$(MINISAT_DLIB).$(SOMAJOR).$(SOMINOR)$(SORELEASE)\
+-	  $(BUILD_DIR)/dynamic/lib/$(MINISAT_DLIB).$(SOMAJOR)\
+-	  $(BUILD_DIR)/dynamic/lib/$(MINISAT_DLIB)
+-
+-distclean:	clean
+-	rm -f config.mk
+-
+-## Include generated dependencies
+--include $(foreach s, $(SRCS:.cc=.d), $(BUILD_DIR)/release/$s)
+--include $(foreach s, $(SRCS:.cc=.d), $(BUILD_DIR)/debug/$s)
+--include $(foreach s, $(SRCS:.cc=.d), $(BUILD_DIR)/profile/$s)
+--include $(foreach s, $(SRCS:.cc=.d), $(BUILD_DIR)/dynamic/$s)
++	cd /home/craig/Documents/code/monolith && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 third-party/minisat/clean
++.PHONY : clean
++
++# The main clean target
++clean/fast: clean
++
++.PHONY : clean/fast
++
++# Prepare targets for installation.
++preinstall: all
++	cd /home/craig/Documents/code/monolith && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 third-party/minisat/preinstall
++.PHONY : preinstall
++
++# Prepare targets for installation.
++preinstall/fast:
++	cd /home/craig/Documents/code/monolith && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 third-party/minisat/preinstall
++.PHONY : preinstall/fast
++
++# clear depends
++depend:
++	cd /home/craig/Documents/code/monolith && $(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 1
++.PHONY : depend
++
++# Convenience name for target.
++third-party/minisat/CMakeFiles/minisat-lib-static.dir/rule:
++	cd /home/craig/Documents/code/monolith && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 third-party/minisat/CMakeFiles/minisat-lib-static.dir/rule
++.PHONY : third-party/minisat/CMakeFiles/minisat-lib-static.dir/rule
++
++# Convenience name for target.
++minisat-lib-static: third-party/minisat/CMakeFiles/minisat-lib-static.dir/rule
++
++.PHONY : minisat-lib-static
++
++# fast build rule for target.
++minisat-lib-static/fast:
++	cd /home/craig/Documents/code/monolith && $(MAKE) $(MAKESILENT) -f third-party/minisat/CMakeFiles/minisat-lib-static.dir/build.make third-party/minisat/CMakeFiles/minisat-lib-static.dir/build
++.PHONY : minisat-lib-static/fast
++
++minisat/core/Solver.o: minisat/core/Solver.cc.o
++
++.PHONY : minisat/core/Solver.o
++
++# target to build an object file
++minisat/core/Solver.cc.o:
++	cd /home/craig/Documents/code/monolith && $(MAKE) $(MAKESILENT) -f third-party/minisat/CMakeFiles/minisat-lib-static.dir/build.make third-party/minisat/CMakeFiles/minisat-lib-static.dir/minisat/core/Solver.cc.o
++.PHONY : minisat/core/Solver.cc.o
++
++minisat/core/Solver.i: minisat/core/Solver.cc.i
++
++.PHONY : minisat/core/Solver.i
++
++# target to preprocess a source file
++minisat/core/Solver.cc.i:
++	cd /home/craig/Documents/code/monolith && $(MAKE) $(MAKESILENT) -f third-party/minisat/CMakeFiles/minisat-lib-static.dir/build.make third-party/minisat/CMakeFiles/minisat-lib-static.dir/minisat/core/Solver.cc.i
++.PHONY : minisat/core/Solver.cc.i
++
++minisat/core/Solver.s: minisat/core/Solver.cc.s
++
++.PHONY : minisat/core/Solver.s
++
++# target to generate assembly for a file
++minisat/core/Solver.cc.s:
++	cd /home/craig/Documents/code/monolith && $(MAKE) $(MAKESILENT) -f third-party/minisat/CMakeFiles/minisat-lib-static.dir/build.make third-party/minisat/CMakeFiles/minisat-lib-static.dir/minisat/core/Solver.cc.s
++.PHONY : minisat/core/Solver.cc.s
++
++minisat/simp/SimpSolver.o: minisat/simp/SimpSolver.cc.o
++
++.PHONY : minisat/simp/SimpSolver.o
++
++# target to build an object file
++minisat/simp/SimpSolver.cc.o:
++	cd /home/craig/Documents/code/monolith && $(MAKE) $(MAKESILENT) -f third-party/minisat/CMakeFiles/minisat-lib-static.dir/build.make third-party/minisat/CMakeFiles/minisat-lib-static.dir/minisat/simp/SimpSolver.cc.o
++.PHONY : minisat/simp/SimpSolver.cc.o
++
++minisat/simp/SimpSolver.i: minisat/simp/SimpSolver.cc.i
++
++.PHONY : minisat/simp/SimpSolver.i
++
++# target to preprocess a source file
++minisat/simp/SimpSolver.cc.i:
++	cd /home/craig/Documents/code/monolith && $(MAKE) $(MAKESILENT) -f third-party/minisat/CMakeFiles/minisat-lib-static.dir/build.make third-party/minisat/CMakeFiles/minisat-lib-static.dir/minisat/simp/SimpSolver.cc.i
++.PHONY : minisat/simp/SimpSolver.cc.i
++
++minisat/simp/SimpSolver.s: minisat/simp/SimpSolver.cc.s
++
++.PHONY : minisat/simp/SimpSolver.s
++
++# target to generate assembly for a file
++minisat/simp/SimpSolver.cc.s:
++	cd /home/craig/Documents/code/monolith && $(MAKE) $(MAKESILENT) -f third-party/minisat/CMakeFiles/minisat-lib-static.dir/build.make third-party/minisat/CMakeFiles/minisat-lib-static.dir/minisat/simp/SimpSolver.cc.s
++.PHONY : minisat/simp/SimpSolver.cc.s
++
++minisat/utils/Options.o: minisat/utils/Options.cc.o
++
++.PHONY : minisat/utils/Options.o
++
++# target to build an object file
++minisat/utils/Options.cc.o:
++	cd /home/craig/Documents/code/monolith && $(MAKE) $(MAKESILENT) -f third-party/minisat/CMakeFiles/minisat-lib-static.dir/build.make third-party/minisat/CMakeFiles/minisat-lib-static.dir/minisat/utils/Options.cc.o
++.PHONY : minisat/utils/Options.cc.o
++
++minisat/utils/Options.i: minisat/utils/Options.cc.i
++
++.PHONY : minisat/utils/Options.i
++
++# target to preprocess a source file
++minisat/utils/Options.cc.i:
++	cd /home/craig/Documents/code/monolith && $(MAKE) $(MAKESILENT) -f third-party/minisat/CMakeFiles/minisat-lib-static.dir/build.make third-party/minisat/CMakeFiles/minisat-lib-static.dir/minisat/utils/Options.cc.i
++.PHONY : minisat/utils/Options.cc.i
++
++minisat/utils/Options.s: minisat/utils/Options.cc.s
++
++.PHONY : minisat/utils/Options.s
++
++# target to generate assembly for a file
++minisat/utils/Options.cc.s:
++	cd /home/craig/Documents/code/monolith && $(MAKE) $(MAKESILENT) -f third-party/minisat/CMakeFiles/minisat-lib-static.dir/build.make third-party/minisat/CMakeFiles/minisat-lib-static.dir/minisat/utils/Options.cc.s
++.PHONY : minisat/utils/Options.cc.s
++
++minisat/utils/System.o: minisat/utils/System.cc.o
++
++.PHONY : minisat/utils/System.o
++
++# target to build an object file
++minisat/utils/System.cc.o:
++	cd /home/craig/Documents/code/monolith && $(MAKE) $(MAKESILENT) -f third-party/minisat/CMakeFiles/minisat-lib-static.dir/build.make third-party/minisat/CMakeFiles/minisat-lib-static.dir/minisat/utils/System.cc.o
++.PHONY : minisat/utils/System.cc.o
++
++minisat/utils/System.i: minisat/utils/System.cc.i
++
++.PHONY : minisat/utils/System.i
++
++# target to preprocess a source file
++minisat/utils/System.cc.i:
++	cd /home/craig/Documents/code/monolith && $(MAKE) $(MAKESILENT) -f third-party/minisat/CMakeFiles/minisat-lib-static.dir/build.make third-party/minisat/CMakeFiles/minisat-lib-static.dir/minisat/utils/System.cc.i
++.PHONY : minisat/utils/System.cc.i
++
++minisat/utils/System.s: minisat/utils/System.cc.s
++
++.PHONY : minisat/utils/System.s
++
++# target to generate assembly for a file
++minisat/utils/System.cc.s:
++	cd /home/craig/Documents/code/monolith && $(MAKE) $(MAKESILENT) -f third-party/minisat/CMakeFiles/minisat-lib-static.dir/build.make third-party/minisat/CMakeFiles/minisat-lib-static.dir/minisat/utils/System.cc.s
++.PHONY : minisat/utils/System.cc.s
++
++# Help Target
++help:
++	@echo "The following are some of the valid targets for this Makefile:"
++	@echo "... all (the default if no target is provided)"
++	@echo "... clean"
++	@echo "... depend"
++	@echo "... edit_cache"
++	@echo "... install"
++	@echo "... install/local"
++	@echo "... install/strip"
++	@echo "... list_install_components"
++	@echo "... rebuild_cache"
++	@echo "... test"
++	@echo "... minisat-lib-static"
++	@echo "... minisat/core/Solver.o"
++	@echo "... minisat/core/Solver.i"
++	@echo "... minisat/core/Solver.s"
++	@echo "... minisat/simp/SimpSolver.o"
++	@echo "... minisat/simp/SimpSolver.i"
++	@echo "... minisat/simp/SimpSolver.s"
++	@echo "... minisat/utils/Options.o"
++	@echo "... minisat/utils/Options.i"
++	@echo "... minisat/utils/Options.s"
++	@echo "... minisat/utils/System.o"
++	@echo "... minisat/utils/System.i"
++	@echo "... minisat/utils/System.s"
++.PHONY : help
++
++
++
++#=============================================================================
++# Special targets to cleanup operation of make.
++
++# Special rule to run CMake to check the build system integrity.
++# No rule that depends on this can have commands that come from listfiles
++# because they might be regenerated.
++cmake_check_build_system:
++	cd /home/craig/Documents/code/monolith && $(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 0
++.PHONY : cmake_check_build_system
++
+diff --git a/third-party/minisatp/Makefile b/third-party/minisatp/Makefile
+index 709ebf1..84c9ae1 100644
+--- a/third-party/minisatp/Makefile
++++ b/third-party/minisatp/Makefile
+@@ -1,177 +1,591 @@
+-## TODO ###########################################################################################
+-#
+-
+-.PHONY:	r d p sh cr cd cp csh lr ld lp lsh config all install clean \
+-	distclean
+-all:	r lr lsh
+-
+-## Load Previous Configuration ####################################################################
+-
+--include config.mk
+-
+-## Configurable options ###########################################################################
+-
+-# Directory to store object files, libraries, executables, and dependencies:
+-BUILD_DIR      ?= build
+-
+-# Include debug-symbols in release builds
+-MINISATP_RELSYM ?= -g
+-
+-# Sets of compile flags for different build types
+-MINISATP_REL    ?= -O3 -D NDEBUG
+-MINISATP_DEB    ?= -O0 -D DEBUG 
+-MINISATP_PRF    ?= -O3 -D NDEBUG
+-MINISATP_FPIC   ?= -fpic
+-
+-# GNU Standard Install Variables
+-exec_prefix ?= $(prefix)
+-includedir  ?= $(prefix)/include
+-bindir      ?= $(exec_prefix)/bin
+-libdir      ?= $(exec_prefix)/lib
+-datarootdir ?= $(prefix)/share
+-mandir      ?= $(datarootdir)/man
+-
+-# Dependencies
+-MINISAT_INCLUDE?=-I$(includedir)
+-MINISAT_LIB    ?=-L$(libdir) -lminisat
+-
+-## Write Configuration  ###########################################################################
+-
+-config:
+-	@( echo 'BUILD_DIR?=$(BUILD_DIR)'             ; \
+-	   echo 'MINISATP_RELSYM?=$(MINISATP_RELSYM)'           ; \
+-	   echo 'MINISATP_REL?=$(MINISATP_REL)'                 ; \
+-	   echo 'MINISATP_DEB?=$(MINISATP_DEB)'                 ; \
+-	   echo 'MINISATP_PRF?=$(MINISATP_PRF)'                 ; \
+-	   echo 'MINISATP_FPIC?=$(MINISATP_FPIC)'               ; \
+-	   echo 'MINISAT_INCLUDE?=$(MINISAT_INCLUDE)' ; \
+-	   echo 'MINISAT_LIB?=$(MINISAT_LIB)'         ; \
+-	   echo 'MCL_INCLUDE?=$(MCL_INCLUDE)'         ; \
+-	   echo 'MCL_LIB?=$(MCL_LIB)'                 ; \
+-	   echo 'prefix?=$(prefix)'                   ) > config.mk
+-
+-## Configurable options end #######################################################################
+-
+-INSTALL ?= install
+-
+-# Target file names
+-MINISATP      = minisatp#  Name of MiniSat+ main executable.
+-MINISATP_SLIB = libminisatp.a#  Name of MiniSat+ static library.
+-MINISATP_DLIB = libminisatp.so# Name of MiniSat+ shared library.
+-
+-# Shared Library Version
+-SOMAJOR=1
+-SOMINOR=0
+-SORELEASE?=.0#   Declare empty to leave out from library file name.
+-
+-MINISATP_CXXFLAGS = -IADTs -include Global.h -include Main.h -D_FILE_OFFSET_BITS=64 -D __STDC_LIMIT_MACROS -D __STDC_FORMAT_MACROS -Wall -Wno-parentheses -Wextra  $(MCL_INCLUDE) $(MINISAT_INCLUDE)
+-MINISATP_LDFLAGS  = -Wall  $(MCL_LIB) $(MINISAT_LIB) -lz -lgmp
+-
+-ifeq ($(VERB),)
+-ECHO=@
+-VERB=@
+-else
+-ECHO=#
+-VERB=
+-endif
+-
+-SRCS = $(wildcard *.cc) $(wildcard ADTs/*.cc)
+-HDRS = $(wildcard *.h)
+-OBJS = $(filter-out %Main.o, $(SRCS:.cc=.o))
+-
+-r:	$(BUILD_DIR)/release/bin/$(MINISATP)
+-d:	$(BUILD_DIR)/debug/bin/$(MINISATP)
+-p:	$(BUILD_DIR)/profile/bin/$(MINISATP)
+-sh:	$(BUILD_DIR)/dynamic/bin/$(MINISATP)
+-
+-lr:	$(BUILD_DIR)/release/lib/$(MINISATP_SLIB)
+-ld:	$(BUILD_DIR)/debug/lib/$(MINISATP_SLIB)
+-lp:	$(BUILD_DIR)/profile/lib/$(MINISATP_SLIB)
+-lsh:	$(BUILD_DIR)/dynamic/lib/$(MINISATP_DLIB).$(SOMAJOR).$(SOMINOR)$(SORELEASE)
+-
+-## Build-type Compile-flags:
+-$(BUILD_DIR)/release/%.o:			MINISATP_CXXFLAGS +=$(MINISATP_REL) $(MINISATP_RELSYM)
+-$(BUILD_DIR)/debug/%.o:				MINISATP_CXXFLAGS +=$(MINISATP_DEB) -g
+-$(BUILD_DIR)/profile/%.o:			MINISATP_CXXFLAGS +=$(MINISATP_PRF) -pg
+-$(BUILD_DIR)/dynamic/%.o:			MINISATP_CXXFLAGS +=$(MINISATP_REL) $(MINISATP_FPIC)
+-
+-## Build-type Link-flags:
+-$(BUILD_DIR)/profile/bin/$(MINISATP):		MINISATP_LDFLAGS += -pg
+-$(BUILD_DIR)/release/bin/$(MINISATP):		MINISATP_LDFLAGS += --static $(MINISATP_RELSYM)
+-$(BUILD_DIR)/debug/bin/$(MINISATP):	        MINISATP_LDFLAGS += --static
+-
+-## Executable dependencies
+-$(BUILD_DIR)/release/bin/$(MINISATP):	 	$(BUILD_DIR)/release/Main.o $(BUILD_DIR)/release/lib/$(MINISATP_SLIB)
+-$(BUILD_DIR)/debug/bin/$(MINISATP):	 	$(BUILD_DIR)/debug/Main.o $(BUILD_DIR)/debug/lib/$(MINISATP_SLIB)
+-$(BUILD_DIR)/profile/bin/$(MINISATP):	 	$(BUILD_DIR)/profile/Main.o $(BUILD_DIR)/profile/lib/$(MINISATP_SLIB)
+-# need the main-file be compiled with fpic?
+-$(BUILD_DIR)/dynamic/bin/$(MINISATP):	 	$(BUILD_DIR)/dynamic/Main.o $(BUILD_DIR)/dynamic/lib/$(MINISATP_DLIB)
+-
+-## Library dependencies
+-$(BUILD_DIR)/release/lib/$(MINISATP_SLIB):	$(foreach o,$(OBJS),$(BUILD_DIR)/release/$(o))
+-$(BUILD_DIR)/debug/lib/$(MINISATP_SLIB):	$(foreach o,$(OBJS),$(BUILD_DIR)/debug/$(o))
+-$(BUILD_DIR)/profile/lib/$(MINISATP_SLIB):	$(foreach o,$(OBJS),$(BUILD_DIR)/profile/$(o))
+-$(BUILD_DIR)/dynamic/lib/$(MINISATP_DLIB).$(SOMAJOR).$(SOMINOR)$(SORELEASE):	$(foreach o,$(OBJS),$(BUILD_DIR)/dynamic/$(o))
+-
+-## Compile rules (these should be unified, buit I have not yet found a way which works in GNU Make)
+-$(BUILD_DIR)/release/%.o:	%.cc
+-	$(ECHO) echo Compiling: $@
+-	$(VERB) mkdir -p $(dir $@) $(dir $(BUILD_DIR)/dep/$*.d)
+-	$(VERB) $(CXX) $(MINISATP_CXXFLAGS) $(CXXFLAGS) -c -o $@ $< -MMD -MF $(BUILD_DIR)/dep/$*.d
+-
+-$(BUILD_DIR)/profile/%.o:	%.cc
+-	$(ECHO) echo Compiling: $@
+-	$(VERB) mkdir -p $(dir $@) $(dir $(BUILD_DIR)/dep/$*.d)
+-	$(VERB) $(CXX) $(MINISATP_CXXFLAGS) $(CXXFLAGS) -c -o $@ $< -MMD -MF $(BUILD_DIR)/dep/$*.d
+-
+-$(BUILD_DIR)/debug/%.o:	%.cc
+-	$(ECHO) echo Compiling: $@
+-	$(VERB) mkdir -p $(dir $@) $(dir $(BUILD_DIR)/dep/$*.d)
+-	$(VERB) $(CXX) $(MINISATP_CXXFLAGS) $(CXXFLAGS) -c -o $@ $< -MMD -MF $(BUILD_DIR)/dep/$*.d
+-
+-$(BUILD_DIR)/dynamic/%.o:	%.cc
+-	$(ECHO) echo Compiling: $@
+-	$(VERB) mkdir -p $(dir $@) $(dir $(BUILD_DIR)/dep/$*.d)
+-	$(VERB) $(CXX) $(MINISATP_CXXFLAGS) $(CXXFLAGS) -c -o $@ $< -MMD -MF $(BUILD_DIR)/dep/$*.d
+-
+-## Linking rule
+-$(BUILD_DIR)/release/bin/$(MINISATP) $(BUILD_DIR)/debug/bin/$(MINISATP) $(BUILD_DIR)/profile/bin/$(MINISATP) $(BUILD_DIR)/dynamic/bin/$(MINISATP):
+-	$(ECHO) echo Linking Binary: $@
+-	$(VERB) mkdir -p $(dir $@)
+-	$(VERB) $(CXX) $^ $(MINISATP_LDFLAGS) $(LDFLAGS) -o $@
+-
+-## Static Library rule
+-%/lib/$(MINISATP_SLIB):
+-	$(ECHO) echo Linking Static Library: $@
+-	$(VERB) mkdir -p $(dir $@)
+-	$(VERB) $(AR) -rcs $@ $^
+-
+-## Shared Library rule
+-$(BUILD_DIR)/dynamic/lib/$(MINISATP_DLIB).$(SOMAJOR).$(SOMINOR)$(SORELEASE)\
+- $(BUILD_DIR)/dynamic/lib/$(MINISATP_DLIB).$(SOMAJOR)\
+- $(BUILD_DIR)/dynamic/lib/$(MINISATP_DLIB):
+-	$(ECHO) echo Linking Shared Library: $@
+-	$(VERB) mkdir -p $(dir $@)
+-	$(VERB) $(CXX) $(MINISATP_LDFLAGS) -o $@ -shared -Wl,-soname,$(MINISATP_DLIB).$(SOMAJOR) $^
+-	$(VERB) ln -sf $(MINISATP_DLIB).$(SOMAJOR).$(SOMINOR)$(SORELEASE) $(BUILD_DIR)/dynamic/lib/$(MINISATP_DLIB).$(SOMAJOR)
+-	$(VERB) ln -sf $(MINISATP_DLIB).$(SOMAJOR) $(BUILD_DIR)/dynamic/lib/$(MINISATP_DLIB)
+-
+-install:	install-bin
+-
+-install-bin: $(BUILD_DIR)/release/bin/$(MINISATP)
+-	$(INSTALL) -d $(DESTDIR)$(bindir)
+-	$(INSTALL) $(BUILD_DIR)/release/bin/$(MINISATP) $(DESTDIR)$(bindir)/
++# CMAKE generated file: DO NOT EDIT!
++# Generated by "Unix Makefiles" Generator, CMake Version 3.19
+ 
++# Default target executed when no arguments are given to make.
++default_target: all
++
++.PHONY : default_target
++
++# Allow only one "make -f Makefile2" at a time, but pass parallelism.
++.NOTPARALLEL:
++
++
++#=============================================================================
++# Special targets provided by cmake.
++
++# Disable implicit rules so canonical targets will work.
++.SUFFIXES:
++
++
++# Disable VCS-based implicit rules.
++% : %,v
++
++
++# Disable VCS-based implicit rules.
++% : RCS/%
++
++
++# Disable VCS-based implicit rules.
++% : RCS/%,v
++
++
++# Disable VCS-based implicit rules.
++% : SCCS/s.%
++
++
++# Disable VCS-based implicit rules.
++% : s.%
++
++
++.SUFFIXES: .hpux_make_needs_suffix_list
++
++
++# Command-line flag to silence nested $(MAKE).
++$(VERBOSE)MAKESILENT = -s
++
++#Suppress display of executed commands.
++$(VERBOSE).SILENT:
++
++# A target that is always out of date.
++cmake_force:
++
++.PHONY : cmake_force
++
++#=============================================================================
++# Set environment variables for the build.
++
++# The shell in which to execute make rules.
++SHELL = /bin/sh
++
++# The CMake executable.
++CMAKE_COMMAND = /home/craig/.local/share/JetBrains/Toolbox/apps/CLion/ch-0/211.7442.42/bin/cmake/linux/bin/cmake
++
++# The command to remove a file.
++RM = /home/craig/.local/share/JetBrains/Toolbox/apps/CLion/ch-0/211.7442.42/bin/cmake/linux/bin/cmake -E rm -f
++
++# Escaping for special characters.
++EQUALS = =
++
++# The top-level source directory on which CMake was run.
++CMAKE_SOURCE_DIR = /home/craig/Documents/code/monolith
++
++# The top-level build directory on which CMake was run.
++CMAKE_BINARY_DIR = /home/craig/Documents/code/monolith
++
++#=============================================================================
++# Targets provided globally by CMake.
++
++# Special rule for the target install/strip
++install/strip: preinstall
++	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Installing the project stripped..."
++	/home/craig/.local/share/JetBrains/Toolbox/apps/CLion/ch-0/211.7442.42/bin/cmake/linux/bin/cmake -DCMAKE_INSTALL_DO_STRIP=1 -P cmake_install.cmake
++.PHONY : install/strip
++
++# Special rule for the target install/strip
++install/strip/fast: preinstall/fast
++	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Installing the project stripped..."
++	/home/craig/.local/share/JetBrains/Toolbox/apps/CLion/ch-0/211.7442.42/bin/cmake/linux/bin/cmake -DCMAKE_INSTALL_DO_STRIP=1 -P cmake_install.cmake
++.PHONY : install/strip/fast
++
++# Special rule for the target install/local
++install/local: preinstall
++	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Installing only the local directory..."
++	/home/craig/.local/share/JetBrains/Toolbox/apps/CLion/ch-0/211.7442.42/bin/cmake/linux/bin/cmake -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake
++.PHONY : install/local
++
++# Special rule for the target install/local
++install/local/fast: preinstall/fast
++	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Installing only the local directory..."
++	/home/craig/.local/share/JetBrains/Toolbox/apps/CLion/ch-0/211.7442.42/bin/cmake/linux/bin/cmake -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake
++.PHONY : install/local/fast
++
++# Special rule for the target install
++install: preinstall
++	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Install the project..."
++	/home/craig/.local/share/JetBrains/Toolbox/apps/CLion/ch-0/211.7442.42/bin/cmake/linux/bin/cmake -P cmake_install.cmake
++.PHONY : install
++
++# Special rule for the target install
++install/fast: preinstall/fast
++	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Install the project..."
++	/home/craig/.local/share/JetBrains/Toolbox/apps/CLion/ch-0/211.7442.42/bin/cmake/linux/bin/cmake -P cmake_install.cmake
++.PHONY : install/fast
++
++# Special rule for the target list_install_components
++list_install_components:
++	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Available install components are: \"Unspecified\" \"libprotobuf\" \"libprotobuf-lite\" \"libprotoc\" \"protobuf-export\" \"protobuf-headers\" \"protobuf-protos\" \"protoc\""
++.PHONY : list_install_components
++
++# Special rule for the target list_install_components
++list_install_components/fast: list_install_components
++
++.PHONY : list_install_components/fast
++
++# Special rule for the target test
++test:
++	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running tests..."
++	/home/craig/.local/share/JetBrains/Toolbox/apps/CLion/ch-0/211.7442.42/bin/cmake/linux/bin/ctest --force-new-ctest-process $(ARGS)
++.PHONY : test
++
++# Special rule for the target test
++test/fast: test
++
++.PHONY : test/fast
++
++# Special rule for the target edit_cache
++edit_cache:
++	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "No interactive CMake dialog available..."
++	/home/craig/.local/share/JetBrains/Toolbox/apps/CLion/ch-0/211.7442.42/bin/cmake/linux/bin/cmake -E echo No\ interactive\ CMake\ dialog\ available.
++.PHONY : edit_cache
++
++# Special rule for the target edit_cache
++edit_cache/fast: edit_cache
++
++.PHONY : edit_cache/fast
++
++# Special rule for the target rebuild_cache
++rebuild_cache:
++	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake to regenerate build system..."
++	/home/craig/.local/share/JetBrains/Toolbox/apps/CLion/ch-0/211.7442.42/bin/cmake/linux/bin/cmake --regenerate-during-build -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
++.PHONY : rebuild_cache
++
++# Special rule for the target rebuild_cache
++rebuild_cache/fast: rebuild_cache
++
++.PHONY : rebuild_cache/fast
++
++# The main all target
++all: cmake_check_build_system
++	cd /home/craig/Documents/code/monolith && $(CMAKE_COMMAND) -E cmake_progress_start /home/craig/Documents/code/monolith/CMakeFiles /home/craig/Documents/code/monolith/third-party/minisatp//CMakeFiles/progress.marks
++	cd /home/craig/Documents/code/monolith && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 third-party/minisatp/all
++	$(CMAKE_COMMAND) -E cmake_progress_start /home/craig/Documents/code/monolith/CMakeFiles 0
++.PHONY : all
++
++# The main clean target
+ clean:
+-	rm -f $(foreach t, release debug profile dynamic, $(foreach o, $(SRCS:.cc=.o), $(BUILD_DIR)/$t/$o)) \
+-	  $(foreach d, $(SRCS:.cc=.d), $(BUILD_DIR)/dep/$d) \
+-	  $(foreach t, release debug profile dynamic, $(BUILD_DIR)/$t/bin/$(MINISATP)) \
+-	  $(foreach t, release debug profile, $(BUILD_DIR)/$t/lib/$(MINISATP_SLIB)) \
+-	  $(BUILD_DIR)/dynamic/lib/$(MINISATP_DLIB).$(SOMAJOR).$(SOMINOR)$(SORELEASE)
+-
+-distclean:	clean
+-	rm -f config.mk
+-
+-## Include generated dependencies
+-## NOTE: dependencies are assumed to be the same in all build modes at the moment!
+--include $(foreach s, $(SRCS:.cc=.d), $(BUILD_DIR)/dep/$s)
++	cd /home/craig/Documents/code/monolith && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 third-party/minisatp/clean
++.PHONY : clean
++
++# The main clean target
++clean/fast: clean
++
++.PHONY : clean/fast
++
++# Prepare targets for installation.
++preinstall: all
++	cd /home/craig/Documents/code/monolith && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 third-party/minisatp/preinstall
++.PHONY : preinstall
++
++# Prepare targets for installation.
++preinstall/fast:
++	cd /home/craig/Documents/code/monolith && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 third-party/minisatp/preinstall
++.PHONY : preinstall/fast
++
++# clear depends
++depend:
++	cd /home/craig/Documents/code/monolith && $(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 1
++.PHONY : depend
++
++# Convenience name for target.
++third-party/minisatp/CMakeFiles/minisatp-lib-static.dir/rule:
++	cd /home/craig/Documents/code/monolith && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 third-party/minisatp/CMakeFiles/minisatp-lib-static.dir/rule
++.PHONY : third-party/minisatp/CMakeFiles/minisatp-lib-static.dir/rule
++
++# Convenience name for target.
++minisatp-lib-static: third-party/minisatp/CMakeFiles/minisatp-lib-static.dir/rule
++
++.PHONY : minisatp-lib-static
++
++# fast build rule for target.
++minisatp-lib-static/fast:
++	cd /home/craig/Documents/code/monolith && $(MAKE) $(MAKESILENT) -f third-party/minisatp/CMakeFiles/minisatp-lib-static.dir/build.make third-party/minisatp/CMakeFiles/minisatp-lib-static.dir/build
++.PHONY : minisatp-lib-static/fast
++
++ADTs/FEnv.o: ADTs/FEnv.cc.o
++
++.PHONY : ADTs/FEnv.o
++
++# target to build an object file
++ADTs/FEnv.cc.o:
++	cd /home/craig/Documents/code/monolith && $(MAKE) $(MAKESILENT) -f third-party/minisatp/CMakeFiles/minisatp-lib-static.dir/build.make third-party/minisatp/CMakeFiles/minisatp-lib-static.dir/ADTs/FEnv.cc.o
++.PHONY : ADTs/FEnv.cc.o
++
++ADTs/FEnv.i: ADTs/FEnv.cc.i
++
++.PHONY : ADTs/FEnv.i
++
++# target to preprocess a source file
++ADTs/FEnv.cc.i:
++	cd /home/craig/Documents/code/monolith && $(MAKE) $(MAKESILENT) -f third-party/minisatp/CMakeFiles/minisatp-lib-static.dir/build.make third-party/minisatp/CMakeFiles/minisatp-lib-static.dir/ADTs/FEnv.cc.i
++.PHONY : ADTs/FEnv.cc.i
++
++ADTs/FEnv.s: ADTs/FEnv.cc.s
++
++.PHONY : ADTs/FEnv.s
++
++# target to generate assembly for a file
++ADTs/FEnv.cc.s:
++	cd /home/craig/Documents/code/monolith && $(MAKE) $(MAKESILENT) -f third-party/minisatp/CMakeFiles/minisatp-lib-static.dir/build.make third-party/minisatp/CMakeFiles/minisatp-lib-static.dir/ADTs/FEnv.cc.s
++.PHONY : ADTs/FEnv.cc.s
++
++ADTs/Global.o: ADTs/Global.cc.o
++
++.PHONY : ADTs/Global.o
++
++# target to build an object file
++ADTs/Global.cc.o:
++	cd /home/craig/Documents/code/monolith && $(MAKE) $(MAKESILENT) -f third-party/minisatp/CMakeFiles/minisatp-lib-static.dir/build.make third-party/minisatp/CMakeFiles/minisatp-lib-static.dir/ADTs/Global.cc.o
++.PHONY : ADTs/Global.cc.o
++
++ADTs/Global.i: ADTs/Global.cc.i
++
++.PHONY : ADTs/Global.i
++
++# target to preprocess a source file
++ADTs/Global.cc.i:
++	cd /home/craig/Documents/code/monolith && $(MAKE) $(MAKESILENT) -f third-party/minisatp/CMakeFiles/minisatp-lib-static.dir/build.make third-party/minisatp/CMakeFiles/minisatp-lib-static.dir/ADTs/Global.cc.i
++.PHONY : ADTs/Global.cc.i
++
++ADTs/Global.s: ADTs/Global.cc.s
++
++.PHONY : ADTs/Global.s
++
++# target to generate assembly for a file
++ADTs/Global.cc.s:
++	cd /home/craig/Documents/code/monolith && $(MAKE) $(MAKESILENT) -f third-party/minisatp/CMakeFiles/minisatp-lib-static.dir/build.make third-party/minisatp/CMakeFiles/minisatp-lib-static.dir/ADTs/Global.cc.s
++.PHONY : ADTs/Global.cc.s
++
++Debug.o: Debug.cc.o
++
++.PHONY : Debug.o
++
++# target to build an object file
++Debug.cc.o:
++	cd /home/craig/Documents/code/monolith && $(MAKE) $(MAKESILENT) -f third-party/minisatp/CMakeFiles/minisatp-lib-static.dir/build.make third-party/minisatp/CMakeFiles/minisatp-lib-static.dir/Debug.cc.o
++.PHONY : Debug.cc.o
++
++Debug.i: Debug.cc.i
++
++.PHONY : Debug.i
++
++# target to preprocess a source file
++Debug.cc.i:
++	cd /home/craig/Documents/code/monolith && $(MAKE) $(MAKESILENT) -f third-party/minisatp/CMakeFiles/minisatp-lib-static.dir/build.make third-party/minisatp/CMakeFiles/minisatp-lib-static.dir/Debug.cc.i
++.PHONY : Debug.cc.i
++
++Debug.s: Debug.cc.s
++
++.PHONY : Debug.s
++
++# target to generate assembly for a file
++Debug.cc.s:
++	cd /home/craig/Documents/code/monolith && $(MAKE) $(MAKESILENT) -f third-party/minisatp/CMakeFiles/minisatp-lib-static.dir/build.make third-party/minisatp/CMakeFiles/minisatp-lib-static.dir/Debug.cc.s
++.PHONY : Debug.cc.s
++
++Hardware_adders.o: Hardware_adders.cc.o
++
++.PHONY : Hardware_adders.o
++
++# target to build an object file
++Hardware_adders.cc.o:
++	cd /home/craig/Documents/code/monolith && $(MAKE) $(MAKESILENT) -f third-party/minisatp/CMakeFiles/minisatp-lib-static.dir/build.make third-party/minisatp/CMakeFiles/minisatp-lib-static.dir/Hardware_adders.cc.o
++.PHONY : Hardware_adders.cc.o
++
++Hardware_adders.i: Hardware_adders.cc.i
++
++.PHONY : Hardware_adders.i
++
++# target to preprocess a source file
++Hardware_adders.cc.i:
++	cd /home/craig/Documents/code/monolith && $(MAKE) $(MAKESILENT) -f third-party/minisatp/CMakeFiles/minisatp-lib-static.dir/build.make third-party/minisatp/CMakeFiles/minisatp-lib-static.dir/Hardware_adders.cc.i
++.PHONY : Hardware_adders.cc.i
++
++Hardware_adders.s: Hardware_adders.cc.s
++
++.PHONY : Hardware_adders.s
++
++# target to generate assembly for a file
++Hardware_adders.cc.s:
++	cd /home/craig/Documents/code/monolith && $(MAKE) $(MAKESILENT) -f third-party/minisatp/CMakeFiles/minisatp-lib-static.dir/build.make third-party/minisatp/CMakeFiles/minisatp-lib-static.dir/Hardware_adders.cc.s
++.PHONY : Hardware_adders.cc.s
++
++Hardware_clausify.o: Hardware_clausify.cc.o
++
++.PHONY : Hardware_clausify.o
++
++# target to build an object file
++Hardware_clausify.cc.o:
++	cd /home/craig/Documents/code/monolith && $(MAKE) $(MAKESILENT) -f third-party/minisatp/CMakeFiles/minisatp-lib-static.dir/build.make third-party/minisatp/CMakeFiles/minisatp-lib-static.dir/Hardware_clausify.cc.o
++.PHONY : Hardware_clausify.cc.o
++
++Hardware_clausify.i: Hardware_clausify.cc.i
++
++.PHONY : Hardware_clausify.i
++
++# target to preprocess a source file
++Hardware_clausify.cc.i:
++	cd /home/craig/Documents/code/monolith && $(MAKE) $(MAKESILENT) -f third-party/minisatp/CMakeFiles/minisatp-lib-static.dir/build.make third-party/minisatp/CMakeFiles/minisatp-lib-static.dir/Hardware_clausify.cc.i
++.PHONY : Hardware_clausify.cc.i
++
++Hardware_clausify.s: Hardware_clausify.cc.s
++
++.PHONY : Hardware_clausify.s
++
++# target to generate assembly for a file
++Hardware_clausify.cc.s:
++	cd /home/craig/Documents/code/monolith && $(MAKE) $(MAKESILENT) -f third-party/minisatp/CMakeFiles/minisatp-lib-static.dir/build.make third-party/minisatp/CMakeFiles/minisatp-lib-static.dir/Hardware_clausify.cc.s
++.PHONY : Hardware_clausify.cc.s
++
++Hardware_sorters.o: Hardware_sorters.cc.o
++
++.PHONY : Hardware_sorters.o
++
++# target to build an object file
++Hardware_sorters.cc.o:
++	cd /home/craig/Documents/code/monolith && $(MAKE) $(MAKESILENT) -f third-party/minisatp/CMakeFiles/minisatp-lib-static.dir/build.make third-party/minisatp/CMakeFiles/minisatp-lib-static.dir/Hardware_sorters.cc.o
++.PHONY : Hardware_sorters.cc.o
++
++Hardware_sorters.i: Hardware_sorters.cc.i
++
++.PHONY : Hardware_sorters.i
++
++# target to preprocess a source file
++Hardware_sorters.cc.i:
++	cd /home/craig/Documents/code/monolith && $(MAKE) $(MAKESILENT) -f third-party/minisatp/CMakeFiles/minisatp-lib-static.dir/build.make third-party/minisatp/CMakeFiles/minisatp-lib-static.dir/Hardware_sorters.cc.i
++.PHONY : Hardware_sorters.cc.i
++
++Hardware_sorters.s: Hardware_sorters.cc.s
++
++.PHONY : Hardware_sorters.s
++
++# target to generate assembly for a file
++Hardware_sorters.cc.s:
++	cd /home/craig/Documents/code/monolith && $(MAKE) $(MAKESILENT) -f third-party/minisatp/CMakeFiles/minisatp-lib-static.dir/build.make third-party/minisatp/CMakeFiles/minisatp-lib-static.dir/Hardware_sorters.cc.s
++.PHONY : Hardware_sorters.cc.s
++
++Main.o: Main.cc.o
++
++.PHONY : Main.o
++
++# target to build an object file
++Main.cc.o:
++	cd /home/craig/Documents/code/monolith && $(MAKE) $(MAKESILENT) -f third-party/minisatp/CMakeFiles/minisatp-lib-static.dir/build.make third-party/minisatp/CMakeFiles/minisatp-lib-static.dir/Main.cc.o
++.PHONY : Main.cc.o
++
++Main.i: Main.cc.i
++
++.PHONY : Main.i
++
++# target to preprocess a source file
++Main.cc.i:
++	cd /home/craig/Documents/code/monolith && $(MAKE) $(MAKESILENT) -f third-party/minisatp/CMakeFiles/minisatp-lib-static.dir/build.make third-party/minisatp/CMakeFiles/minisatp-lib-static.dir/Main.cc.i
++.PHONY : Main.cc.i
++
++Main.s: Main.cc.s
++
++.PHONY : Main.s
++
++# target to generate assembly for a file
++Main.cc.s:
++	cd /home/craig/Documents/code/monolith && $(MAKE) $(MAKESILENT) -f third-party/minisatp/CMakeFiles/minisatp-lib-static.dir/build.make third-party/minisatp/CMakeFiles/minisatp-lib-static.dir/Main.cc.s
++.PHONY : Main.cc.s
++
++PbSolver.o: PbSolver.cc.o
++
++.PHONY : PbSolver.o
++
++# target to build an object file
++PbSolver.cc.o:
++	cd /home/craig/Documents/code/monolith && $(MAKE) $(MAKESILENT) -f third-party/minisatp/CMakeFiles/minisatp-lib-static.dir/build.make third-party/minisatp/CMakeFiles/minisatp-lib-static.dir/PbSolver.cc.o
++.PHONY : PbSolver.cc.o
++
++PbSolver.i: PbSolver.cc.i
++
++.PHONY : PbSolver.i
++
++# target to preprocess a source file
++PbSolver.cc.i:
++	cd /home/craig/Documents/code/monolith && $(MAKE) $(MAKESILENT) -f third-party/minisatp/CMakeFiles/minisatp-lib-static.dir/build.make third-party/minisatp/CMakeFiles/minisatp-lib-static.dir/PbSolver.cc.i
++.PHONY : PbSolver.cc.i
++
++PbSolver.s: PbSolver.cc.s
++
++.PHONY : PbSolver.s
++
++# target to generate assembly for a file
++PbSolver.cc.s:
++	cd /home/craig/Documents/code/monolith && $(MAKE) $(MAKESILENT) -f third-party/minisatp/CMakeFiles/minisatp-lib-static.dir/build.make third-party/minisatp/CMakeFiles/minisatp-lib-static.dir/PbSolver.cc.s
++.PHONY : PbSolver.cc.s
++
++PbSolver_convert.o: PbSolver_convert.cc.o
++
++.PHONY : PbSolver_convert.o
++
++# target to build an object file
++PbSolver_convert.cc.o:
++	cd /home/craig/Documents/code/monolith && $(MAKE) $(MAKESILENT) -f third-party/minisatp/CMakeFiles/minisatp-lib-static.dir/build.make third-party/minisatp/CMakeFiles/minisatp-lib-static.dir/PbSolver_convert.cc.o
++.PHONY : PbSolver_convert.cc.o
++
++PbSolver_convert.i: PbSolver_convert.cc.i
++
++.PHONY : PbSolver_convert.i
++
++# target to preprocess a source file
++PbSolver_convert.cc.i:
++	cd /home/craig/Documents/code/monolith && $(MAKE) $(MAKESILENT) -f third-party/minisatp/CMakeFiles/minisatp-lib-static.dir/build.make third-party/minisatp/CMakeFiles/minisatp-lib-static.dir/PbSolver_convert.cc.i
++.PHONY : PbSolver_convert.cc.i
++
++PbSolver_convert.s: PbSolver_convert.cc.s
++
++.PHONY : PbSolver_convert.s
++
++# target to generate assembly for a file
++PbSolver_convert.cc.s:
++	cd /home/craig/Documents/code/monolith && $(MAKE) $(MAKESILENT) -f third-party/minisatp/CMakeFiles/minisatp-lib-static.dir/build.make third-party/minisatp/CMakeFiles/minisatp-lib-static.dir/PbSolver_convert.cc.s
++.PHONY : PbSolver_convert.cc.s
++
++PbSolver_convertAdd.o: PbSolver_convertAdd.cc.o
++
++.PHONY : PbSolver_convertAdd.o
++
++# target to build an object file
++PbSolver_convertAdd.cc.o:
++	cd /home/craig/Documents/code/monolith && $(MAKE) $(MAKESILENT) -f third-party/minisatp/CMakeFiles/minisatp-lib-static.dir/build.make third-party/minisatp/CMakeFiles/minisatp-lib-static.dir/PbSolver_convertAdd.cc.o
++.PHONY : PbSolver_convertAdd.cc.o
++
++PbSolver_convertAdd.i: PbSolver_convertAdd.cc.i
++
++.PHONY : PbSolver_convertAdd.i
++
++# target to preprocess a source file
++PbSolver_convertAdd.cc.i:
++	cd /home/craig/Documents/code/monolith && $(MAKE) $(MAKESILENT) -f third-party/minisatp/CMakeFiles/minisatp-lib-static.dir/build.make third-party/minisatp/CMakeFiles/minisatp-lib-static.dir/PbSolver_convertAdd.cc.i
++.PHONY : PbSolver_convertAdd.cc.i
++
++PbSolver_convertAdd.s: PbSolver_convertAdd.cc.s
++
++.PHONY : PbSolver_convertAdd.s
++
++# target to generate assembly for a file
++PbSolver_convertAdd.cc.s:
++	cd /home/craig/Documents/code/monolith && $(MAKE) $(MAKESILENT) -f third-party/minisatp/CMakeFiles/minisatp-lib-static.dir/build.make third-party/minisatp/CMakeFiles/minisatp-lib-static.dir/PbSolver_convertAdd.cc.s
++.PHONY : PbSolver_convertAdd.cc.s
++
++PbSolver_convertBdd.o: PbSolver_convertBdd.cc.o
++
++.PHONY : PbSolver_convertBdd.o
++
++# target to build an object file
++PbSolver_convertBdd.cc.o:
++	cd /home/craig/Documents/code/monolith && $(MAKE) $(MAKESILENT) -f third-party/minisatp/CMakeFiles/minisatp-lib-static.dir/build.make third-party/minisatp/CMakeFiles/minisatp-lib-static.dir/PbSolver_convertBdd.cc.o
++.PHONY : PbSolver_convertBdd.cc.o
++
++PbSolver_convertBdd.i: PbSolver_convertBdd.cc.i
++
++.PHONY : PbSolver_convertBdd.i
++
++# target to preprocess a source file
++PbSolver_convertBdd.cc.i:
++	cd /home/craig/Documents/code/monolith && $(MAKE) $(MAKESILENT) -f third-party/minisatp/CMakeFiles/minisatp-lib-static.dir/build.make third-party/minisatp/CMakeFiles/minisatp-lib-static.dir/PbSolver_convertBdd.cc.i
++.PHONY : PbSolver_convertBdd.cc.i
++
++PbSolver_convertBdd.s: PbSolver_convertBdd.cc.s
++
++.PHONY : PbSolver_convertBdd.s
++
++# target to generate assembly for a file
++PbSolver_convertBdd.cc.s:
++	cd /home/craig/Documents/code/monolith && $(MAKE) $(MAKESILENT) -f third-party/minisatp/CMakeFiles/minisatp-lib-static.dir/build.make third-party/minisatp/CMakeFiles/minisatp-lib-static.dir/PbSolver_convertBdd.cc.s
++.PHONY : PbSolver_convertBdd.cc.s
++
++PbSolver_convertSort.o: PbSolver_convertSort.cc.o
++
++.PHONY : PbSolver_convertSort.o
++
++# target to build an object file
++PbSolver_convertSort.cc.o:
++	cd /home/craig/Documents/code/monolith && $(MAKE) $(MAKESILENT) -f third-party/minisatp/CMakeFiles/minisatp-lib-static.dir/build.make third-party/minisatp/CMakeFiles/minisatp-lib-static.dir/PbSolver_convertSort.cc.o
++.PHONY : PbSolver_convertSort.cc.o
++
++PbSolver_convertSort.i: PbSolver_convertSort.cc.i
++
++.PHONY : PbSolver_convertSort.i
++
++# target to preprocess a source file
++PbSolver_convertSort.cc.i:
++	cd /home/craig/Documents/code/monolith && $(MAKE) $(MAKESILENT) -f third-party/minisatp/CMakeFiles/minisatp-lib-static.dir/build.make third-party/minisatp/CMakeFiles/minisatp-lib-static.dir/PbSolver_convertSort.cc.i
++.PHONY : PbSolver_convertSort.cc.i
++
++PbSolver_convertSort.s: PbSolver_convertSort.cc.s
++
++.PHONY : PbSolver_convertSort.s
++
++# target to generate assembly for a file
++PbSolver_convertSort.cc.s:
++	cd /home/craig/Documents/code/monolith && $(MAKE) $(MAKESILENT) -f third-party/minisatp/CMakeFiles/minisatp-lib-static.dir/build.make third-party/minisatp/CMakeFiles/minisatp-lib-static.dir/PbSolver_convertSort.cc.s
++.PHONY : PbSolver_convertSort.cc.s
++
++# Help Target
++help:
++	@echo "The following are some of the valid targets for this Makefile:"
++	@echo "... all (the default if no target is provided)"
++	@echo "... clean"
++	@echo "... depend"
++	@echo "... edit_cache"
++	@echo "... install"
++	@echo "... install/local"
++	@echo "... install/strip"
++	@echo "... list_install_components"
++	@echo "... rebuild_cache"
++	@echo "... test"
++	@echo "... minisatp-lib-static"
++	@echo "... ADTs/FEnv.o"
++	@echo "... ADTs/FEnv.i"
++	@echo "... ADTs/FEnv.s"
++	@echo "... ADTs/Global.o"
++	@echo "... ADTs/Global.i"
++	@echo "... ADTs/Global.s"
++	@echo "... Debug.o"
++	@echo "... Debug.i"
++	@echo "... Debug.s"
++	@echo "... Hardware_adders.o"
++	@echo "... Hardware_adders.i"
++	@echo "... Hardware_adders.s"
++	@echo "... Hardware_clausify.o"
++	@echo "... Hardware_clausify.i"
++	@echo "... Hardware_clausify.s"
++	@echo "... Hardware_sorters.o"
++	@echo "... Hardware_sorters.i"
++	@echo "... Hardware_sorters.s"
++	@echo "... Main.o"
++	@echo "... Main.i"
++	@echo "... Main.s"
++	@echo "... PbSolver.o"
++	@echo "... PbSolver.i"
++	@echo "... PbSolver.s"
++	@echo "... PbSolver_convert.o"
++	@echo "... PbSolver_convert.i"
++	@echo "... PbSolver_convert.s"
++	@echo "... PbSolver_convertAdd.o"
++	@echo "... PbSolver_convertAdd.i"
++	@echo "... PbSolver_convertAdd.s"
++	@echo "... PbSolver_convertBdd.o"
++	@echo "... PbSolver_convertBdd.i"
++	@echo "... PbSolver_convertBdd.s"
++	@echo "... PbSolver_convertSort.o"
++	@echo "... PbSolver_convertSort.i"
++	@echo "... PbSolver_convertSort.s"
++.PHONY : help
++
++
++
++#=============================================================================
++# Special targets to cleanup operation of make.
++
++# Special rule to run CMake to check the build system integrity.
++# No rule that depends on this can have commands that come from listfiles
++# because they might be regenerated.
++cmake_check_build_system:
++	cd /home/craig/Documents/code/monolith && $(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 0
++.PHONY : cmake_check_build_system
++
