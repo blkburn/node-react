@@ -13,6 +13,7 @@ import pandas as pd
 import pika
 from random import random
 import re
+import jwt
 
 connection = pika.BlockingConnection(
     pika.ConnectionParameters(host='localhost'))
@@ -35,17 +36,17 @@ def gsheet_api_check(SCOPES):
             creds.refresh(Request())
         else:
             flow = InstalledAppFlow.from_client_secrets_file(
-                'credentials.json', SCOPES)
+                'rotav2_key.json', SCOPES)
             creds = flow.run_local_server(port=0)
         with open('token.pickle', 'wb') as token:
             pickle.dump(creds, token)
     return creds
 
 
-def pull_sheet_data(SCOPES,SPREADSHEET_ID,DATA_TO_PULL):
-    creds = gsheet_api_check(SCOPES)
-    service = build('sheets', 'v4', credentials=creds)
-    sheet = service.spreadsheets()
+def pull_sheet_data(sheet,SPREADSHEET_ID,DATA_TO_PULL):
+    # creds = gsheet_api_check(SCOPES)
+    # service = build('sheets', 'v4', credentials=creds)
+    # sheet = service.spreadsheets()
     try:
         result = sheet.values().get(
             spreadsheetId=SPREADSHEET_ID,
@@ -82,15 +83,44 @@ def run(ch, method, props, body):
         rnd = random()
         print(rnd)
 
+        SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
+        SERVICE_ACCOUNT_FILE = 'rotav2_key.json'
+
+        credentials = service_account.Credentials.from_service_account_file(
+            SERVICE_ACCOUNT_FILE, scopes=SCOPES)
+
+        service = build('sheets', 'v4', credentials=credentials)
+        sheet = service.spreadsheets()
+
+
+        client = pygsheets.authorize(credentials=credentials)
+        pySheet = client.open_by_key('1Ct2-Veq9Crr7CFMZrL83_EcvZpNu3lGrTqb6TQZ_ayc')
+        # pySheet = client.open_by_key('1Ct2-Veq9Crr7CFMZrL83_EcvZpNu3lGrTqb6TQZ_ayc')
+
+        # iat = time.time()
+        # exp = iat + 3600
+        # payload = {'iss': 'rotav2@rota-314413.iam.gserviceaccount.com',
+        #            'sub': 'rotav2@rota-314413.iam.gserviceaccount.com',
+        #            'aud': 'https://firestore.googleapis.com/',
+        #            'iat': iat,
+        #            'exp': exp}
+        # additional_headers = {'kid': PRIVATE_KEY_ID_FROM_JSON}
+        # signed_jwt = jwt.encode(payload, PRIVATE_KEY_FROM_JSON, headers=additional_headers,
+        #                         algorithm='RS256')
+        #
+        # result = sheet.values().get(
+        #     spreadsheetId=param,
+        #     range='Initial').execute()
+
         if (command == 'VERIFY_SHEET'):
             log.write("verify google sheet " + str(rnd) + "\n")
             print('check if locked')
 
-            SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
-            SPREADSHEET_ID = param
+            # SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
+            SPREADSHEET_ID = '1Ct2-Veq9Crr7CFMZrL83_EcvZpNu3lGrTqb6TQZ_ayc'
             DATA_TO_PULL = 'LOCKED'
             log.write("check if sheet is locked\n")
-            data = pull_sheet_data(SCOPES,SPREADSHEET_ID,DATA_TO_PULL)
+            data = pull_sheet_data(sheet, SPREADSHEET_ID, DATA_TO_PULL)
             log.write('LOCKED = ' + data[0][0] + '\n')
 
             ch.basic_publish(exchange='',
@@ -111,26 +141,26 @@ def run(ch, method, props, body):
             log.write("reading sheet\n")
             # ch.basic_ack(delivery_tag=method.delivery_tag)
 
-            SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
+            # SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
             SPREADSHEET_ID = '1Ct2-Veq9Crr7CFMZrL83_EcvZpNu3lGrTqb6TQZ_ayc'
             DATA_TO_PULL = 'Initial'
             log.write("reading Initial sheet\n")
-            data = pull_sheet_data(SCOPES,SPREADSHEET_ID,DATA_TO_PULL)
+            data = pull_sheet_data(sheet,SPREADSHEET_ID,DATA_TO_PULL)
             raw = pd.DataFrame(data[1:], columns=data[0])
 
             DATA_TO_PULL = 'Shifts'
             log.write("reading Shifts sheet\n")
-            data = pull_sheet_data(SCOPES,SPREADSHEET_ID,DATA_TO_PULL)
+            data = pull_sheet_data(sheet,SPREADSHEET_ID,DATA_TO_PULL)
             shifts = pd.DataFrame(data[1:], columns=data[0])
 
             DATA_TO_PULL = 'Shifts_Setup'
             log.write("reading Shifts_Setup sheet\n")
-            data = pull_sheet_data(SCOPES,SPREADSHEET_ID,DATA_TO_PULL)
+            data = pull_sheet_data(sheet,SPREADSHEET_ID,DATA_TO_PULL)
             shifts_setup = pd.DataFrame(data[1:], columns=data[0])
 
             DATA_TO_PULL = 'Staff'
             log.write("reading Staff sheet\n")
-            data = pull_sheet_data(SCOPES,SPREADSHEET_ID,DATA_TO_PULL)
+            data = pull_sheet_data(sheet,SPREADSHEET_ID,DATA_TO_PULL)
             staff_hours = pd.DataFrame(data[1:], columns=data[0])
 
             log.write("Generating optimisation file...\n")
@@ -200,7 +230,7 @@ def run(ch, method, props, body):
 
                 DATA_TO_PULL = 'Objective'
                 log.write("reading Objective sheet\n")
-                data = pull_sheet_data(SCOPES,SPREADSHEET_ID,DATA_TO_PULL)
+                data = pull_sheet_data(sheet,SPREADSHEET_ID,DATA_TO_PULL)
                 obj = pd.DataFrame(data[1:raw.shape[0]+1], columns=data[0])
 
             else:
@@ -306,14 +336,15 @@ def run(ch, method, props, body):
             ws_cnt.insert(0, '')
 
 
-            with open('rota-314413-2be54990db4f.json') as source:
-                info = json.load(source)
-            credentials = service_account.Credentials.from_service_account_info(info)
-            client = pygsheets.authorize(service_account_file='rota-314413-2be54990db4f.json')
-            # sheet_data = client.sheet.get('1Ct2-Veq9Crr7CFMZrL83_EcvZpNu3lGrTqb6TQZ_ayc')
+            # with open('rotav2_key.json') as source:
+            #     info = json.load(source)
+            # credentials = service_account.Credentials.from_service_account_info(info)
+            # client = pygsheets.authorize(service_account_file='rotav2_key.json')
+            # # sheet_data = client.sheet.get('1Ct2-Veq9Crr7CFMZrL83_EcvZpNu3lGrTqb6TQZ_ayc')
 
-            sheet = client.open_by_key('1Ct2-Veq9Crr7CFMZrL83_EcvZpNu3lGrTqb6TQZ_ayc')
-            wks = sheet.worksheet_by_title('Objective')
+
+            # sheet = client.open_by_key('1Ct2-Veq9Crr7CFMZrL83_EcvZpNu3lGrTqb6TQZ_ayc')
+            wks = pySheet.worksheet_by_title('Objective')
             wks.clear(start='A1', end=None, fields="*")
             wks.set_dataframe(obj, start=(1,1))
             wks.set_dataframe(obj_pas, start=((len(obj)+3),1))
