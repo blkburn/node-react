@@ -9,15 +9,16 @@ import connectDB from './config/db.js'
 // import productRoutes from './routes/productRoutes.js'
 import userRoutes from './routes/usersRoutes.js'
 import rotaRoutes from './routes/rotaRoutes.js'
+import sheetRoutes from './routes/sheetsRoutes.js'
 
 // import orderRoutes from './routes/orderRoutes.js'
 // import uploadRoutes from './routes/uploadRoutes.js'
 
-import { fileURLToPath } from 'url';
-import { dirname } from 'path';
+import { fileURLToPath } from 'url'
+import { dirname } from 'path'
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = dirname(__filename)
 
 dotenv.config()
 
@@ -35,7 +36,7 @@ app.use(express.json())
 // app.use('/api/products', productRoutes)
 app.use('/api/users', userRoutes)
 app.use('/api/rota/', rotaRoutes)
-
+app.use('/api/sheets', sheetRoutes)
 // app.use('/api/orders', orderRoutes)
 // app.use('/api/upload', uploadRoutes)
 
@@ -59,7 +60,9 @@ if (process.env.NODE_ENV === 'production') {
   app.use(express.static(path.join(__dirname, '../frontend/build')))
 
   app.get('*', (req, res) =>
-    res.sendFile(path.resolve(__dirname, '../', 'frontend', 'build', 'index.html'))
+    res.sendFile(
+      path.resolve(__dirname, '../', 'frontend', 'build', 'index.html')
+    )
   )
 } else {
   app.get('/', (req, res) => {

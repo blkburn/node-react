@@ -101,6 +101,9 @@ const verifyRotaSheet = (req, res) => {
 
           console.log(' [x] ', 'VERIFY_SHEET')
           // console.log(req.params)
+          // console.log(req.body)
+          const params = req.body
+          console.log(params)
 
           channel.consume(
             q.queue,
@@ -127,10 +130,14 @@ const verifyRotaSheet = (req, res) => {
             replyTo: q.queue,
           })
           deque.clear()
-          channel.sendToQueue('rpc_queue', Buffer.from(req.body.sheet), {
-            correlationId: correlationId,
-            replyTo: q.queue,
-          })
+          channel.sendToQueue(
+            'rpc_queue',
+            Buffer.from(JSON.stringify(params)),
+            {
+              correlationId: correlationId,
+              replyTo: q.queue,
+            }
+          )
 
           running = true
         }
@@ -186,16 +193,21 @@ const runRotaSheet = (req, res) => {
               noAck: true,
             }
           )
-
+          const params = req.body
+          console.log(params)
           channel.sendToQueue('rpc_queue', Buffer.from('RUN_MODEL'), {
             correlationId: correlationId,
             replyTo: q.queue,
           })
           deque.clear()
-          channel.sendToQueue('rpc_queue', Buffer.from(req.body.locked), {
-            correlationId: correlationId,
-            replyTo: q.queue,
-          })
+          channel.sendToQueue(
+            'rpc_queue',
+            Buffer.from(JSON.stringify(params)),
+            {
+              correlationId: correlationId,
+              replyTo: q.queue,
+            }
+          )
           running = true
         }
       )

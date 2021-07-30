@@ -5,6 +5,7 @@ import store from './store'
 import './bootstrap.min.css'
 import './index.css'
 import App from './App'
+import 'react-bootstrap-table-next/dist/react-bootstrap-table2.min.css'
 
 ReactDOM.render(
   <Provider store={store}>

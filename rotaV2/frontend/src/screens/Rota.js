@@ -21,6 +21,7 @@ import {
   runRotaSheet,
   setRotaName,
 } from '../actions/rotaActions'
+import SheetList from '../components/SheetsList'
 
 const Rota = (props) => {
   const dispatch = useDispatch()
@@ -28,6 +29,8 @@ const Rota = (props) => {
   const { userInfo } = userLogin
 
   const rota = useSelector((state) => state.rota)
+  const sheetDetails = useSelector((state) => state.sheetDetails)
+  const { loading, error, sheet } = sheetDetails
 
   useEffect(() => {
     console.log(`rota count ${rota.count}`)
@@ -49,8 +52,11 @@ const Rota = (props) => {
     dispatch(validRotaSheet(false))
   }, [dispatch])
 
+  // useEffect(() => {}, [sheet])
+
   const handleChange = (name) => (event) => {
     // localStorage.setItem([name], event.target.value)
+    // dispatch(setRotaSheet(name))
     dispatch(validRotaSheet(false))
     dispatch(clearRotaMessage())
     dispatch(setRotaSheet(event.target.value))
@@ -63,29 +69,58 @@ const Rota = (props) => {
 
   const handleSubmit = (e) => {
     e.preventDefault()
+
+    dispatch(validRotaSheet(false))
+    dispatch(clearRotaMessage())
+    dispatch(setRotaSheet(sheet.sheet))
+    dispatch(setRotaName(sheet.name))
     dispatch(verifyRotaSheet())
   }
   const runHandler = (e) => {
     e.preventDefault()
     dispatch(runRotaSheet())
   }
+  const loadSheet = () => {
+    console.log('load')
+  }
   return (
     <FormContainer>
-      <h1>Create Rota</h1>
+      <SheetList />
+      <h2>Update Rota</h2>
       <Form onSubmit={handleSubmit}>
         <Form.Group controlId='name'>
-          <Form.Label className='my-2'>Sheet Name</Form.Label>
+          <Form.Label className='my-2'>Rota Name</Form.Label>
           <Form.Control
             type='name'
-            placeholder='Enter sheet URL'
-            value={rota.sheet}
-            onChange={handleChange('sheet')}
+            placeholder='Enter rota name'
+            value={sheet.name || ''}
+            readOnly={true}
+            // onChange={(e) => dispatch(setRotaName(e.target.value))}
+          ></Form.Control>
+        </Form.Group>
+        <Form.Group controlId='sheet'>
+          <Form.Label className='my-2'>Sheet URL</Form.Label>
+          <Form.Control
+            type='sheet'
+            placeholder='Sheet URL'
+            value={sheet.sheet || ''}
+            readOnly={true}
+            // onChange={handleChange('sheet')}
           ></Form.Control>
         </Form.Group>
         <Button
+          className='my-3 me-3'
+          // type='submitLoad'
+          disabled={rota.running || !sheet.sheet}
+          variant='primary'
+          onClick={() => window.open(sheet.sheet, '_blank')}
+        >
+          Open Sheet
+        </Button>
+        <Button
           className='my-3'
           type='submit'
-          disabled={rota.running || rota.valid}
+          disabled={rota.running || rota.valid || !sheet.sheet}
           variant='primary'
         >
           {rota.valid ? (
@@ -100,15 +135,6 @@ const Rota = (props) => {
         </Button>
       </Form>
       <Form onSubmit={runHandler}>
-        <Form.Group controlId='name'>
-          <Form.Label className='my-2'>Rota Name</Form.Label>
-          <Form.Control
-            type='name'
-            placeholder='Enter rota name'
-            value={rota.name}
-            onChange={(e) => dispatch(setRotaName(e.target.value))}
-          ></Form.Control>
-        </Form.Group>
         <Button
           className='my-3'
           disabled={rota.running || !rota.valid}

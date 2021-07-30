@@ -8,6 +8,7 @@ import Register from './screens/Register'
 import Profile from './screens/Profile'
 import UserList from './screens/UserList'
 import UserEdit from './screens/UserEdit'
+import SheetNew from './screens/SheetNew'
 
 const App = () => {
   return (
@@ -20,6 +21,7 @@ const App = () => {
           <Route path='/login' component={Login} />
           <Route path='/profile' component={Profile} />
           <Route path='/admin/userlist' component={UserList} />
+          <Route path='/admin/sheetnew' component={SheetNew} />
           <Route path='/admin/user/:id/edit' component={UserEdit} />
         </Container>
       </main>

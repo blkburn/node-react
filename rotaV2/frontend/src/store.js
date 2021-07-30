@@ -1,16 +1,7 @@
 import { createStore, combineReducers, applyMiddleware } from 'redux'
 import thunk from 'redux-thunk'
 import { composeWithDevTools } from 'redux-devtools-extension'
-// import {
-//   productListReducer,
-//   productDetailsReducer,
-//   productDeleteReducer,
-//   productCreateReducer,
-//   productUpdateReducer,
-//   productReviewCreateReducer,
-//   productTopRatedReducer,
-// } from './reducers/productReducers'
-// import { cartReducer } from './reducers/cartReducers'
+
 import {
   userLoginReducer,
   userRegisterReducer,
@@ -21,24 +12,15 @@ import {
   userUpdateReducer,
 } from './reducers/userReducers'
 import { rotaSheetReducer } from './reducers/rotaReducers'
-// import {
-//   orderCreateReducer,
-//   orderDetailsReducer,
-//   orderPayReducer,
-//   orderDeliverReducer,
-//   orderListMyReducer,
-//   orderListReducer,
-// } from './reducers/orderReducers'
+import {
+  sheetAddReducer,
+  sheetDeleteReducer,
+  sheetDetailsReducer,
+  sheetListReducer,
+  sheetUpdateReducer,
+} from './reducers/sheetReducers'
 
 const reducer = combineReducers({
-  // productList: productListReducer,
-  // productDetails: productDetailsReducer,
-  // productDelete: productDeleteReducer,
-  // productCreate: productCreateReducer,
-  // productUpdate: productUpdateReducer,
-  // productReviewCreate: productReviewCreateReducer,
-  // productTopRated: productTopRatedReducer,
-  // cart: cartReducer,
   userLogin: userLoginReducer,
   userRegister: userRegisterReducer,
   userDetails: userDetailsReducer,
@@ -47,12 +29,11 @@ const reducer = combineReducers({
   userDelete: userDeleteReducer,
   userUpdate: userUpdateReducer,
   rota: rotaSheetReducer,
-  // orderCreate: orderCreateReducer,
-  // orderDetails: orderDetailsReducer,
-  // orderPay: orderPayReducer,
-  // orderDeliver: orderDeliverReducer,
-  // orderListMy: orderListMyReducer,
-  // orderList: orderListReducer,
+  sheetAdd: sheetAddReducer,
+  sheetDetails: sheetDetailsReducer,
+  sheetUpdate: sheetUpdateReducer,
+  sheetList: sheetListReducer,
+  sheetDelete: sheetDeleteReducer,
 })
 
 // const cartItemsFromStorage = localStorage.getItem('cartItems')

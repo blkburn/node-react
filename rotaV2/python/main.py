@@ -13,7 +13,10 @@ import pandas as pd
 import pika
 from random import random
 import re
-import jwt
+
+# google-api-python-client==1.7.9
+# google-auth-httplib2==0.0.3
+# google-auth-oauthlib==0.4.0
 
 connection = pika.BlockingConnection(
     pika.ConnectionParameters(host='localhost'))
@@ -77,7 +80,8 @@ def run(ch, method, props, body):
         ch.basic_ack(delivery_tag=method.delivery_tag)
     else:
         log = open("log.txt", "w")
-        param = body.decode('UTF-8')
+        param = json.loads(body.decode('UTF-8'))
+
         print(param)
         ch.basic_ack(delivery_tag=method.delivery_tag)
         rnd = random()
@@ -94,7 +98,7 @@ def run(ch, method, props, body):
 
 
         client = pygsheets.authorize(credentials=credentials)
-        pySheet = client.open_by_key('1Ct2-Veq9Crr7CFMZrL83_EcvZpNu3lGrTqb6TQZ_ayc')
+        pySheet = client.open_by_key(param['sheet'])
         # pySheet = client.open_by_key('1Ct2-Veq9Crr7CFMZrL83_EcvZpNu3lGrTqb6TQZ_ayc')
 
         # iat = time.time()
@@ -136,13 +140,13 @@ def run(ch, method, props, body):
             log.close()
             command = 'none'
         else: # assume RUN_MODEL received
-            locked = param == 'true'
+            locked = param['locked'] == 'true'
 
             log.write("reading sheet\n")
             # ch.basic_ack(delivery_tag=method.delivery_tag)
 
             # SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
-            SPREADSHEET_ID = '1Ct2-Veq9Crr7CFMZrL83_EcvZpNu3lGrTqb6TQZ_ayc'
+            SPREADSHEET_ID = param['sheet']
             DATA_TO_PULL = 'Initial'
             log.write("reading Initial sheet\n")
             data = pull_sheet_data(sheet,SPREADSHEET_ID,DATA_TO_PULL)
