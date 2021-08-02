@@ -5,6 +5,7 @@ import {
   ROTA_INC_COUNT,
   ROTA_SET_LOCKED,
   ROTA_SET_RUNNING,
+  ROTA_SET_SCHEDULE,
   ROTA_SET_SHEET,
   ROTA_SET_SHEET_NAME,
   ROTA_SHEET_VALID,
@@ -27,6 +28,13 @@ export const rotaSheetReducer = (state = { message: [] }, action) => {
       return { ...state, running: false }
     case ROTA_CLEAR_COUNT:
       return { ...state, count: 0 }
+    case ROTA_SET_SCHEDULE:
+      return {
+        ...state,
+        schedule: JSON.parse(action.payload)['schedule'],
+        staff: JSON.parse(action.payload)['staff'],
+        shift: JSON.parse(action.payload)['shift'],
+      }
     case ROTA_INC_COUNT:
       return { ...state, count: state.count + 1 }
     case ROTA_APPEND_MESSAGE:

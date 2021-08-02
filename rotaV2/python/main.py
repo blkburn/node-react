@@ -13,6 +13,7 @@ import pandas as pd
 import pika
 from random import random
 import re
+from datetime import datetime, timedelta
 
 # google-api-python-client==1.7.9
 # google-auth-httplib2==0.0.3
@@ -101,27 +102,12 @@ def run(ch, method, props, body):
         pySheet = client.open_by_key(param['sheet'])
         # pySheet = client.open_by_key('1Ct2-Veq9Crr7CFMZrL83_EcvZpNu3lGrTqb6TQZ_ayc')
 
-        # iat = time.time()
-        # exp = iat + 3600
-        # payload = {'iss': 'rotav2@rota-314413.iam.gserviceaccount.com',
-        #            'sub': 'rotav2@rota-314413.iam.gserviceaccount.com',
-        #            'aud': 'https://firestore.googleapis.com/',
-        #            'iat': iat,
-        #            'exp': exp}
-        # additional_headers = {'kid': PRIVATE_KEY_ID_FROM_JSON}
-        # signed_jwt = jwt.encode(payload, PRIVATE_KEY_FROM_JSON, headers=additional_headers,
-        #                         algorithm='RS256')
-        #
-        # result = sheet.values().get(
-        #     spreadsheetId=param,
-        #     range='Initial').execute()
-
         if (command == 'VERIFY_SHEET'):
             log.write("verify google sheet " + str(rnd) + "\n")
             print('check if locked')
 
             # SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
-            SPREADSHEET_ID = '1Ct2-Veq9Crr7CFMZrL83_EcvZpNu3lGrTqb6TQZ_ayc'
+            SPREADSHEET_ID = param['sheet']
             DATA_TO_PULL = 'LOCKED'
             log.write("check if sheet is locked\n")
             data = pull_sheet_data(sheet, SPREADSHEET_ID, DATA_TO_PULL)
@@ -136,6 +122,77 @@ def run(ch, method, props, body):
                              routing_key=props.reply_to,
                              properties=pika.BasicProperties(correlation_id = \
                                                                  props.correlation_id),
+                             body=str('Complete'))
+            log.close()
+            command = 'none'
+
+        elif (command == 'GET_SCHEDULE'):
+
+            SPREADSHEET_ID = param['sheet']
+            DATA_TO_PULL = 'Initial'
+            log.write("reading Initial sheet\n")
+            data = pull_sheet_data(sheet,SPREADSHEET_ID,DATA_TO_PULL)
+            raw = pd.DataFrame(data[1:], columns=data[0])
+
+            DATA_TO_PULL = 'Staff'
+            log.write("reading Staff sheet\n")
+            data = pull_sheet_data(sheet,SPREADSHEET_ID,DATA_TO_PULL)
+            staff_hours = pd.DataFrame(data[1:], columns=data[0])
+
+            DATA_TO_PULL = 'Shifts'
+            log.write("reading Shifts sheet\n")
+            data = pull_sheet_data(sheet,SPREADSHEET_ID,DATA_TO_PULL)
+            shifts = pd.DataFrame(data[1:], columns=data[0])
+
+            DATA_TO_PULL = 'Objective'
+            log.write("reading Objective sheet\n")
+            data = pull_sheet_data(sheet,SPREADSHEET_ID,DATA_TO_PULL)
+            obj = pd.DataFrame(data[1:raw.shape[0]+1], columns=data[0])
+
+            cols = obj.columns[2:]
+            dates = [obj.columns[0], obj.columns[1]]
+            for d in cols:
+                dates.append(datetime.strptime(d, '%d/%m/%y'))
+            obj.columns=dates
+
+            cnt = 0
+            keys = ['title', 'staff', 'shift', 'startDate', 'endDate', 'id']
+            ssKeys = ['text', 'id', 'color']
+            # keys = ['title', 'location', 'startDate', 'endDate', 'id']
+            scheduleJson = []
+            staffJson = []
+            shiftJson = []
+
+            for index, row in obj.iterrows():
+                for idx, value in row.iteritems():
+                    if (idx == 'ID'):
+                        id = value
+                    if (isinstance(idx, datetime)):
+                        if (any(shifts['ShiftID']==value)):
+                            hr_min = shifts[shifts['ShiftID']==value]['StartTime'].values[0].split(':')
+                            start = timedelta(hours=int(hr_min[0]), minutes=int(hr_min[1]))
+                            hr_min = shifts[shifts['ShiftID']==value]['EndTime'].values[0].split(':')
+                            if ('+1' in hr_min[1]):
+                                end = timedelta(days=1, hours=int(hr_min[0]), minutes=int(hr_min[1][:-2]))
+                            else:
+                                end = timedelta(hours=int(hr_min[0]), minutes=int(hr_min[1]))
+                            scheduleJson.append(dict(zip(keys, [value + ' : ' + row.ID, row.ID, value, (idx+start).isoformat(), (idx+end).isoformat(), cnt])))
+                            cnt += 1
+
+            for index, row in staff_hours.iterrows():
+                staffJson.append(dict(zip(ssKeys, [row.Name, row.ID, row.Color])))
+            for index, row in shifts.iterrows():
+                shiftJson.append(dict(zip(ssKeys, [row.ShiftName, row.ShiftID, row.Color])))
+
+            ch.basic_publish(exchange='',
+                             routing_key=props.reply_to,
+                             properties=pika.BasicProperties(correlation_id = props.correlation_id),
+                             body=json.dumps(dict({'staff':staffJson, 'shift':shiftJson, 'schedule':scheduleJson})))
+            # body=json.dumps(dict({'schedule': schedule})))
+
+            ch.basic_publish(exchange='',
+                             routing_key=props.reply_to,
+                             properties=pika.BasicProperties(correlation_id = props.correlation_id),
                              body=str('Complete'))
             log.close()
             command = 'none'
@@ -203,7 +260,18 @@ def run(ch, method, props, body):
                 xpa = pd.to_numeric(staff_hours[staff_hours['Name']==row['Name']]['Extra_PA']).values[0]
                 required = np.round(10 * ((pa * rota_days/7 - pa * tmp / 5) - spa * (rota_days/7 - tmp / 5) + xpa)).astype(int)
                 df = df.append({'ID': row['ID'], 'MaxShifts': '', 'MaxTotalMinutes': required, 'MinTotalMinutes': '0', 'MaxConsecutiveShifts': '3', 'MinConsecutiveShifts': '1', 'MinConsecutiveDaysOff': '1', 'MaxWeekends': '3'}, ignore_index=True)
+                if required <= 0:
+                    log.write("#################\n" + row['ID'] + " ERROR: MaxTotalMinutes < 0\n#################\n")
+                    log.write(df[-1:].to_string())
+                    ch.basic_publish(exchange='',
+                                     routing_key=props.reply_to,
+                                     properties=pika.BasicProperties(correlation_id = \
+                                                                         props.correlation_id),
+                                     body=str('Complete'))
 
+                    command = 'none'
+                    log.close()
+                    return
 
             shift_on_request = pd.DataFrame(columns=['EmployeeID', 'Day', 'ShiftID', 'Weight'])
             for  index, col in enumerate(raw[dates]):
@@ -339,15 +407,6 @@ def run(ch, method, props, body):
             ws_cnt.insert(0, 'Totals')
             ws_cnt.insert(0, '')
 
-
-            # with open('rotav2_key.json') as source:
-            #     info = json.load(source)
-            # credentials = service_account.Credentials.from_service_account_info(info)
-            # client = pygsheets.authorize(service_account_file='rotav2_key.json')
-            # # sheet_data = client.sheet.get('1Ct2-Veq9Crr7CFMZrL83_EcvZpNu3lGrTqb6TQZ_ayc')
-
-
-            # sheet = client.open_by_key('1Ct2-Veq9Crr7CFMZrL83_EcvZpNu3lGrTqb6TQZ_ayc')
             wks = pySheet.worksheet_by_title('Objective')
             wks.clear(start='A1', end=None, fields="*")
             wks.set_dataframe(obj, start=(1,1))

@@ -1,3 +1,4 @@
-verify google sheet 0.7196341475388145
-check if sheet is locked
-LOCKED = FALSE
+reading Initial sheet
+reading Staff sheet
+reading Shifts sheet
+reading Objective sheet

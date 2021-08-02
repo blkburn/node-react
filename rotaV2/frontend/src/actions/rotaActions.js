@@ -11,6 +11,7 @@ import {
   ROTA_SET_SHEET_NAME,
   ROTA_SHEET_VALID,
   ROTA_STOP_RUNNING,
+  ROTA_SET_SCHEDULE,
 } from '../constants/userConstants'
 
 const rotaFail = (dispatch, error) => {
@@ -48,6 +49,19 @@ export const appendRotaMessage = (msg) => async (dispatch) => {
   }
 }
 
+export const setSchedule = (schedule) => async (dispatch) => {
+  try {
+    // console.log(JSON.parse(JSON.stringify(schedule)))
+    if (schedule) {
+      dispatch({
+        type: ROTA_SET_SCHEDULE,
+        payload: JSON.parse(JSON.stringify(schedule)),
+      })
+    }
+  } catch (error) {
+    rotaFail(dispatch, error)
+  }
+}
 export const setRotaRunning = () => async (dispatch) => {
   try {
     dispatch({
@@ -175,6 +189,9 @@ export const checkRotaStatus = () => async (dispatch, getState) => {
     if (data.message !== '') {
       dispatch(appendRotaMessage(data.message))
     }
+    if (data.scheduleData && data.scheduleData !== '') {
+      dispatch(setSchedule(data.scheduleData))
+    }
   } catch (error) {
     const message =
       error.response && error.response.data.message
@@ -267,7 +284,55 @@ export const runRotaSheet = (sheet) => async (dispatch, getState) => {
     console.log(data)
     if (data.running) {
       dispatch(incRotaCount())
-      // dispatch(validRotaSheet(false))
+      if (data.message !== '') {
+        dispatch(appendRotaMessage(data.message))
+      }
+    } else {
+      dispatch(updateStatus(data))
+    }
+  } catch (error) {
+    console.log(error)
+    const message =
+      error.response && error.response.data.message
+        ? error.response.data.message
+        : error.message
+    dispatch({
+      type: ROTA_APPEND_MESSAGE,
+      payload: message,
+    })
+  }
+}
+
+export const getSchedule = (sheet) => async (dispatch, getState) => {
+  try {
+    console.log('get rota schedule')
+    dispatch(clearRotaCount())
+    dispatch(clearRotaMessage())
+    dispatch(setRotaRunning())
+    // dispatch(validRotaSheet(false))
+    const {
+      userLogin: { userInfo },
+      sheetDetails: { sheet },
+    } = getState()
+    const config = {
+      headers: {
+        Authorization: `Bearer ${userInfo.token}`,
+      },
+    }
+    console.log(sheet)
+    let spreadsheetId = new RegExp('/spreadsheets/d/([a-zA-Z0-9-_]+)').exec(
+      sheet.sheet
+    )[1]
+    console.log(spreadsheetId)
+
+    const { data } = await axios.post(
+      `/api/rota/schedule`,
+      { sheet: spreadsheetId },
+      config
+    )
+    console.log(data)
+    if (data.running) {
+      dispatch(incRotaCount())
       if (data.message !== '') {
         dispatch(appendRotaMessage(data.message))
       }

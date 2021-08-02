@@ -1,36 +1,21 @@
-// import { Redirect, Link } from 'react-router-dom'
-// import auth from './../auth/auth-helper'
-// import { read, sendMsg, checkStatus, sendVerify } from './api-user.js'
-
 import React, { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { Form, Button } from 'react-bootstrap'
 import FormContainer from '../components/FormContainer'
-import {
-  clearRotaMessage,
-  appendRotaMessage,
-  setRotaRunning,
-  stopRotaRunning,
-  setRotaSheet,
-  validRotaSheet,
-  clearRotaCount,
-  incRotaCount,
-  setRotaLocked,
-  checkRotaStatus,
-  verifyRotaSheet,
-  runRotaSheet,
-  setRotaName,
-} from '../actions/rotaActions'
 import SheetList from '../components/SheetsList'
+import RotaAdmin from '../components/rotaAdmin'
+import Schedule from '../components/Schedule'
+import ScheduleOld from '../components/Schedule_old'
+
+import { checkRotaStatus, getSchedule } from '../actions/rotaActions'
+// import { appointments } from '../appointments'
 
 const Rota = (props) => {
-  const dispatch = useDispatch()
   const userLogin = useSelector((state) => state.userLogin)
   const { userInfo } = userLogin
-
-  const rota = useSelector((state) => state.rota)
   const sheetDetails = useSelector((state) => state.sheetDetails)
   const { loading, error, sheet } = sheetDetails
+  const dispatch = useDispatch()
+  const rota = useSelector((state) => state.rota)
 
   useEffect(() => {
     console.log(`rota count ${rota.count}`)
@@ -48,109 +33,19 @@ const Rota = (props) => {
   }, [rota.count, rota.running, dispatch])
 
   useEffect(() => {
-    console.log('screen refresh')
-    dispatch(validRotaSheet(false))
-  }, [dispatch])
+    if (!userInfo.isAdmin) {
+      if (sheet.sheet) {
+        console.log('get schedule')
+        // get the current schedule
+        dispatch(getSchedule())
+      }
+    }
+  }, [userInfo.isAdmin, sheet.sheet, dispatch])
 
-  // useEffect(() => {}, [sheet])
-
-  const handleChange = (name) => (event) => {
-    // localStorage.setItem([name], event.target.value)
-    // dispatch(setRotaSheet(name))
-    dispatch(validRotaSheet(false))
-    dispatch(clearRotaMessage())
-    dispatch(setRotaSheet(event.target.value))
-
-    // setValues({ ...values, [name]: event.target.value })
-  }
-  // if (redirectToSignin) {
-  //   return <Redirect to='/signin' />
-  // }
-
-  const handleSubmit = (e) => {
-    e.preventDefault()
-
-    dispatch(validRotaSheet(false))
-    dispatch(clearRotaMessage())
-    dispatch(setRotaSheet(sheet.sheet))
-    dispatch(setRotaName(sheet.name))
-    dispatch(verifyRotaSheet())
-  }
-  const runHandler = (e) => {
-    e.preventDefault()
-    dispatch(runRotaSheet())
-  }
-  const loadSheet = () => {
-    console.log('load')
-  }
   return (
     <FormContainer>
       <SheetList />
-      <h2>Update Rota</h2>
-      <Form onSubmit={handleSubmit}>
-        <Form.Group controlId='name'>
-          <Form.Label className='my-2'>Rota Name</Form.Label>
-          <Form.Control
-            type='name'
-            placeholder='Enter rota name'
-            value={sheet.name || ''}
-            readOnly={true}
-            // onChange={(e) => dispatch(setRotaName(e.target.value))}
-          ></Form.Control>
-        </Form.Group>
-        <Form.Group controlId='sheet'>
-          <Form.Label className='my-2'>Sheet URL</Form.Label>
-          <Form.Control
-            type='sheet'
-            placeholder='Sheet URL'
-            value={sheet.sheet || ''}
-            readOnly={true}
-            // onChange={handleChange('sheet')}
-          ></Form.Control>
-        </Form.Group>
-        <Button
-          className='my-3 me-3'
-          // type='submitLoad'
-          disabled={rota.running || !sheet.sheet}
-          variant='primary'
-          onClick={() => window.open(sheet.sheet, '_blank')}
-        >
-          Open Sheet
-        </Button>
-        <Button
-          className='my-3'
-          type='submit'
-          disabled={rota.running || rota.valid || !sheet.sheet}
-          variant='primary'
-        >
-          {rota.valid ? (
-            rota.locked ? (
-              <i className='fas fa-lock'></i>
-            ) : (
-              <i className='fas fa-unlock'></i>
-            )
-          ) : (
-            'Verify Sheet'
-          )}
-        </Button>
-      </Form>
-      <Form onSubmit={runHandler}>
-        <Button
-          className='my-3'
-          disabled={rota.running || !rota.valid}
-          type='submit'
-          variant='primary'
-        >
-          {rota.locked ? 'Generate Metrics' : 'Run'}
-        </Button>
-        <Form.Control
-          as='textarea'
-          placeholder='Leave a comment here'
-          style={{ height: '300px' }}
-          value={rota.message.join('\n')}
-          onChange={(e) => null}
-        />
-      </Form>
+      {userInfo.isAdmin ? <RotaAdmin /> : <Schedule />}
     </FormContainer>
   )
 }

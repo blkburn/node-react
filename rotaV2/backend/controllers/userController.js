@@ -1,6 +1,7 @@
 import asyncHandler from 'express-async-handler'
 import generateToken from '../utils/generateToken.js'
 import User from '../models/userModel.js'
+import Email from '../models/emailModel.js'
 
 // @desc    Auth user & get token
 // @route   POST /api/users/login
@@ -31,7 +32,12 @@ const registerUser = asyncHandler(async (req, res) => {
   const { name, email, password } = req.body
 
   const userExists = await User.findOne({ email })
+  const emailExists = await Email.findOne({ email })
 
+  if (!emailExists) {
+    res.status(400)
+    throw new Error('User not permitted to register')
+  }
   if (userExists) {
     res.status(400)
     throw new Error('User already exists')

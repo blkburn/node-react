@@ -16,7 +16,7 @@ router.route('/').get(protect, getSheets)
 router
   .route('/:id')
   .delete(protect, admin, deleteSheet)
-  .get(protect, admin, getSheetById)
+  .get(protect, getSheetById)
   .put(protect, admin, updateSheet)
 
 export default router
