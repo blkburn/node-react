@@ -1,8 +1,4 @@
-reading sheet
 reading Initial sheet
-reading Shifts sheet
-reading Non Clinical Shifts sheet
-reading Shifts_Setup sheet
 reading Staff sheet
-Generating optimisation file...
-Sheet locked - skipping optimisationreading Objective sheet
+reading Shifts sheet
+reading Objective sheet
