@@ -255,7 +255,7 @@ def run(ch, method, props, body):
             for index, row in raw.iterrows():
                 tmp = sum(row[dates].isin(['AL', 'PL', 'SL']))
                 staff_hols.append(tmp)
-                staff_list = row[dates].isin(['OFF', 'AL', 'PL', 'SL', 'ML', 'SPA', 'EPA', '2EPA']).to_list()
+                staff_list = row[dates].isin(['OFF', 'AL', 'PL', 'SL', 'ML', 'SPA', 'EPA', 'EPAt', 'EPAu']).to_list()
                 s_off = [index for index, element in enumerate(staff_list) if element == True]
                 s_off.insert(0, row['ID'])
                 staff_off.append(s_off)
@@ -319,9 +319,9 @@ def run(ch, method, props, body):
                 log.write("%d\n\n" % rota_days)
 
                 f.write("SECTION_SHIFTS\n# ShiftID, Length in mins, Shifts which cannot follow this shift | separated\n")
-                f.write(shifts.to_csv(header=False, index=False))
+                f.write(shifts.iloc[:,1:4].to_csv(header=False, index=False))
                 log.write("SECTION_SHIFTS\n# ShiftID, Length in mins, Shifts which cannot follow this shift | separated\n")
-                log.write(shifts.to_csv(header=False, index=False))
+                log.write(shifts.iloc[:,1:4].to_csv(header=False, index=False))
                 log.write("\n\n")
 
                 f.write("\nSECTION_STAFF\n# ID, MaxShifts, MaxTotalMinutes, MinTotalMinutes, MaxConsecutiveShifts, MinConsecutiveShifts, MinConsecutiveDaysOff, MaxWeekends\n")
@@ -360,7 +360,7 @@ def run(ch, method, props, body):
                 for idx, row in enumerate(tmp[:-1]):
                     row = row.replace('.', 'OFF').split(' ')[:-1]
                     obj.loc[idx] = pd.Series(row, index = dates)
-                    update = raw[dates].loc[idx].isin(['AL', 'PL', 'SL', 'ML', 'SPA', 'EPA', '2EPA'])
+                    update = raw[dates].loc[idx].isin(['AL', 'PL', 'SL', 'ML', 'SPA', 'EPA', 'EPAt', 'EPAu'])
                     obj.loc[idx][update] = raw[dates].loc[idx][update]
 
                 obj.insert(0, 'ID', raw['ID'])
@@ -398,7 +398,7 @@ def run(ch, method, props, body):
             req = df['MaxTotalMinutes'] / 10
             staff_pas = pd.DataFrame({'Name': raw['Name'], 'ID': raw['ID'], 'Allocated': alloc, 'Required': req, 'Shortfall': req-alloc})
 
-            t = [['Name', 'ID'], shifts['ShiftID'], ['OFF', 'AL', 'PL', 'SL', 'ML', 'SPA', 'EPA', '2EPA' ]]
+            t = [['Name', 'ID'], shifts['ShiftID'], ['OFF', 'AL', 'PL', 'SL', 'ML', 'SPA', 'EPA', 'EPAt', 'EPAu' ]]
             flat_list = [item for sublist in t for item in sublist]
             worked_shifts = pd.DataFrame(columns=flat_list)
             for idx, row in obj.iterrows():

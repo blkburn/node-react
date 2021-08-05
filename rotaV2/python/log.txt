@@ -5,4 +5,501 @@ reading Non Clinical Shifts sheet
 reading Shifts_Setup sheet
 reading Staff sheet
 Generating optimisation file...
-Sheet locked - skipping optimisationreading Objective sheet
+SECTION_HORIZON
+# The horizon length in days:
+77
+
+SECTION_SHIFTS
+# ShiftID, Length in mins, Shifts which cannot follow this shift | separated
+DS,25.0,
+WRM,25.0,WRM
+BS,20.0,DS|WRM|BS
+FS,25.0,DS
+OC,25.0,DS|WRM|BS|WOC|WDS|OC|FS
+WDS,30.0,OC
+WOC,40.0,DS|WRM|BS|OC
+FBS,20.0,
+FOC,25.0,
+
+
+
+SECTION_STAFF
+# ID, MaxShifts, MaxTotalMinutes, MinTotalMinutes, MaxConsecutiveShifts, MinConsecutiveShifts, MinConsecutiveDaysOff, MaxWeekends
+BR,,405,0,3,1,1,3
+NC,,658,0,3,1,1,3
+LJ,,371,0,3,1,1,3
+MC,,420,0,3,1,1,3
+JT,,504,0,3,1,1,3
+SP,,608,0,3,1,1,3
+KS,,589,0,3,1,1,3
+RK,,660,0,3,1,1,3
+MCW,,588,0,3,1,1,3
+JH,,400,0,3,1,1,3
+FD,,450,0,3,1,1,3
+AD,,880,0,3,1,1,3
+CS,,450,0,3,1,1,3
+EP,,546,0,3,1,1,3
+RA,,220,0,3,1,1,3
+KJ,,608,0,3,1,1,3
+RR,,602,0,3,1,1,3
+
+
+
+ Running Optimisation...
+Number of days: 77
+-- Shift DS, 25 min.
+-- Shift WRM, 25 min.
+-- Shift BS, 20 min.
+-- Shift FS, 25 min.
+-- Shift OC, 25 min.
+-- Shift WDS, 30 min.
+-- Shift WOC, 40 min.
+-- Shift FBS, 20 min.
+-- Shift FOC, 25 min.
+Number of shifts: 9
+-- Shift 0. OK after = [0, 1, 2, 3, 4, 5, 6, 7, 8] forbidden_after = []
+-- Shift 1. OK after = [0, 2, 3, 4, 5, 6, 7, 8] forbidden_after = [1]
+-- Shift 2. OK after = [3, 4, 5, 6, 7, 8] forbidden_after = [0, 1, 2]
+-- Shift 3. OK after = [1, 2, 3, 4, 5, 6, 7, 8] forbidden_after = [0]
+-- Shift 4. OK after = [7, 8] forbidden_after = [0, 1, 2, 6, 5, 4, 3]
+-- Shift 5. OK after = [0, 1, 2, 3, 5, 6, 7, 8] forbidden_after = [4]
+-- Shift 6. OK after = [3, 5, 6, 7, 8] forbidden_after = [0, 1, 2, 4]
+-- Shift 7. OK after = [0, 1, 2, 3, 4, 5, 6, 7, 8] forbidden_after = []
+-- Shift 8. OK after = [0, 1, 2, 3, 4, 5, 6, 7, 8] forbidden_after = []
+-- Staff BR: Consequtive limit [1, 3]. Time limit [0, 405]. Max weekends: 3. Max shifts: [].
+-- Staff NC: Consequtive limit [1, 3]. Time limit [0, 658]. Max weekends: 3. Max shifts: [].
+-- Staff LJ: Consequtive limit [1, 3]. Time limit [0, 371]. Max weekends: 3. Max shifts: [].
+-- Staff MC: Consequtive limit [1, 3]. Time limit [0, 420]. Max weekends: 3. Max shifts: [].
+-- Staff JT: Consequtive limit [1, 3]. Time limit [0, 504]. Max weekends: 3. Max shifts: [].
+-- Staff SP: Consequtive limit [1, 3]. Time limit [0, 608]. Max weekends: 3. Max shifts: [].
+-- Staff KS: Consequtive limit [1, 3]. Time limit [0, 589]. Max weekends: 3. Max shifts: [].
+-- Staff RK: Consequtive limit [1, 3]. Time limit [0, 660]. Max weekends: 3. Max shifts: [].
+-- Staff MCW: Consequtive limit [1, 3]. Time limit [0, 588]. Max weekends: 3. Max shifts: [].
+-- Staff JH: Consequtive limit [1, 3]. Time limit [0, 400]. Max weekends: 3. Max shifts: [].
+-- Staff FD: Consequtive limit [1, 3]. Time limit [0, 450]. Max weekends: 3. Max shifts: [].
+-- Staff AD: Consequtive limit [1, 3]. Time limit [0, 880]. Max weekends: 3. Max shifts: [].
+-- Staff CS: Consequtive limit [1, 3]. Time limit [0, 450]. Max weekends: 3. Max shifts: [].
+-- Staff EP: Consequtive limit [1, 3]. Time limit [0, 546]. Max weekends: 3. Max shifts: [].
+-- Staff RA: Consequtive limit [1, 3]. Time limit [0, 220]. Max weekends: 3. Max shifts: [].
+-- Staff KJ: Consequtive limit [1, 3]. Time limit [0, 608]. Max weekends: 3. Max shifts: [].
+-- Staff RR: Consequtive limit [1, 3]. Time limit [0, 602]. Max weekends: 3. Max shifts: [].
+Number of staff: 17
+Read 80 shift on requests.
+Read 23 shift off requests.
+Read 693 cover constraints.
+Dividing all minutes by 5
+## id: BR
+verify_bound(worker.time_limit());
+lower: 0
+upper: 81
+verify_bound(worker.consecutive_shifts_limit());
+lower: 1
+upper: 3
+verify_bound(worker.consecutive_days_off_limit());
+lower: 1
+upper: 77
+verify_bound(worker.has_working_weekends_limit());
+lower: 0
+upper: 3
+## id: NC
+verify_bound(worker.time_limit());
+lower: 0
+upper: 131
+verify_bound(worker.consecutive_shifts_limit());
+lower: 1
+upper: 3
+verify_bound(worker.consecutive_days_off_limit());
+lower: 1
+upper: 77
+verify_bound(worker.has_working_weekends_limit());
+lower: 0
+upper: 3
+## id: LJ
+verify_bound(worker.time_limit());
+lower: 0
+upper: 74
+verify_bound(worker.consecutive_shifts_limit());
+lower: 1
+upper: 3
+verify_bound(worker.consecutive_days_off_limit());
+lower: 1
+upper: 77
+verify_bound(worker.has_working_weekends_limit());
+lower: 0
+upper: 3
+## id: MC
+verify_bound(worker.time_limit());
+lower: 0
+upper: 84
+verify_bound(worker.consecutive_shifts_limit());
+lower: 1
+upper: 3
+verify_bound(worker.consecutive_days_off_limit());
+lower: 1
+upper: 77
+verify_bound(worker.has_working_weekends_limit());
+lower: 0
+upper: 3
+## id: JT
+verify_bound(worker.time_limit());
+lower: 0
+upper: 100
+verify_bound(worker.consecutive_shifts_limit());
+lower: 1
+upper: 3
+verify_bound(worker.consecutive_days_off_limit());
+lower: 1
+upper: 77
+verify_bound(worker.has_working_weekends_limit());
+lower: 0
+upper: 3
+## id: SP
+verify_bound(worker.time_limit());
+lower: 0
+upper: 121
+verify_bound(worker.consecutive_shifts_limit());
+lower: 1
+upper: 3
+verify_bound(worker.consecutive_days_off_limit());
+lower: 1
+upper: 77
+verify_bound(worker.has_working_weekends_limit());
+lower: 0
+upper: 3
+## id: KS
+verify_bound(worker.time_limit());
+lower: 0
+upper: 117
+verify_bound(worker.consecutive_shifts_limit());
+lower: 1
+upper: 3
+verify_bound(worker.consecutive_days_off_limit());
+lower: 1
+upper: 77
+verify_bound(worker.has_working_weekends_limit());
+lower: 0
+upper: 3
+## id: RK
+verify_bound(worker.time_limit());
+lower: 0
+upper: 132
+verify_bound(worker.consecutive_shifts_limit());
+lower: 1
+upper: 3
+verify_bound(worker.consecutive_days_off_limit());
+lower: 1
+upper: 77
+verify_bound(worker.has_working_weekends_limit());
+lower: 0
+upper: 3
+## id: MCW
+verify_bound(worker.time_limit());
+lower: 0
+upper: 117
+verify_bound(worker.consecutive_shifts_limit());
+lower: 1
+upper: 3
+verify_bound(worker.consecutive_days_off_limit());
+lower: 1
+upper: 77
+verify_bound(worker.has_working_weekends_limit());
+lower: 0
+upper: 3
+## id: JH
+verify_bound(worker.time_limit());
+lower: 0
+upper: 80
+verify_bound(worker.consecutive_shifts_limit());
+lower: 1
+upper: 3
+verify_bound(worker.consecutive_days_off_limit());
+lower: 1
+upper: 77
+verify_bound(worker.has_working_weekends_limit());
+lower: 0
+upper: 3
+## id: FD
+verify_bound(worker.time_limit());
+lower: 0
+upper: 90
+verify_bound(worker.consecutive_shifts_limit());
+lower: 1
+upper: 3
+verify_bound(worker.consecutive_days_off_limit());
+lower: 1
+upper: 77
+verify_bound(worker.has_working_weekends_limit());
+lower: 0
+upper: 3
+## id: AD
+verify_bound(worker.time_limit());
+lower: 0
+upper: 176
+verify_bound(worker.consecutive_shifts_limit());
+lower: 1
+upper: 3
+verify_bound(worker.consecutive_days_off_limit());
+lower: 1
+upper: 77
+verify_bound(worker.has_working_weekends_limit());
+lower: 0
+upper: 3
+## id: CS
+verify_bound(worker.time_limit());
+lower: 0
+upper: 90
+verify_bound(worker.consecutive_shifts_limit());
+lower: 1
+upper: 3
+verify_bound(worker.consecutive_days_off_limit());
+lower: 1
+upper: 77
+verify_bound(worker.has_working_weekends_limit());
+lower: 0
+upper: 3
+## id: EP
+verify_bound(worker.time_limit());
+lower: 0
+upper: 109
+verify_bound(worker.consecutive_shifts_limit());
+lower: 1
+upper: 3
+verify_bound(worker.consecutive_days_off_limit());
+lower: 1
+upper: 77
+verify_bound(worker.has_working_weekends_limit());
+lower: 0
+upper: 3
+## id: RA
+verify_bound(worker.time_limit());
+lower: 0
+upper: 44
+verify_bound(worker.consecutive_shifts_limit());
+lower: 1
+upper: 3
+verify_bound(worker.consecutive_days_off_limit());
+lower: 1
+upper: 77
+verify_bound(worker.has_working_weekends_limit());
+lower: 0
+upper: 3
+## id: KJ
+verify_bound(worker.time_limit());
+lower: 0
+upper: 121
+verify_bound(worker.consecutive_shifts_limit());
+lower: 1
+upper: 3
+verify_bound(worker.consecutive_days_off_limit());
+lower: 1
+upper: 77
+verify_bound(worker.has_working_weekends_limit());
+lower: 0
+upper: 3
+## id: RR
+verify_bound(worker.time_limit());
+lower: 0
+upper: 120
+verify_bound(worker.consecutive_shifts_limit());
+lower: 1
+upper: 3
+verify_bound(worker.consecutive_days_off_limit());
+lower: 1
+upper: 77
+verify_bound(worker.has_working_weekends_limit());
+lower: 0
+upper: 3
+verify_bound(worker.consecutive_limit());
+verify_bound(worker.consecutive_limit());
+verify_bound(worker.consecutive_limit());
+verify_bound(worker.consecutive_limit());
+verify_bound(worker.consecutive_limit());
+verify_bound(worker.consecutive_limit());
+verify_bound(worker.consecutive_limit());
+verify_bound(worker.consecutive_limit());
+verify_bound(worker.consecutive_limit());
+
+Lower bound is 600
+
+Starting search.
+Welcome to the CBC MILP Solver 
+Version: 2.9.7 
+Build Date: Jul 31 2021 
+
+command line - minimum_linear -solve -quit (default strategy 1)
+Continuous objective value is 600 - 0.05 seconds
+Cgl0002I 7587 variables fixed
+Cgl0003I 0 fixed, 0 tightened bounds, 4811 strengthened rows, 0 substitutions
+Cgl0003I 0 fixed, 0 tightened bounds, 3994 strengthened rows, 0 substitutions
+Cgl0003I 0 fixed, 0 tightened bounds, 2829 strengthened rows, 0 substitutions
+Cgl0003I 0 fixed, 0 tightened bounds, 1539 strengthened rows, 0 substitutions
+Cgl0003I 0 fixed, 0 tightened bounds, 663 strengthened rows, 0 substitutions
+Cgl0003I 0 fixed, 0 tightened bounds, 480 strengthened rows, 0 substitutions
+Cgl0004I processed model has 2954 rows, 4829 columns (4191 integer (4191 of which binary)) and 32614 elements
+Cutoff increment increased from 1e-05 to 99.9999
+Cbc0038I Initial state - 88 integers unsatisfied sum - 24.1503
+Cbc0038I Pass   1: suminf.    0.94167 (4) obj. 2135.83 iterations 533
+Cbc0038I Pass   2: suminf.    0.00000 (0) obj. 4900 iterations 5
+Cbc0038I Solution found of 4900
+Cbc0038I Relaxing continuous gives 4900
+Cbc0038I Before mini branch and bound, 4099 integers at bound fixed and 619 continuous
+Cbc0038I Full problem 2954 rows 4829 columns, reduced to 60 rows 62 columns
+Cbc0038I Mini branch and bound improved solution from 4900 to 1200 (0.37 seconds)
+Cbc0038I Round again with cutoff of 1001
+Cbc0038I Reduced cost fixing fixed 103 variables on major pass 2
+Cbc0038I Pass   3: suminf.    1.79000 (8) obj. 1001 iterations 181
+Cbc0038I Pass   4: suminf.    1.79000 (8) obj. 1001 iterations 5
+Cbc0038I Pass   5: suminf.    1.41000 (5) obj. 1001 iterations 125
+Cbc0038I Pass   6: suminf.    1.39000 (6) obj. 1001 iterations 50
+Cbc0038I Pass   7: suminf.    1.41000 (5) obj. 1001 iterations 50
+Cbc0038I Pass   8: suminf.    4.89000 (22) obj. 1001 iterations 496
+Cbc0038I Pass   9: suminf.    2.39000 (13) obj. 1001 iterations 352
+Cbc0038I Pass  10: suminf.    1.99000 (10) obj. 1001 iterations 285
+Cbc0038I Pass  11: suminf.    1.99000 (11) obj. 1001 iterations 183
+Cbc0038I Pass  12: suminf.    2.01000 (8) obj. 1001 iterations 282
+Cbc0038I Pass  13: suminf.    1.99000 (8) obj. 1001 iterations 139
+Cbc0038I Pass  14: suminf.    1.61000 (8) obj. 1001 iterations 170
+Cbc0038I Pass  15: suminf.    1.59000 (8) obj. 1001 iterations 131
+Cbc0038I Pass  16: suminf.    2.01000 (8) obj. 1001 iterations 155
+Cbc0038I Pass  17: suminf.    4.51000 (15) obj. 1001 iterations 623
+Cbc0038I Pass  18: suminf.    2.39000 (9) obj. 1001 iterations 335
+Cbc0038I Pass  19: suminf.    2.79000 (9) obj. 1001 iterations 363
+Cbc0038I Pass  20: suminf.    1.99000 (9) obj. 1001 iterations 224
+Cbc0038I Pass  21: suminf.    3.23000 (10) obj. 1001 iterations 313
+Cbc0038I Pass  22: suminf.    2.39000 (8) obj. 1001 iterations 183
+Cbc0038I Pass  23: suminf.    2.03000 (7) obj. 1001 iterations 279
+Cbc0038I Pass  24: suminf.    1.19000 (7) obj. 1001 iterations 234
+Cbc0038I Pass  25: suminf.    2.43000 (7) obj. 1001 iterations 179
+Cbc0038I Pass  26: suminf.    1.59000 (7) obj. 1001 iterations 178
+Cbc0038I Pass  27: suminf.    2.03000 (7) obj. 1001 iterations 179
+Cbc0038I Pass  28: suminf.    9.87500 (32) obj. 1001 iterations 549
+Cbc0038I Pass  29: suminf.    2.59000 (11) obj. 1001 iterations 435
+Cbc0038I Pass  30: suminf.    2.39000 (10) obj. 1001 iterations 14
+Cbc0038I Pass  31: suminf.    2.39000 (10) obj. 1001 iterations 57
+Cbc0038I Pass  32: suminf.    3.63000 (11) obj. 1001 iterations 348
+Cbc0038I No solution found this major pass
+Cbc0038I Before mini branch and bound, 3937 integers at bound fixed and 606 continuous
+Cbc0038I Full problem 2954 rows 4829 columns, reduced to 225 rows 217 columns
+Cbc0038I Mini branch and bound improved solution from 1200 to 1100 (0.71 seconds)
+Cbc0038I Round again with cutoff of 900.9
+Cbc0038I Reduced cost fixing fixed 103 variables on major pass 3
+Cbc0038I Pass  32: suminf.    1.80900 (8) obj. 900.9 iterations 7
+Cbc0038I Pass  33: suminf.    1.79100 (8) obj. 900.9 iterations 72
+Cbc0038I Pass  34: suminf.    1.40900 (5) obj. 900.9 iterations 124
+Cbc0038I Pass  35: suminf.    1.39100 (6) obj. 900.9 iterations 52
+Cbc0038I Pass  36: suminf.    1.40900 (5) obj. 900.9 iterations 52
+Cbc0038I Pass  37: suminf.    6.95350 (27) obj. 900.9 iterations 559
+Cbc0038I Pass  38: suminf.    2.79100 (11) obj. 900.9 iterations 304
+Cbc0038I Pass  39: suminf.    2.82700 (9) obj. 900.9 iterations 386
+Cbc0038I Pass  40: suminf.    1.59100 (6) obj. 900.9 iterations 223
+Cbc0038I Pass  41: suminf.    1.20900 (5) obj. 900.9 iterations 115
+Cbc0038I Pass  42: suminf.    1.19100 (6) obj. 900.9 iterations 65
+Cbc0038I Pass  43: suminf.    1.20900 (5) obj. 900.9 iterations 49
+Cbc0038I Pass  44: suminf.    6.90900 (25) obj. 900.9 iterations 602
+Cbc0038I Pass  45: suminf.    2.39100 (11) obj. 900.9 iterations 363
+Cbc0038I Pass  46: suminf.    2.79100 (11) obj. 900.9 iterations 352
+Cbc0038I Pass  47: suminf.    2.59100 (10) obj. 900.9 iterations 119
+Cbc0038I Pass  48: suminf.    2.59100 (10) obj. 900.9 iterations 7
+Cbc0038I Pass  49: suminf.    3.02700 (11) obj. 900.9 iterations 223
+Cbc0038I Pass  50: suminf.    2.39100 (10) obj. 900.9 iterations 216
+Cbc0038I Pass  51: suminf.    2.39100 (10) obj. 900.9 iterations 6
+Cbc0038I Pass  52: suminf.    2.82700 (10) obj. 900.9 iterations 109
+Cbc0038I Pass  53: suminf.    6.04500 (22) obj. 900.9 iterations 532
+Cbc0038I Pass  54: suminf.    2.79100 (10) obj. 900.9 iterations 422
+Cbc0038I Pass  55: suminf.    3.19100 (10) obj. 900.9 iterations 354
+Cbc0038I Pass  56: suminf.    3.19100 (13) obj. 900.9 iterations 212
+Cbc0038I Pass  57: suminf.    2.84500 (10) obj. 900.9 iterations 334
+Cbc0038I Pass  58: suminf.    2.39100 (11) obj. 900.9 iterations 147
+Cbc0038I Pass  59: suminf.    2.84500 (10) obj. 900.9 iterations 270
+Cbc0038I Pass  60: suminf.    2.39100 (13) obj. 900.9 iterations 161
+Cbc0038I Pass  61: suminf.    2.84500 (10) obj. 900.9 iterations 342
+Cbc0038I No solution found this major pass
+Cbc0038I Before mini branch and bound, 3890 integers at bound fixed and 598 continuous
+Cbc0038I Full problem 2954 rows 4829 columns, reduced to 259 rows 253 columns
+Cbc0038I Mini branch and bound did not improve solution (1.04 seconds)
+Cbc0038I After 1.04 seconds - Feasibility pump exiting with objective of 1100 - took 0.73 seconds
+Cbc0012I Integer solution of 1100 found by feasibility pump after 0 iterations and 0 nodes (1.04 seconds)
+Cbc0038I Full problem 2954 rows 4829 columns, reduced to 149 rows 289 columns
+Cbc0031I 3 added rows had average density of 68.666667
+Cbc0013I At root node, 3 cuts changed objective from 600 to 600 in 2 passes
+Cbc0014I Cut generator 0 (Probing) - 0 row cuts average 0.0 elements, 3 column cuts (3 active)  in 0.015 seconds - new frequency is 1
+Cbc0014I Cut generator 1 (Gomory) - 1 row cuts average 25.0 elements, 0 column cuts (0 active)  in 0.037 seconds - new frequency is -100
+Cbc0014I Cut generator 2 (Knapsack) - 0 row cuts average 0.0 elements, 0 column cuts (0 active)  in 0.003 seconds - new frequency is -100
+Cbc0014I Cut generator 3 (Clique) - 0 row cuts average 0.0 elements, 0 column cuts (0 active)  in 0.000 seconds - new frequency is -100
+Cbc0014I Cut generator 4 (MixedIntegerRounding2) - 0 row cuts average 0.0 elements, 0 column cuts (0 active)  in 0.002 seconds - new frequency is -100
+Cbc0014I Cut generator 5 (FlowCover) - 0 row cuts average 0.0 elements, 0 column cuts (0 active)  in 0.001 seconds - new frequency is -100
+Cbc0014I Cut generator 6 (TwoMirCuts) - 16 row cuts average 38.6 elements, 0 column cuts (0 active)  in 0.011 seconds - new frequency is -100
+Cbc0010I After 0 nodes, 1 on tree, 1100 best solution, best possible 600 (1.25 seconds)
+Cbc0038I Full problem 2954 rows 4829 columns, reduced to 118 rows 261 columns
+Cbc0038I Full problem 2957 rows 4829 columns, reduced to 2232 rows 2383 columns
+Cbc0044I Reduced cost fixing - 2232 rows, 2383 columns - restarting search
+Cbc0012I Integer solution of 1100 found by Previous solution after 0 iterations and 0 nodes (1.83 seconds)
+Cbc0038I Full problem 2232 rows 2383 columns, reduced to 59 rows 70 columns
+Cbc0012I Integer solution of 1000 found by RINS after 0 iterations and 0 nodes (1.89 seconds)
+Objective 600 proven optimal in 2.30274 seconds.
+Integer solution with objective 600 in 2.3069 seconds.
+Integer solution with objective 600 in 2.31127 seconds.
+Cbc0012I Integer solution of 600 found by DiveCoefficient after 352 iterations and 0 nodes (2.04 seconds)
+Cbc0031I 7 added rows had average density of 705.57143
+Cbc0013I At root node, 7 cuts changed objective from 600 to 600 in 7 passes
+Cbc0014I Cut generator 0 (Probing) - 0 row cuts average 0.0 elements, 0 column cuts (0 active)  in 0.031 seconds - new frequency is 1
+Cbc0014I Cut generator 1 (Gomory) - 25 row cuts average 819.4 elements, 0 column cuts (0 active)  in 0.034 seconds - new frequency is -100
+Cbc0014I Cut generator 2 (Knapsack) - 0 row cuts average 0.0 elements, 0 column cuts (0 active)  in 0.006 seconds - new frequency is -100
+Cbc0014I Cut generator 3 (Clique) - 0 row cuts average 0.0 elements, 0 column cuts (0 active)  in 0.000 seconds - new frequency is -100
+Cbc0014I Cut generator 4 (MixedIntegerRounding2) - 0 row cuts average 0.0 elements, 0 column cuts (0 active)  in 0.006 seconds - new frequency is -100
+Cbc0014I Cut generator 5 (FlowCover) - 0 row cuts average 0.0 elements, 0 column cuts (0 active)  in 0.003 seconds - new frequency is -100
+Cbc0014I Cut generator 6 (TwoMirCuts) - 44 row cuts average 215.1 elements, 0 column cuts (0 active)  in 0.017 seconds - new frequency is 1
+Cbc0014I Cut generator 8 (Stored from first) - 1 row cuts average 90.0 elements, 0 column cuts (0 active)
+Cbc0001I Search completed - best objective 600, took 352 iterations and 0 nodes (2.04 seconds)
+Cbc0035I Maximum depth 0, 0 variables fixed on reduced cost
+Cbc0038I Probing was tried 7 times and created 0 cuts of which 0 were active after adding rounds of cuts (0.031 seconds)
+Cbc0038I Gomory was tried 7 times and created 25 cuts of which 0 were active after adding rounds of cuts (0.034 seconds)
+Cbc0038I Knapsack was tried 7 times and created 0 cuts of which 0 were active after adding rounds of cuts (0.006 seconds)
+Cbc0038I Clique was tried 7 times and created 0 cuts of which 0 were active after adding rounds of cuts (0.000 seconds)
+Cbc0038I MixedIntegerRounding2 was tried 7 times and created 0 cuts of which 0 were active after adding rounds of cuts (0.006 seconds)
+Cbc0038I FlowCover was tried 7 times and created 0 cuts of which 0 were active after adding rounds of cuts (0.003 seconds)
+Cbc0038I TwoMirCuts was tried 7 times and created 44 cuts of which 0 were active after adding rounds of cuts (0.017 seconds)
+Cbc0038I Stored from first was tried 7 times and created 1 cuts of which 0 were active after adding rounds of cuts (0.000 seconds)
+Cbc0012I Integer solution of 600 found by Reduced search after 1358 iterations and 50 nodes (2.05 seconds)
+Cbc0001I Search completed - best objective 600, took 1358 iterations and 50 nodes (2.05 seconds)
+Cbc0032I Strong branching done 300 times (2809 iterations), fathomed 0 nodes and fixed 0 variables
+Cbc0035I Maximum depth 23, 103 variables fixed on reduced cost
+Cuts at root node changed objective from 600 to 600
+Probing was tried 16 times and created 3 cuts of which 0 were active after adding rounds of cuts (0.025 seconds)
+Gomory was tried 2 times and created 1 cuts of which 0 were active after adding rounds of cuts (0.037 seconds)
+Knapsack was tried 2 times and created 0 cuts of which 0 were active after adding rounds of cuts (0.003 seconds)
+Clique was tried 2 times and created 0 cuts of which 0 were active after adding rounds of cuts (0.000 seconds)
+MixedIntegerRounding2 was tried 2 times and created 0 cuts of which 0 were active after adding rounds of cuts (0.002 seconds)
+FlowCover was tried 2 times and created 0 cuts of which 0 were active after adding rounds of cuts (0.001 seconds)
+TwoMirCuts was tried 2 times and created 16 cuts of which 0 were active after adding rounds of cuts (0.011 seconds)
+
+Result - Optimal solution found
+
+Objective value:                600.00000000
+Enumerated nodes:               50
+Total iterations:               1358
+Time (CPU seconds):             2.09
+Time (Wallclock seconds):       2.12
+
+Total time (CPU seconds):       2.09   (Wallclock seconds):       2.12
+
+======
+. . . . . . . . BS FS BS . . . . . FS BS FS . . . WRM . BS FS . . . . OC . FBS WDS WDS . . . . . . . . . . . . . . . . . DS . . . . . FS . . . . . WRM . . . . . . BS . . . . . 
+. . . . . . . BS . WRM . FOC WOC WOC . . . . . . . . . . . . . . OC . BS . FS . . BS . WRM FS . . . OC . WRM . . . . BS . WRM . DS . . OC . DS OC . . . BS . FS FS WRM . . OC . BS . WRM . . 
+DS WRM . . . . . . . . . . . . DS WRM . . . . . WRM . . . . . . DS OC . . . . . DS WRM . . . . . BS OC . . . . . . DS . . . . . . WRM . . . . . WRM OC . . . . . . . . . . . . 
+. . . . . . . . WRM DS FS . . . . . . . . . . . . DS WRM DS . . . WRM . . . . . . DS OC . . . . . BS . BS . WOC WOC . . . . . . . . . . WRM FS . . . . . . DS . . . . . . . . . 
+. . . . FOC WOC WOC . . . . . . . . . . . . . . . . FS FS WRM . . . . WRM . DS . . . . . . . . . FS . DS . FOC . . . . . BS . . . BS . BS FS . . . . . WRM OC . WDS WDS . . . . . . . 
+OC . BS OC . . . . . . . . . . . . . . . . . OC . WRM OC . . . WRM . . . FOC WOC WOC . . . . . . . . WRM FS OC . . . OC . FS OC . . . FS FS OC . FOC WOC WOC . . . . . . . . . . . . . . 
+WRM DS . . . . . DS FS . OC . . . . . . . . . . DS BS . DS . . . FS FS . OC . . . . BS . OC . . . . . . FS . . . DS BS . . FBS WDS WDS . OC . . . . . . FS . . . . . BS FS . DS . . . 
+. BS . WRM FS . . FS OC . WRM FS . . FS OC . . FBS WDS WDS . . . . . . . . BS . WRM . . . WRM . . BS FS . . WRM . . WRM . . . . OC . WRM . . . . . . . FBS WDS WDS . BS . . . . . . OC . BS . . . 
+. . . . . . . . . . . . . . WRM . DS FS WRM . . BS FS OC . FBS WDS WDS . . . . . . . . FS BS . . . . . . . DS DS . . . FS . . FOC WOC WOC . BS . . . . . DS . DS . . . . WRM . . . . . . 
+. . DS . . . . . . . . . . . . DS BS . . . . . DS BS . . . . . DS DS . . . . . . DS . . . . . DS BS . . . . . . BS . . . . . DS WRM . . . . . DS BS . . . . . WRM DS . . . . 
+. . . BS . . . OC . . DS WRM . . OC . . . FOC WOC WOC . . . . . . . . . . . . . . . . . WRM DS . . . . . . . . . . . . . . . . . . . . DS . . . . . BS FOC . . . . . . FOC WOC WOC 
+. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 
+. OC . DS . . . . . . . . . . . BS . WRM DS . . . . . . . . . . . . FS WRM . . . OC . . FOC WOC WOC . . . . . . . . WRM . FS WRM . . . . . . . . . . . . . . . . . DS . WRM DS . . 
+FS . . . FBS WDS WDS . . . . . . . . . . . . . . . . . . . . . BS . FS BS . . . . . . DS WRM . . DS . . . FS . . FS . OC . FS . . DS . . DS WRM . . FS . . WRM FS . . DS . WRM . . . . 
+. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . WOC WOC FS . FS FS FS . . 
+. FS OC . DS . . . . . . . . . BS FS OC . . . . FS OC . . FOC WOC WOC . . . . . . . OC . . . . . . . FS OC . WRM . . WRM . DS . . . . . . . . . . . OC . OC . . . . . . OC . FBS WDS WDS 
+BS . FS FS WRM . . WRM DS OC . FBS WDS WDS . . . . . . . . . . . . . . . . . DS . . . FS . FS . FBS WDS WDS . . . . FBS WDS WDS . . . . . . . WRM . . BS . . . . . . DS FBS . . . . . OC . . . 
+
+Optimisation finished
