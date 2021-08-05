@@ -254,10 +254,10 @@ def run(ch, method, props, body):
                 s_off = [index for index, element in enumerate(staff_list) if element == True]
                 s_off.insert(0, row['ID'])
                 staff_off.append(s_off)
-                dcc = pd.to_numeric(staff_hours[staff_hours['Name']==row['Name']]['DCC']).values[0]
-                pa = pd.to_numeric(staff_hours[staff_hours['Name']==row['Name']]['PA']).values[0]
+                dcc = pd.to_numeric(staff_hours[staff_hours['ID']==row['ID']]['DCC']).values[0]
+                pa = pd.to_numeric(staff_hours[staff_hours['ID']==row['ID']]['PA']).values[0]
                 spa = pa - dcc
-                xpa = pd.to_numeric(staff_hours[staff_hours['Name']==row['Name']]['Extra_PA']).values[0]
+                xpa = pd.to_numeric(staff_hours[staff_hours['ID']==row['ID']]['Extra_PA']).values[0]
                 required = np.round(10 * ((pa * rota_days/7 - pa * tmp / 5) - spa * (rota_days/7 - tmp / 5) + xpa)).astype(int)
                 df = df.append({'ID': row['ID'], 'MaxShifts': '', 'MaxTotalMinutes': required, 'MinTotalMinutes': '0', 'MaxConsecutiveShifts': '3', 'MinConsecutiveShifts': '1', 'MinConsecutiveDaysOff': '1', 'MaxWeekends': '3'}, ignore_index=True)
                 if required <= 0:

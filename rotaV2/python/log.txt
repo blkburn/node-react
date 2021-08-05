@@ -1,4 +1,50 @@
+reading sheet
 reading Initial sheet
-reading Staff sheet
 reading Shifts sheet
-reading Objective sheet
+reading Shifts_Setup sheet
+reading Staff sheet
+Generating optimisation file...
+SECTION_HORIZON
+# The horizon length in days:
+77
+
+SECTION_SHIFTS
+# ShiftID, Length in mins, Shifts which cannot follow this shift | separated
+Day Shift,DS,25.0,,8:00,18:00,#9ccc65
+Ward Round Minors,WRM,25.0,WRM,8:00,18:00,#5c6bc0
+Back Shift,BS,20.0,DS|WRM|BS,14:00,22:00,#ec407a
+Float Shift,FS,25.0,DS,14:00,22:00,#ffea00
+On-Call,OC,25.0,DS|WRM|BS|WOC|WDS|OC|FS,19:00,9:00+1,#d4e157
+Weekend Day Shift,WDS,30.0,OC,8:00,18:00,#ffa726
+Weekend On-Call,WOC,40.0,DS|WRM|BS|OC,19:00,9:00+1,#8d6e63
+Friday Back Shift,FBS,20.0,,8:00,18:00,#ab47bc
+Friday on-Call,FOC,25.0,,19:00,9:00+1,#ef5350
+
+
+
+SECTION_STAFF
+# ID, MaxShifts, MaxTotalMinutes, MinTotalMinutes, MaxConsecutiveShifts, MinConsecutiveShifts, MinConsecutiveDaysOff, MaxWeekends
+BR,,405,0,3,1,1,3
+NC,,630,0,3,1,1,3
+LJ,,289,0,3,1,1,3
+MC,,400,0,3,1,1,3
+JT,,480,0,3,1,1,3
+SP,,800,0,3,1,1,3
+KS,,614,0,3,1,1,3
+RK,,880,0,3,1,1,3
+MCW,,490,0,3,1,1,3
+JH,,400,0,3,1,1,3
+FD,,450,0,3,1,1,3
+AD,,640,0,3,1,1,3
+CS,,450,0,3,1,1,3
+EP,,650,0,3,1,1,3
+RA,,220,0,3,1,1,3
+KJ,,704,0,3,1,1,3
+
+
+
+ Running Optimisation...
+Number of days: 77
+Error: Could not parse i from "DS".
+
+Optimisation finished
