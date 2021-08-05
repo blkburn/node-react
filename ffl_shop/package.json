@@ -1,6 +1,7 @@
 {
   "name": "FifeForLife",
   "version": "1.0.0",
+  "homepage": "/shop",
   "description": "MERN shopping cart app",
   "main": "server.js",
   "type": "module",
