@@ -432,13 +432,19 @@ def run(ch, method, props, body):
             results = obj[dates]
 
             for index, row in shifts.iterrows():
-                color = row['Color'].lstrip('#')
+                if row['Color'] is None:
+                    color = 'ffffff'
+                else:
+                    color = row['Color'].lstrip('#')
                 rgb = tuple(float(int(color[i:i+2], 16))/255 for i in (0, 2, 4))
                 d = '{"backgroundColor":{"red": '+str(rgb[0])+', "green": '+str(rgb[1])+', "blue": '+str(rgb[2])+'}}'
                 wks.add_conditional_formatting((1, 3), (20, 100), 'TEXT_EQ', json.loads(d), [row['ShiftID']])
 
             for index, row in shifts_nc.iterrows():
-                color = row['Color'].lstrip('#')
+                if row['Color'] is None:
+                    color = 'ffffff'
+                else:
+                    color = row['Color'].lstrip('#')
                 rgb = tuple(float(int(color[i:i+2], 16))/255 for i in (0, 2, 4))
                 d = '{"backgroundColor":{"red": '+str(rgb[0])+', "green": '+str(rgb[1])+', "blue": '+str(rgb[2])+'}}'
                 wks.add_conditional_formatting((1, 3), (20, 100), 'TEXT_EQ', json.loads(d), [row['ShiftID']])
