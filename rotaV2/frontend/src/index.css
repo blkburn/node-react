@@ -14,3 +14,9 @@ main {
 /* .react-bootstrap-table table {
   table-layout: auto !important;
 } */
+
+.alert {
+  text-align: center;
+  border-radius: 10px;
+  font-weight: 700;
+}

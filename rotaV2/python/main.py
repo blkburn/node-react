@@ -214,6 +214,11 @@ def run(ch, method, props, body):
             data = pull_sheet_data(sheet,SPREADSHEET_ID,DATA_TO_PULL)
             shifts = pd.DataFrame(data[1:], columns=data[0])
 
+            DATA_TO_PULL = 'Non_Clinical_Shifts'
+            log.write("reading Non Clinical Shifts sheet\n")
+            data = pull_sheet_data(sheet,SPREADSHEET_ID,DATA_TO_PULL)
+            shifts_nc = pd.DataFrame(data[1:], columns=data[0])
+
             DATA_TO_PULL = 'Shifts_Setup'
             log.write("reading Shifts_Setup sheet\n")
             data = pull_sheet_data(sheet,SPREADSHEET_ID,DATA_TO_PULL)
@@ -419,18 +424,26 @@ def run(ch, method, props, body):
             wks.update_row(2*(len(obj)+3)+len(staff_pas)+4+3+len(worked_shifts)+1, ws_cnt)
 
             for idx, (a, r) in enumerate(zip(cnt[2:],required_pas[2:])):
-                # header = wks.cell((2*(len(obj)+3)-1,idx+3))
                 col = 2*(len(obj)+3)-1
                 if a != r:
-                    # print('add conditional : ' + str(idx+3))
                     wks.add_conditional_formatting((col, idx+3), (col, idx+3), 'NUMBER_NOT_EQ', {'backgroundColor':{'red':1}}, [str(int(r))])
-                #     header.text_format['foregroundColor'] = (1,0,0,1)
-                # else:
-                #     header.text_format['foregroundColor'] = (0,0,0,1)
-                # header.update()
 
             original = raw[dates]
             results = obj[dates]
+
+            for index, row in shifts.iterrows():
+                color = row['Color'].lstrip('#')
+                rgb = tuple(float(int(color[i:i+2], 16))/255 for i in (0, 2, 4))
+                d = '{"backgroundColor":{"red": '+str(rgb[0])+', "green": '+str(rgb[1])+', "blue": '+str(rgb[2])+'}}'
+                wks.add_conditional_formatting((1, 3), (20, 100), 'TEXT_EQ', json.loads(d), [row['ShiftID']])
+
+            for index, row in shifts_nc.iterrows():
+                color = row['Color'].lstrip('#')
+                rgb = tuple(float(int(color[i:i+2], 16))/255 for i in (0, 2, 4))
+                d = '{"backgroundColor":{"red": '+str(rgb[0])+', "green": '+str(rgb[1])+', "blue": '+str(rgb[2])+'}}'
+                wks.add_conditional_formatting((1, 3), (20, 100), 'TEXT_EQ', json.loads(d), [row['ShiftID']])
+
+
 
             for index, row in results.iterrows():
                 orig_row = original.loc[[index]].values
@@ -439,7 +452,7 @@ def run(ch, method, props, body):
                         if '-' in o:
                             negs = list(filter(None,re.split(',|-|\n',o.replace(' ', ''))))
                             if r in negs:
-                                wks.add_conditional_formatting((index+2, idx+3), (index+2, idx+3), 'TEXT_NOT_CONTAINS', {'backgroundColor':{'red':1}}, [o])
+                                wks.add_conditional_formatting((index+2, idx+3), (index+2, idx+3), 'TEXT_NOT_CONTAINS', {'backgroundColor':{'red':1,'green':1}}, [o])
                                 print(o + ':' + r)
                         elif o != r:
                             wks.add_conditional_formatting((index+2, idx+3), (index+2, idx+3), 'TEXT_NOT_CONTAINS', {'backgroundColor':{'red':1}}, [o])

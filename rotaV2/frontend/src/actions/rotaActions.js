@@ -177,14 +177,9 @@ export const checkRotaStatus = () => async (dispatch, getState) => {
 
     console.log(data)
     if (!data.running) {
-      // dispatch(stopRotaRunning())
-      // dispatch(setRotaLocked(data.locked === 'TRUE'))
-      // dispatch(appendRotaMessage(data.message))
-      // dispatch(validRotaSheet(true))
       dispatch(updateStatus(data))
     } else {
       dispatch(incRotaCount())
-      // dispatch(validRotaSheet(false))
     }
     if (data.message !== '') {
       dispatch(appendRotaMessage(data.message))

@@ -7,6 +7,8 @@ import Schedule from '../components/Schedule'
 import ScheduleOld from '../components/Schedule_old'
 
 import { checkRotaStatus, getSchedule } from '../actions/rotaActions'
+import Loader from '../components/Loader'
+import Message from '../components/Message'
 // import { appointments } from '../appointments'
 
 const Rota = (props) => {
@@ -16,21 +18,6 @@ const Rota = (props) => {
   const { loading, error, sheet } = sheetDetails
   const dispatch = useDispatch()
   const rota = useSelector((state) => state.rota)
-
-  useEffect(() => {
-    console.log(`rota count ${rota.count}`)
-    const statusSubmit = () => {
-      dispatch(checkRotaStatus())
-    }
-    if (rota.running && rota.count > 0) {
-      function checkRunning() {
-        setTimeout(() => statusSubmit(), 1000)
-      }
-      checkRunning()
-    } else {
-      console.log('running is false')
-    }
-  }, [rota.count, rota.running, dispatch])
 
   useEffect(() => {
     if (!userInfo.isAdmin) {
@@ -44,6 +31,9 @@ const Rota = (props) => {
 
   return (
     <FormContainer>
+      {rota.running && (
+        <Message variant='info'>Running : {rota.count}s</Message>
+      )}
       <SheetList />
       {userInfo.isAdmin ? <RotaAdmin /> : <Schedule />}
     </FormContainer>

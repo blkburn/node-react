@@ -87,7 +87,6 @@ const RotaAdmin = (props) => {
             placeholder='Enter rota name'
             value={sheet.name || ''}
             readOnly={true}
-            // onChange={(e) => dispatch(setRotaName(e.target.value))}
           ></Form.Control>
         </Form.Group>
         <Form.Group controlId='sheet'>
@@ -97,7 +96,6 @@ const RotaAdmin = (props) => {
             placeholder='Sheet URL'
             value={sheet.sheet || ''}
             readOnly={true}
-            // onChange={handleChange('sheet')}
           ></Form.Control>
         </Form.Group>
         <Button
@@ -112,14 +110,14 @@ const RotaAdmin = (props) => {
         <Button
           className='my-3'
           type='submit'
-          disabled={rota.running || rota.valid || !sheet.sheet}
+          disabled={rota.running || !sheet.sheet}
           variant='primary'
         >
           {rota.valid ? (
             rota.locked ? (
-              <i className='fas fa-lock'></i>
+              <i className='fas fa-lock'> Reverify Sheet</i>
             ) : (
-              <i className='fas fa-unlock'></i>
+              <i className='fas fa-unlock'> Reverify Sheet</i>
             )
           ) : (
             'Verify Sheet'
