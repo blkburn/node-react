@@ -7,7 +7,11 @@ import { ViewState } from '@devexpress/dx-react-scheduler'
 import { indigo, blue, teal } from '@material-ui/core/colors'
 import ButtonGroup from '@material-ui/core/ButtonGroup'
 import Button from '@material-ui/core/Button'
+import DownloadLink from 'react-download-link'
 import classNames from 'clsx'
+// import ics from 'ics'
+// import '../components/ics.deps.min.js'
+
 import { fade } from '@material-ui/core/styles/colorManipulator'
 // import { Resource } from 'devextreme-react/scheduler'
 import {
@@ -237,8 +241,64 @@ const Schedule = (props) => {
     } else {
     }
   }, [filterIDs, dispatch, rota.schedule])
+  const convertDate = (date) => {
+    var event = new Date(date).toISOString()
+    event = event.split('T')
+    event[1] = event[1].split(':').slice(0, 2).join('-')
+    event = event.join('-')
+    event = event.split('-')
+    event = '[' + event.join(',') + [']']
+    return event
+  }
+  const createICS = () => {
+    if (rota.filtered) {
+      let cal = window.ics()
+      rota.filtered.map((item) => {
+        cal.addEvent(
+          item.title,
+          'Exported Schedule',
+          'NHS',
+          item.startDate,
+          item.endDate
+        )
+      })
+      return cal.download()
+
+      // let tmp = ics.createEvents(icsEvents, (err, value) => {
+      //   if (err) {
+      //     // if iCal generation fails, err is an object containing the reason
+      //     // if iCal generation succeeds, err is null
+      //     console.log(err)
+      //   }
+
+      //   console.log(value) // iCal-compliant text string
+      // })
+      // console.log(tmp)
+      // return tmp
+    }
+  }
+
   return (
     <div className='schedule-container'>
+      <div className='ics'>
+        <Button
+          className='my-3 me-3'
+          // type='submitLoad'
+          disabled={rota.running || !rota.filtered}
+          // variant='primary'
+          onClick={() => createICS()}
+        >
+          Download Calendar
+        </Button>
+        {/* <DownloadLink
+          tagName='Button'
+          disabled={rota.running || !rota.filtered}
+          label='Download Calendar'
+          filename='myfile.ics'
+          exportFile={() => createICS()}
+        /> */}
+        {/* <a href={createICS()}>Download Calendar</a> */}
+      </div>
       <div className='pill-container'>
         {rota.staff &&
           rota.staff.map((name, index) => (
