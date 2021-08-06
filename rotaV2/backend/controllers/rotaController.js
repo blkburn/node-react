@@ -14,6 +14,8 @@ let running = false
 let verifying = false
 let locked = ''
 let schedule = ''
+let startDate = ''
+let endDate = ''
 
 const child = spawn('tail', ['-f', './python/log.txt'])
 
@@ -31,7 +33,6 @@ const getRotaStatus = asyncHandler(async (req, res) => {
     if (!deque.isEmpty()) {
       res.status(202).json({
         running: running,
-        link: '/api/status',
         message: deque.toString(),
       })
       deque.clear()
@@ -44,7 +45,8 @@ const getRotaStatus = asyncHandler(async (req, res) => {
     res.status(200).json({
       running: running,
       locked: locked,
-      link: '',
+      startDate: startDate,
+      endDate: endDate,
       message: deque.toString(),
       scheduleData: schedule,
     })
@@ -117,8 +119,13 @@ const verifyRotaSheet = (req, res) => {
                   running = false
                   // deque.clear()
                 } else {
-                  console.log(' [.] Locked = %s', msg.content.toString())
-                  locked = msg.content.toString()
+                  const resp = JSON.parse(msg.content)
+                  locked = resp['isLocked']
+                  startDate = resp['startDate']
+                  endDate = resp['endDate']
+                  console.log(' [.] Locked = %s', locked)
+                  console.log(' [.] Start Date = %s', startDate)
+                  console.log(' [.] End Date = %s', endDate)
                 }
               }
             },
@@ -257,7 +264,15 @@ const runGetSchedule = (req, res) => {
                   console.log('Process Complete...')
                   running = false
                 } else {
+                  // schedule = msg.content.toString()
+                  const resp = JSON.parse(msg.content)
+                  locked = resp['isLocked']
+                  startDate = resp['startDate']
+                  endDate = resp['endDate']
                   schedule = msg.content.toString()
+                  console.log(' [.] Locked = %s', locked)
+                  console.log(' [.] Start Date = %s', startDate)
+                  console.log(' [.] End Date = %s', endDate)
                 }
               }
             },

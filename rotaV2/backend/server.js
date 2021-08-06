@@ -35,7 +35,7 @@ app.use(express.json())
 
 // app.use('/api/products', productRoutes)
 app.use('/api/users', userRoutes)
-app.use('/api/rota/', rotaRoutes)
+app.use('/api/rota', rotaRoutes)
 app.use('/api/sheets', sheetRoutes)
 // app.use('/api/orders', orderRoutes)
 // app.use('/api/upload', uploadRoutes)

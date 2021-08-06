@@ -8,7 +8,14 @@ import Sheet from '../models/sheetModel.js'
 // @access  Private/Admin
 const getSheets = asyncHandler(async (req, res) => {
   const sheets = await Sheet.find({})
-  res.json(sheets)
+  if (req.user.isAdmin) {
+    res.json(sheets)
+  } else {
+    const resp = sheets.filter((item) => {
+      return item.isPublished == true
+    })
+    res.json(resp)
+  }
 })
 
 // @desc    Delete sheet
@@ -30,6 +37,7 @@ const deleteSheet = asyncHandler(async (req, res) => {
 // @route   GET /api/sheets/:id
 // @access  Private/Admin
 const getSheetById = asyncHandler(async (req, res) => {
+  console.log(req.params.id)
   const sheet = await Sheet.findById(req.params.id)
   if (sheet) {
     res.json(sheet)
@@ -43,6 +51,7 @@ const getSheetById = asyncHandler(async (req, res) => {
 // @route   PUT /api/sheets/:id
 // @access  Private/Admin
 const updateSheet = asyncHandler(async (req, res) => {
+  console.log(req.params.id)
   const sheet = await Sheet.findById(req.params.id)
 
   if (sheet) {
@@ -53,10 +62,10 @@ const updateSheet = asyncHandler(async (req, res) => {
     const updatedSheet = await sheet.save()
 
     res.json({
-      _id: updatedsheet._id,
-      name: updatedsheet.name,
-      sheet: updatedsheet.sheet,
-      isPublished: updatedsheet.isPublished,
+      _id: updatedSheet._id,
+      name: updatedSheet.name,
+      sheet: updatedSheet.sheet,
+      isPublished: updatedSheet.isPublished,
     })
   } else {
     res.status(404)

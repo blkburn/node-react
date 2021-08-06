@@ -14,6 +14,7 @@ import pika
 from random import random
 import re
 from datetime import datetime, timedelta
+import http.client
 
 # google-api-python-client==1.7.9
 # google-auth-httplib2==0.0.3
@@ -97,27 +98,48 @@ def run(ch, method, props, body):
         service = build('sheets', 'v4', credentials=credentials)
         sheet = service.spreadsheets()
 
+        # SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
+        SPREADSHEET_ID = param['sheet']
+        DATA_TO_PULL = 'LOCKED'
+        log.write("check if sheet is locked\n")
+        lockedSheet = pull_sheet_data(sheet, SPREADSHEET_ID, DATA_TO_PULL)
 
-        client = pygsheets.authorize(credentials=credentials)
-        pySheet = client.open_by_key(param['sheet'])
-        # pySheet = client.open_by_key('1Ct2-Veq9Crr7CFMZrL83_EcvZpNu3lGrTqb6TQZ_ayc')
-
-        if (command == 'VERIFY_SHEET'):
-            log.write("verify google sheet " + str(rnd) + "\n")
-            print('check if locked')
-
-            # SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
-            SPREADSHEET_ID = param['sheet']
-            DATA_TO_PULL = 'LOCKED'
-            log.write("check if sheet is locked\n")
-            data = pull_sheet_data(sheet, SPREADSHEET_ID, DATA_TO_PULL)
-            log.write('LOCKED = ' + data[0][0] + '\n')
+        if lockedSheet == None:
 
             ch.basic_publish(exchange='',
                              routing_key=props.reply_to,
                              properties=pika.BasicProperties(correlation_id = \
                                                                  props.correlation_id),
-                             body=str(data[0][0]))
+                             body=str('Error: Sheet not found'))
+            ch.basic_publish(exchange='',
+                             routing_key=props.reply_to,
+                             properties=pika.BasicProperties(correlation_id = \
+                                                                 props.correlation_id),
+                             body=str('Complete'))
+            log.close()
+            command = 'none'
+            return
+
+        isLocked = lockedSheet[0][0]
+        # Get the Initial sheet - get the start and end dates
+        DATA_TO_PULL = 'Initial'
+        log.write("reading Initial sheet\n")
+        data = pull_sheet_data(sheet,SPREADSHEET_ID,DATA_TO_PULL)
+        raw = pd.DataFrame(data[1:], columns=data[0])
+        cols = raw.columns[2:]
+        startDate = cols[0]
+        endDate = cols[-1]
+
+        if (command == 'VERIFY_SHEET'):
+            print('check if locked')
+            log.write("check if sheet is locked\n")
+            log.write('LOCKED = ' + lockedSheet[0][0] + '\n')
+
+            ch.basic_publish(exchange='',
+                             routing_key=props.reply_to,
+                             properties=pika.BasicProperties(correlation_id = \
+                                                                 props.correlation_id),
+                             body=json.dumps(dict({'isLocked':isLocked, 'startDate':startDate, 'endDate':endDate})))
             ch.basic_publish(exchange='',
                              routing_key=props.reply_to,
                              properties=pika.BasicProperties(correlation_id = \
@@ -128,11 +150,11 @@ def run(ch, method, props, body):
 
         elif (command == 'GET_SCHEDULE'):
 
-            SPREADSHEET_ID = param['sheet']
-            DATA_TO_PULL = 'Initial'
-            log.write("reading Initial sheet\n")
-            data = pull_sheet_data(sheet,SPREADSHEET_ID,DATA_TO_PULL)
-            raw = pd.DataFrame(data[1:], columns=data[0])
+            # SPREADSHEET_ID = param['sheet']
+            # DATA_TO_PULL = 'Initial'
+            # log.write("reading Initial sheet\n")
+            # data = pull_sheet_data(sheet,SPREADSHEET_ID,DATA_TO_PULL)
+            # raw = pd.DataFrame(data[1:], columns=data[0])
 
             DATA_TO_PULL = 'Staff'
             log.write("reading Staff sheet\n")
@@ -187,7 +209,7 @@ def run(ch, method, props, body):
             ch.basic_publish(exchange='',
                              routing_key=props.reply_to,
                              properties=pika.BasicProperties(correlation_id = props.correlation_id),
-                             body=json.dumps(dict({'staff':staffJson, 'shift':shiftJson, 'schedule':scheduleJson})))
+                             body=json.dumps(dict({'isLocked':isLocked, 'startDate':startDate, 'endDate':endDate,'staff':staffJson, 'shift':shiftJson, 'schedule':scheduleJson})))
             # body=json.dumps(dict({'schedule': schedule})))
 
             ch.basic_publish(exchange='',
@@ -202,12 +224,12 @@ def run(ch, method, props, body):
             log.write("reading sheet\n")
             # ch.basic_ack(delivery_tag=method.delivery_tag)
 
-            # SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
-            SPREADSHEET_ID = param['sheet']
-            DATA_TO_PULL = 'Initial'
-            log.write("reading Initial sheet\n")
-            data = pull_sheet_data(sheet,SPREADSHEET_ID,DATA_TO_PULL)
-            raw = pd.DataFrame(data[1:], columns=data[0])
+            # # SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
+            # SPREADSHEET_ID = param['sheet']
+            # DATA_TO_PULL = 'Initial'
+            # log.write("reading Initial sheet\n")
+            # data = pull_sheet_data(sheet,SPREADSHEET_ID,DATA_TO_PULL)
+            # raw = pd.DataFrame(data[1:], columns=data[0])
 
             DATA_TO_PULL = 'Shifts'
             log.write("reading Shifts sheet\n")
@@ -412,6 +434,8 @@ def run(ch, method, props, body):
             ws_cnt.insert(0, 'Totals')
             ws_cnt.insert(0, '')
 
+            client = pygsheets.authorize(credentials=credentials)
+            pySheet = client.open_by_key(param['sheet'])
             wks = pySheet.worksheet_by_title('Objective')
             wks.clear(start='A1', end=None, fields="*")
             wks.set_dataframe(obj, start=(1,1))
