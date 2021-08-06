@@ -7,7 +7,6 @@ import { ViewState } from '@devexpress/dx-react-scheduler'
 import { indigo, blue, teal } from '@material-ui/core/colors'
 import ButtonGroup from '@material-ui/core/ButtonGroup'
 import Button from '@material-ui/core/Button'
-import DownloadLink from 'react-download-link'
 import classNames from 'clsx'
 // import ics from 'ics'
 // import '../components/ics.deps.min.js'
@@ -241,15 +240,7 @@ const Schedule = (props) => {
     } else {
     }
   }, [filterIDs, dispatch, rota.schedule])
-  const convertDate = (date) => {
-    var event = new Date(date).toISOString()
-    event = event.split('T')
-    event[1] = event[1].split(':').slice(0, 2).join('-')
-    event = event.join('-')
-    event = event.split('-')
-    event = '[' + event.join(',') + [']']
-    return event
-  }
+
   const createICS = () => {
     if (rota.filtered) {
       let cal = window.ics()
