@@ -160,28 +160,6 @@ const Schedule = (props) => {
     currentDate: '2021-10-23',
     currentViewName: 'Week',
   }
-
-  // const reducer = (state, action) => {
-  //   switch (action.type) {
-  //     case 'setLoading':
-  //       return { ...state, loading: action.payload }
-  //     case 'setData':
-  //       return {
-  //         ...state,
-  //         data: action.payload['schedule'],
-  //         staff: action.payload['staff'],
-  //         shift: action.payload['shift'],
-  //       }
-  //     // return { ...state, data: action.payload.map(mapAppointmentData) }
-  //     case 'setCurrentViewName':
-  //       return { ...state, currentViewName: action.payload }
-  //     case 'setCurrentDate':
-  //       return { ...state, currentDate: action.payload }
-  //     default:
-  //       return state
-  //   }
-  // }
-
   const resources = [
     {
       fieldName: 'staff',
@@ -231,141 +209,6 @@ const Schedule = (props) => {
     }
   }, [rota.count, rota.running, dispatch])
 
-  // const getButtonClass = (staff, classes, staffId) =>
-  //   staff.indexOf(staffId) > -1 && classes.selectedButton
-
-  // const handleButtonClick = (staffId, staff) => {
-  //   const sId = staff.map((item) => {
-  //     return item.id
-  //   })
-  //   if (sId.indexOf(staffId) > -1) {
-  //     console.log(sId.filter((s) => s === staffId))
-  //     return sId.filter((s) => s === staffId)
-  //   }
-  //   const nextstaff = [...staff]
-  //   nextstaff.push(staffId)
-  //   return nextstaff
-  // }
-
-  // const FlexibleSpace = withStyles(styles, { name: 'FlexibleSpace' })(
-  //   ({ classes, ...restProps }) => (
-  //     <Toolbar.FlexibleSpace {...restProps} className={classes.flexibleSpace}>
-  //       <ReduxLocationSelector />
-  //     </Toolbar.FlexibleSpace>
-  //   )
-  // )
-  // const LocationSelector = withStyles(styles, { name: 'LocationSelector' })(
-  //   ({ onStaffIdChange, staff, classes }) => {
-  //     if (staff) {
-  //       return (
-  //         <ButtonGroup className={classes.locationSelector}>
-  //           {staff.map((staffId, index) => (
-  //             <Button
-  //               className={classNames(
-  //                 classes.button,
-  //                 getButtonClass(staff, classes, staffId.id)
-  //               )}
-  //               onClick={() =>
-  //                 onStaffIdChange(handleButtonClick(staffId.id, staff))
-  //               }
-  //               key={staffId.id}
-  //             >
-  //               <React.Fragment>
-  //                 <span className={classes.shortButtonText}>
-  //                   {staff[index].name}
-  //                 </span>
-  //                 <span className={classes.longButtonText}>
-  //                   {staff[index].id}
-  //                 </span>
-  //               </React.Fragment>
-  //             </Button>
-  //           ))}
-  //         </ButtonGroup>
-  //       )
-  //     } else {
-  //       return null
-  //     }
-  //   }
-  // )
-  // const mapStateToProps = (state) => {
-  //   if (state.rota.schedule) {
-  //     let staff = state.rota.staff
-  //     // let data = state.rota.staff.filter(
-  //     //   (dataItem) => state.rota.staff.indexOf(dataItem.id) > -1
-  //     // )
-  //     // const lowerCaseFilter = state.currentFilter.toLowerCase()
-  //     // data = data.filter(
-  //     //   (dataItem) =>
-  //     //     dataItem.title.toLowerCase().includes(lowerCaseFilter) ||
-  //     //     dataItem.staffId.toLowerCase().includes(lowerCaseFilter)
-  //     // )
-  //     return { ...state, staff }
-  //   } else return { ...state }
-  // }
-
-  // const mapDispatchToProps = (dispatch) => ({
-  //   // onStaffIdChange: (locations) =>
-  //   //   dispatch(createSchedulerAction('locations', locations)),
-  //   onStaffIdChange: (id) => {
-  //     if (rota.filteredId === id[0]) {
-  //       dispatch({
-  //         type: ROTA_CLEAR_FILTER_SCHEDULE,
-  //       })
-  //       dispatch({
-  //         type: ROTA_CLEAR_FILTER_SCHEDULE_ID,
-  //       })
-  //     } else {
-  //       const filtered = rota.schedule.filter((item) => {
-  //         // console.log(typeof item.staff)
-  //         return item.staff === id[0]
-  //       })
-  //       console.log(filtered)
-  //       dispatch({
-  //         type: ROTA_FILTER_SCHEDULE,
-  //         payload: filtered,
-  //       })
-  //       dispatch({
-  //         type: ROTA_FILTER_SCHEDULE_ID,
-  //         payload: id[0],
-  //       })
-  //     }
-  //   },
-  // })
-
-  // const SCHEDULER_STATE_CHANGE_ACTION = 'SCHEDULER_STATE_CHANGE'
-
-  // const schedulerReducer = (state = schedulerInitialState, action) => {
-  //   if (action.type === SCHEDULER_STATE_CHANGE_ACTION) {
-  //     return {
-  //       ...state,
-  //       [action.payload.partialStateName]: action.payload.partialStateValue,
-  //     }
-  //   }
-  //   return state
-  // }
-  // const store = createStore(
-  //   schedulerReducer,
-  //   // Enabling Redux DevTools Extension (https://github.com/zalmoxisus/redux-devtools-extension)
-  //   // eslint-disable-next-line no-underscore-dangle
-  //   typeof window !== 'undefined'
-  //     ? window.__REDUX_DEVTOOLS_EXTENSION__ &&
-  //         window.__REDUX_DEVTOOLS_EXTENSION__()
-  //     : undefined
-  //   // eslint-enable
-  // )
-  // const createSchedulerAction = (partialStateName, partialStateValue) => ({
-  //   type: SCHEDULER_STATE_CHANGE_ACTION,
-  //   payload: {
-  //     partialStateName,
-  //     partialStateValue,
-  //   },
-  // })
-
-  // const ReduxLocationSelector = connect(
-  //   mapStateToProps,
-  //   mapDispatchToProps
-  // )(LocationSelector)
-
   const [filterIDs, setFitlerIDs] = useState([])
   const getValue = (e) => {
     const clicked = e.target
@@ -391,6 +234,7 @@ const Schedule = (props) => {
         type: ROTA_FILTER_SCHEDULE,
         payload: filtered,
       })
+    } else {
     }
   }, [filterIDs, dispatch, rota.schedule])
   return (
@@ -414,15 +258,15 @@ const Schedule = (props) => {
           ))}
       </div>
       <Paper>
-        <Scheduler data={rota.filtered} height={660}>
+        <Scheduler data={rota.filtered} height={700}>
           <ViewState
             currentDate={rota.scheduleDate}
             currentViewName={rota.scheduleViewName}
             onCurrentViewNameChange={setCurrentViewName}
             onCurrentDateChange={setCurrentDate}
           />
-          <DayView startDayHour={0} endDayHour={24} />
-          <WeekView startDayHour={0} endDayHour={24} />
+          <DayView startDayHour={8} endDayHour={20} />
+          <WeekView startDayHour={8} endDayHour={20} />
           <MonthView />
           <Appointments />
           {/* <Resources data={resources} /> */}
@@ -444,8 +288,3 @@ const Schedule = (props) => {
 }
 
 export default Schedule
-// export default () => (
-//   <Provider store={store}>
-//     <Schedule />
-//   </Provider>
-// )

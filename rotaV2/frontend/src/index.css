@@ -31,10 +31,11 @@ main {
   flex-direction: row;
   flex-wrap: wrap;
   width: 80%;
-  height: 3rem;
+  /* height: 3rem; */
   box-sizing: border-box;
-  padding: 1rem 2rem;
-  min-height: 200px
+  padding: 1rem 0rem;
+  /* min-height: 200px; */
+  justify-content: space-around;
 }
 
 .pill-container input[type=checkbox] {
@@ -44,22 +45,18 @@ main {
 }
 
 .pill-container .option {
-  border-radius: 20px;
-  padding: 0.25rem 0.25rem;
+  border-radius: 10px;
+  padding: 0.2rem 0.2rem;
+  height: fit-content;
 }
 .pill-container .option label{
-  padding: 0.25rem 0.5rem;
-}
-
-.pill-container .selector:last-child {
-  /* border-right: 2px solid #5183f5; */
-  /* border-top-right-radius: 20px; */
-  /* border-bottom-right-radius: 20px; */
+  padding: 0.3rem 0.3rem;
 }
 
 .selector {
   font-family: "PT Sans", sans-serif;
   letter-spacing: 1.1px;
+  font-size: 0.75rem;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   color: #5183f5;

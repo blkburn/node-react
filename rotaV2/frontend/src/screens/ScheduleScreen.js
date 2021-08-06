@@ -20,14 +20,12 @@ const ScheduleScreen = (props) => {
   const rota = useSelector((state) => state.rota)
 
   useEffect(() => {
-    if (!userInfo.isAdmin) {
-      if (sheet.sheet) {
-        console.log('get schedule')
-        // get the current schedule
-        dispatch(getSchedule())
-      }
+    if (sheet.sheet) {
+      console.log('get schedule')
+      // get the current schedule
+      dispatch(getSchedule())
     }
-  }, [userInfo.isAdmin, sheet.sheet, dispatch])
+  }, [sheet.sheet, dispatch])
 
   return (
     <FormContainer>
