@@ -12,7 +12,7 @@ import {
 import BootstrapTable from 'react-bootstrap-table-next'
 import { SHEET_DETAILS_RESET } from '../constants/userConstants'
 
-const SheetList = ({ history }) => {
+const SheetListAdmin = ({ history }) => {
   const dispatch = useDispatch()
 
   const userLogin = useSelector((state) => state.userLogin)
@@ -63,6 +63,59 @@ const SheetList = ({ history }) => {
         }
       },
     },
+    {
+      dataField: 'isPublished',
+      text: 'Published',
+      style: {
+        textAlign: 'center',
+      },
+      headerStyle: (colum, colIndex) => {
+        return {
+          width: '10%',
+          textAlign: 'center',
+        }
+      },
+      formatter: (rowContent, row) => {
+        const style = rowContent ? (
+          <i className='fas fa-check' style={{ color: 'green' }}></i>
+        ) : (
+          <i className='fas fa-times' style={{ color: 'red' }}></i>
+        )
+        return style
+      },
+    },
+    {
+      dataField: 'Edit',
+      text: 'Edit',
+      formatter: (rowContent, row) => {
+        const style = (
+          <>
+            <LinkContainer to={`/admin/sheets/${row._id}/edit`}>
+              <Button variant='light' className='btn-sm'>
+                <i className='fas fa-edit'></i>
+              </Button>
+            </LinkContainer>
+            <Button
+              variant='danger'
+              className='btn-sm'
+              onClick={() => deleteHandler(row._id)}
+            >
+              <i className='fas fa-trash'></i>
+            </Button>
+          </>
+        )
+        return style
+      },
+      style: {
+        textAlign: 'center',
+      },
+      headerStyle: (colum, colIndex) => {
+        return {
+          width: '10%',
+          textAlign: 'center',
+        }
+      },
+    },
   ]
 
   return (
@@ -86,4 +139,4 @@ const SheetList = ({ history }) => {
   )
 }
 
-export default SheetList
+export default SheetListAdmin

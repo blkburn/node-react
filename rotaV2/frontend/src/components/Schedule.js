@@ -40,6 +40,8 @@ import { checkRotaStatus } from '../actions/rotaActions'
 const Schedule = (props) => {
   const dispatch = useDispatch()
   const rota = useSelector((state) => state.rota)
+  const sheetDetails = useSelector((state) => state.sheetDetails)
+  const { loading, error, sheet } = sheetDetails
 
   const styles = ({ spacing, palette }) => ({
     flexibleSpace: {
@@ -136,13 +138,6 @@ const Schedule = (props) => {
     },
   })
 
-  const getData = (setData, setLoading, rota) => {
-    setLoading(false)
-    if (rota && rota !== '') {
-      setData(rota)
-    }
-  }
-
   const ToolbarWithLoading = withStyles(styles, { name: 'Toolbar' })(
     ({ children, classes, ...restProps }) => (
       <div className={classes.toolbarRoot}>
@@ -152,17 +147,6 @@ const Schedule = (props) => {
     )
   )
 
-  const usaTime = (date) =>
-    new Date(date).toLocaleString('en-US', { timeZone: 'America/Los_Angeles' })
-
-  const initialState = {
-    data: [],
-    staff: [],
-    shift: [],
-    loading: false,
-    currentDate: '2021-10-23',
-    currentViewName: 'Week',
-  }
   const resources = [
     {
       fieldName: 'staff',
@@ -193,8 +177,8 @@ const Schedule = (props) => {
     [dispatch]
   )
   useEffect(() => {
-    setCurrentDate('2021-10-23')
-    setCurrentViewName('Week')
+    setCurrentDate(new Date())
+    setCurrentViewName('Month')
   }, [setCurrentDate, setCurrentViewName])
 
   useEffect(() => {
@@ -213,10 +197,11 @@ const Schedule = (props) => {
   }, [rota.count, rota.running, dispatch])
 
   const [filterIDs, setFitlerIDs] = useState([])
+
   const getValue = (e) => {
     const clicked = e.target
-    console.log(clicked.value)
-    console.log(clicked.checked)
+    // console.log(clicked.value)
+    // console.log(clicked.checked)
     if (clicked.checked) {
       setFitlerIDs((prevState) => [...prevState, clicked.value])
     } else {
@@ -237,7 +222,6 @@ const Schedule = (props) => {
         type: ROTA_FILTER_SCHEDULE,
         payload: filtered,
       })
-    } else {
     }
   }, [filterIDs, dispatch, rota.schedule])
 
@@ -254,41 +238,28 @@ const Schedule = (props) => {
         )
       })
       return cal.download()
-
-      // let tmp = ics.createEvents(icsEvents, (err, value) => {
-      //   if (err) {
-      //     // if iCal generation fails, err is an object containing the reason
-      //     // if iCal generation succeeds, err is null
-      //     console.log(err)
-      //   }
-
-      //   console.log(value) // iCal-compliant text string
-      // })
-      // console.log(tmp)
-      // return tmp
     }
   }
 
   return (
     <div className='schedule-container'>
+      <div className='sheet-title'>
+        <h2 hidden={rota.running || !rota.startDate}>{sheet.name}</h2>
+      </div>
       <div className='ics'>
         <Button
           className='my-3 me-3'
           // type='submitLoad'
-          disabled={rota.running || !rota.filtered}
+          disabled={rota.running || !rota.filtered || !rota.filtered.length}
           // variant='primary'
           onClick={() => createICS()}
         >
           Download Calendar
         </Button>
-        {/* <DownloadLink
-          tagName='Button'
-          disabled={rota.running || !rota.filtered}
-          label='Download Calendar'
-          filename='myfile.ics'
-          exportFile={() => createICS()}
-        /> */}
-        {/* <a href={createICS()}>Download Calendar</a> */}
+        <p hidden={rota.running || !rota.startDate}>
+          {rota.startDate && rota.startDate.toDateString()} to{' '}
+          {rota.endDate && rota.endDate.toDateString()}
+        </p>
       </div>
       <div className='pill-container'>
         {rota.staff &&

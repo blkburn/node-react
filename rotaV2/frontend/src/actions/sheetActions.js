@@ -1,5 +1,6 @@
 import axios from 'axios'
 import {
+  ROTA_CLEAR_SCHEDULE,
   SHEET_ADD_FAIL,
   SHEET_ADD_REQUEST,
   SHEET_ADD_SUCCESS,
@@ -79,6 +80,9 @@ export const getSheetDetails = (id) => async (dispatch, getState) => {
     dispatch({
       type: SHEET_DETAILS_SUCCESS,
       payload: data,
+    })
+    dispatch({
+      type: ROTA_CLEAR_SCHEDULE,
     })
   } catch (error) {
     const message =

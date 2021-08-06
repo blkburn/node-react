@@ -4,16 +4,19 @@ import {
   ROTA_CLEAR_FILTER_SCHEDULE,
   ROTA_CLEAR_FILTER_SCHEDULE_ID,
   ROTA_CLEAR_MESSAGE,
+  ROTA_CLEAR_SCHEDULE,
   ROTA_FILTER_SCHEDULE,
   ROTA_FILTER_SCHEDULE_ID,
   ROTA_INC_COUNT,
   ROTA_SCHEDULE_DATE,
   ROTA_SCHEDULE_VIEW_NAME,
+  ROTA_SET_END_DATE,
   ROTA_SET_LOCKED,
   ROTA_SET_RUNNING,
   ROTA_SET_SCHEDULE,
   ROTA_SET_SHEET,
   ROTA_SET_SHEET_NAME,
+  ROTA_SET_START_DATE,
   ROTA_SHEET_VALID,
   ROTA_STOP_RUNNING,
 } from '../constants/userConstants'
@@ -28,6 +31,10 @@ export const rotaSheetReducer = (state = { message: [] }, action) => {
       return { ...state, valid: action.payload }
     case ROTA_SET_LOCKED:
       return { ...state, locked: action.payload }
+    case ROTA_SET_START_DATE:
+      return { ...state, startDate: action.payload }
+    case ROTA_SET_END_DATE:
+      return { ...state, endDate: action.payload }
     case ROTA_SET_RUNNING:
       return { ...state, running: true }
     case ROTA_STOP_RUNNING:
@@ -41,6 +48,14 @@ export const rotaSheetReducer = (state = { message: [] }, action) => {
         filtered: JSON.parse(action.payload)['schedule'],
         staff: JSON.parse(action.payload)['staff'],
         shift: JSON.parse(action.payload)['shift'],
+      }
+    case ROTA_CLEAR_SCHEDULE:
+      return {
+        ...state,
+        schedule: [],
+        filtered: [],
+        staff: [],
+        shift: [],
       }
     case ROTA_FILTER_SCHEDULE:
       return { ...state, filtered: action.payload }

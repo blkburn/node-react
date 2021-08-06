@@ -12,7 +12,10 @@ import {
   ROTA_SHEET_VALID,
   ROTA_STOP_RUNNING,
   ROTA_SET_SCHEDULE,
+  ROTA_SET_START_DATE,
+  ROTA_SET_END_DATE,
 } from '../constants/userConstants'
+import moment from 'moment'
 
 const rotaFail = (dispatch, error) => {
   console.log(error)
@@ -57,6 +60,8 @@ export const setSchedule = (schedule) => async (dispatch) => {
         type: ROTA_SET_SCHEDULE,
         payload: JSON.parse(JSON.stringify(schedule)),
       })
+      setSartDate(schedule.startDate)
+      setEndDate(schedule.endDate)
     }
   } catch (error) {
     rotaFail(dispatch, error)
@@ -148,6 +153,30 @@ export const setRotaLocked = (isLocked) => async (dispatch) => {
   }
 }
 
+export const setSartDate = (date) => async (dispatch) => {
+  try {
+    let dateObject = moment.utc(date, 'DD/MM/YY').toDate()
+    dispatch({
+      type: ROTA_SET_START_DATE,
+      payload: dateObject,
+    })
+  } catch (error) {
+    rotaFail(dispatch, error)
+  }
+}
+
+export const setEndDate = (date) => async (dispatch) => {
+  let dateObject = moment.utc(date, 'DD/MM/YY').toDate()
+  try {
+    dispatch({
+      type: ROTA_SET_END_DATE,
+      payload: dateObject,
+    })
+  } catch (error) {
+    rotaFail(dispatch, error)
+  }
+}
+
 const updateStatus = (data) => (dispatch) => {
   dispatch(clearRotaCount())
   dispatch(stopRotaRunning())
@@ -159,6 +188,10 @@ const updateStatus = (data) => (dispatch) => {
     console.log('sheet unlocked')
     dispatch(appendRotaMessage('Sheet is UNLOCKED'))
   }
+  dispatch(setSartDate(data.startDate))
+  dispatch(setEndDate(data.endDate))
+  dispatch(appendRotaMessage(`Rota start date : ${data.startDate}`))
+  dispatch(appendRotaMessage(`Rota end date : ${data.endDate}`))
   // dispatch(appendRotaMessage(data.message))
   dispatch(validRotaSheet(true))
 }

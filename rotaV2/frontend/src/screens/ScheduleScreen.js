@@ -9,6 +9,7 @@ import ScheduleOld from '../components/Schedule_old'
 import { checkRotaStatus, getSchedule } from '../actions/rotaActions'
 import Loader from '../components/Loader'
 import Message from '../components/Message'
+import SheetListAdmin from '../components/SheetsListAdmin'
 // import { appointments } from '../appointments'
 
 const ScheduleScreen = (props) => {
@@ -29,8 +30,12 @@ const ScheduleScreen = (props) => {
 
   return (
     <FormContainer>
-      <SheetList />
-      {userInfo.isAdmin ? <Schedule /> : <Schedule />}
+      {rota.running && (
+        <Message variant='info'>Running : {rota.count}s</Message>
+      )}
+      {userInfo.isAdmin ? <SheetListAdmin /> : <SheetList />}
+      {/* {userInfo.isAdmin ? <Schedule /> : <Schedule />} */}
+      <Schedule />
     </FormContainer>
   )
 }
