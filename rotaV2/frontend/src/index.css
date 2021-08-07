@@ -121,3 +121,18 @@ main {
     padding: 0.2rem 1.75rem;
 
 }
+
+.resource-main {
+  padding: 1rem;
+    background: #5183f5;
+    color: white;
+    display: inline-block;
+    padding-right: 1rem;
+}
+
+.resource-select {
+  padding: 0.8rem 1rem;
+  background: #e2eafd;
+  /* color: white !important; */
+
+}

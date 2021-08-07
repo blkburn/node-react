@@ -166,6 +166,11 @@ def run(ch, method, props, body):
             data = pull_sheet_data(sheet,SPREADSHEET_ID,DATA_TO_PULL)
             shifts = pd.DataFrame(data[1:], columns=data[0])
 
+            DATA_TO_PULL = 'Non_Clinical_Shifts'
+            log.write("reading Non Clinical Shifts sheet\n")
+            data = pull_sheet_data(sheet,SPREADSHEET_ID,DATA_TO_PULL)
+            shifts_nc = pd.DataFrame(data[1:], columns=data[0])
+
             DATA_TO_PULL = 'Objective'
             log.write("reading Objective sheet\n")
             data = pull_sheet_data(sheet,SPREADSHEET_ID,DATA_TO_PULL)
@@ -187,8 +192,8 @@ def run(ch, method, props, body):
 
             for index, row in obj.iterrows():
                 for idx, value in row.iteritems():
-                    if (idx == 'ID'):
-                        id = value
+                    # if (idx == 'ID'):
+                    #     id = value
                     if (isinstance(idx, datetime)):
                         if (any(shifts['ShiftID']==value)):
                             hr_min = shifts[shifts['ShiftID']==value]['StartTime'].values[0].split(':')
@@ -198,12 +203,30 @@ def run(ch, method, props, body):
                                 end = timedelta(days=1, hours=int(hr_min[0]), minutes=int(hr_min[1][:-2]))
                             else:
                                 end = timedelta(hours=int(hr_min[0]), minutes=int(hr_min[1]))
-                            scheduleJson.append(dict(zip(keys, [value + ' : ' + row.ID, row.ID, value, (idx+start).isoformat(), (idx+end).isoformat(), cnt])))
+                            shName = shifts[shifts['ShiftID']==value]['ShiftName'].values[0]
+                            stName = staff_hours[staff_hours['ID']==row.ID]['Name'].values[0]
+
+                            scheduleJson.append(dict(zip(keys, [shName + ' : ' + stName, row.ID, value, (idx+start).isoformat(), (idx+end).isoformat(), cnt])))
+                            cnt += 1
+                        elif (value!='OFF' and any(shifts_nc['ShiftID']==value)):
+                            hr_min = shifts_nc[shifts_nc['ShiftID']==value]['StartTime'].values[0].split(':')
+                            start = timedelta(hours=int(hr_min[0]), minutes=int(hr_min[1]))
+                            hr_min = shifts_nc[shifts_nc['ShiftID']==value]['EndTime'].values[0].split(':')
+                            if ('+1' in hr_min[1]):
+                                end = timedelta(days=1, hours=int(hr_min[0]), minutes=int(hr_min[1][:-2]))
+                            else:
+                                end = timedelta(hours=int(hr_min[0]), minutes=int(hr_min[1]))
+                            shName = shifts_nc[shifts_nc['ShiftID']==value]['ShiftName'].values[0]
+                            stName = staff_hours[staff_hours['ID']==row.ID]['Name'].values[0]
+
+                            scheduleJson.append(dict(zip(keys, [shName + ' : ' + stName, row.ID, value, (idx+start).isoformat(), (idx+end).isoformat(), cnt])))
                             cnt += 1
 
             for index, row in staff_hours.iterrows():
                 staffJson.append(dict(zip(ssKeys, [row.Name, row.ID, row.Color])))
             for index, row in shifts.iterrows():
+                shiftJson.append(dict(zip(ssKeys, [row.ShiftName, row.ShiftID, row.Color])))
+            for index, row in shifts_nc.iterrows():
                 shiftJson.append(dict(zip(ssKeys, [row.ShiftName, row.ShiftID, row.Color])))
 
             ch.basic_publish(exchange='',
@@ -277,7 +300,8 @@ def run(ch, method, props, body):
             for index, row in raw.iterrows():
                 tmp = sum(row[dates].isin(['AL', 'PL', 'SL']))
                 staff_hols.append(tmp)
-                staff_list = row[dates].isin(['OFF', 'AL', 'PL', 'SL', 'ML', 'SPA', 'EPA', 'EPAt', 'EPAu']).to_list()
+                # staff_list = row[dates].isin(['OFF', 'AL', 'PL', 'SL', 'ML', 'SPA', 'EPA', 'EPAt', 'EPAu']).to_list()
+                staff_list = row[dates].isin(shifts_nc['ShiftID'].to_list()).to_list()
                 s_off = [index for index, element in enumerate(staff_list) if element == True]
                 s_off.insert(0, row['ID'])
                 staff_off.append(s_off)
@@ -382,7 +406,9 @@ def run(ch, method, props, body):
                 for idx, row in enumerate(tmp[:-1]):
                     row = row.replace('.', 'OFF').split(' ')[:-1]
                     obj.loc[idx] = pd.Series(row, index = dates)
-                    update = raw[dates].loc[idx].isin(['AL', 'PL', 'SL', 'ML', 'SPA', 'EPA', 'EPAt', 'EPAu'])
+                    shiftIdsNoff = shifts_nc['ShiftID'].to_list()
+                    shiftIdsNoff.remove('OFF')
+                    update = raw[dates].loc[idx].isin(shiftIdsNoff)
                     obj.loc[idx][update] = raw[dates].loc[idx][update]
 
                 obj.insert(0, 'ID', raw['ID'])
@@ -420,7 +446,7 @@ def run(ch, method, props, body):
             req = df['MaxTotalMinutes'] / 10
             staff_pas = pd.DataFrame({'Name': raw['Name'], 'ID': raw['ID'], 'Allocated': alloc, 'Required': req, 'Shortfall': req-alloc})
 
-            t = [['Name', 'ID'], shifts['ShiftID'], ['OFF', 'AL', 'PL', 'SL', 'ML', 'SPA', 'EPA', 'EPAt', 'EPAu' ]]
+            t = [['Name', 'ID'], shifts['ShiftID'], shifts_nc['ShiftID'].to_list()]
             flat_list = [item for sublist in t for item in sublist]
             worked_shifts = pd.DataFrame(columns=flat_list)
             for idx, row in obj.iterrows():

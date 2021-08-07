@@ -10,6 +10,8 @@ import Button from '@material-ui/core/Button'
 import classNames from 'clsx'
 // import ics from 'ics'
 // import '../components/ics.deps.min.js'
+import Select from '@material-ui/core/Select'
+import MenuItem from '@material-ui/core/MenuItem'
 
 import { fade } from '@material-ui/core/styles/colorManipulator'
 // import { Resource } from 'devextreme-react/scheduler'
@@ -159,6 +161,26 @@ const Schedule = (props) => {
       instances: rota.shift || [],
     },
   ]
+
+  const ResourceSwitcher = withStyles(styles, { name: 'ResourceSwitcher' })(
+    ({ classes }) => (
+      <div className='resource-switcher'>
+        <div className='resource-main'>Select Highlighting by </div>
+        <Select
+          className='resource-select'
+          value={resourceName}
+          onChange={(e) => setResourceName(e.target.value)}
+        >
+          {resources.map((resource) => (
+            <MenuItem key={resource.fieldName} value={resource.fieldName}>
+              {resource.title}
+            </MenuItem>
+          ))}
+        </Select>
+      </div>
+    )
+  )
+
   const setCurrentViewName = React.useCallback(
     (nextViewName) =>
       dispatch({
@@ -197,6 +219,8 @@ const Schedule = (props) => {
   }, [rota.count, rota.running, dispatch])
 
   const [filterIDs, setFitlerIDs] = useState([])
+
+  const [resourceName, setResourceName] = useState('shift')
 
   const getValue = (e) => {
     const clicked = e.target
@@ -279,6 +303,7 @@ const Schedule = (props) => {
             </div>
           ))}
       </div>
+      <ResourceSwitcher />
       <Paper>
         <Scheduler data={rota.filtered} height={700}>
           <ViewState
@@ -292,7 +317,7 @@ const Schedule = (props) => {
           <MonthView />
           <Appointments />
           {/* <Resources data={resources} /> */}
-          <Resources data={resources} />
+          <Resources data={resources} mainResourceName={resourceName} />
 
           <Toolbar
             // flexibleSpaceComponent={FlexibleSpace}
