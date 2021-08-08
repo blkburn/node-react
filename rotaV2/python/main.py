@@ -184,7 +184,7 @@ def run(ch, method, props, body):
 
             cnt = 0
             keys = ['title', 'staff', 'shift', 'startDate', 'endDate', 'id']
-            ssKeys = ['text', 'id', 'color']
+            ssKeys = ['text', 'id', 'color', 'isChecked']
             # keys = ['title', 'location', 'startDate', 'endDate', 'id']
             scheduleJson = []
             staffJson = []
@@ -223,11 +223,11 @@ def run(ch, method, props, body):
                             cnt += 1
 
             for index, row in staff_hours.iterrows():
-                staffJson.append(dict(zip(ssKeys, [row.Name, row.ID, row.Color])))
+                staffJson.append(dict(zip(ssKeys, [row.Name, row.ID, row.Color, False])))
             for index, row in shifts.iterrows():
-                shiftJson.append(dict(zip(ssKeys, [row.ShiftName, row.ShiftID, row.Color])))
+                shiftJson.append(dict(zip(ssKeys, [row.ShiftName, row.ShiftID, row.Color, False])))
             for index, row in shifts_nc.iterrows():
-                shiftJson.append(dict(zip(ssKeys, [row.ShiftName, row.ShiftID, row.Color])))
+                shiftJson.append(dict(zip(ssKeys, [row.ShiftName, row.ShiftID, row.Color, False])))
 
             ch.basic_publish(exchange='',
                              routing_key=props.reply_to,

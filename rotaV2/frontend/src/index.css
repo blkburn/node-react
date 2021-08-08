@@ -38,7 +38,8 @@ main {
   justify-content: space-around;
 }
 
-.pill-container input[type=checkbox] {
+.pill-container input[type=checkbox],
+.option input[type=checkbox] {
   opacity: 0;
   position: fixed;
   width: 0;
@@ -49,8 +50,15 @@ main {
   padding: 0.2rem 0.2rem;
   height: fit-content;
 }
-.pill-container .option label{
+.ics .option {
+  border-radius: 10px;
+  padding: 0.2rem 1.5rem;
+  height: fit-content;
+}
+.pill-container .option label,
+.ics .option label {
   padding: 0.3rem 0.3rem;
+  text-align: center;
 }
 
 .ics button {
@@ -89,6 +97,10 @@ main {
   color: white;
 }
 
+.option input[type=checkbox]:checked+label {
+  background: #5183f5;
+  color: white;
+}
 .ics {
   display: flex;
   flex-direction: row;

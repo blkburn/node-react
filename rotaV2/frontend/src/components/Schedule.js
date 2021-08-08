@@ -36,6 +36,7 @@ import {
   ROTA_FILTER_SCHEDULE_ID,
   ROTA_SCHEDULE_DATE,
   ROTA_SCHEDULE_VIEW_NAME,
+  ROTA_UPDATE_CHECKED_VIEW,
 } from '../constants/userConstants'
 import { checkRotaStatus } from '../actions/rotaActions'
 
@@ -218,28 +219,31 @@ const Schedule = (props) => {
     }
   }, [rota.count, rota.running, dispatch])
 
-  const [filterIDs, setFitlerIDs] = useState([])
-
   const [resourceName, setResourceName] = useState('shift')
+  const [allChecked, setAllChecked] = useState(false)
 
   const getValue = (e) => {
-    const clicked = e.target
-    // console.log(clicked.value)
-    // console.log(clicked.checked)
-    if (clicked.checked) {
-      setFitlerIDs((prevState) => [...prevState, clicked.value])
+    let value = e.target.value
+    let checked = e.target.checked
+    let updateStaff = []
+    if (value === 'selectAll') {
+      updateStaff = rota.staff.map((item) => {
+        return { ...item, isChecked: checked }
+      })
+      setAllChecked(checked)
     } else {
-      setFitlerIDs((prevState) => [
-        ...prevState.filter((value) => value !== clicked.value),
-      ])
+      updateStaff = rota.staff.map((item) => {
+        return item.id === value ? { ...item, isChecked: checked } : item
+      })
+      setAllChecked(updateStaff.every((item) => item.isChecked))
     }
+    dispatch({ type: ROTA_UPDATE_CHECKED_VIEW, payload: updateStaff })
   }
   useEffect(() => {
-    console.log(filterIDs)
     if (rota.schedule) {
       const filtered = rota.schedule.filter((item) => {
-        // console.log(typeof item.staff)
-        return filterIDs.includes(item.staff)
+        let fStaff = rota.staff.find(({ id }) => id === item.staff)
+        return fStaff['isChecked'] === true
       })
       console.log(filtered)
       dispatch({
@@ -247,7 +251,7 @@ const Schedule = (props) => {
         payload: filtered,
       })
     }
-  }, [filterIDs, dispatch, rota.schedule])
+  }, [rota.staff, rota.schedule, dispatch])
 
   const createICS = () => {
     if (rota.filtered) {
@@ -271,6 +275,20 @@ const Schedule = (props) => {
         <h2 hidden={rota.running || !rota.startDate}>{sheet.name}</h2>
       </div>
       <div className='ics'>
+        <div className='option' hidden={rota.running || !rota.startDate}>
+          <input
+            type='checkbox'
+            id='selectAll'
+            name='selector'
+            value='selectAll'
+            key='selectAll'
+            onChange={getValue}
+            checked={allChecked}
+          ></input>
+          <label class='selector option' htmlFor='selectAll'>
+            Select All Staff
+          </label>
+        </div>
         <Button
           className='my-3 me-3'
           // type='submitLoad'
@@ -296,6 +314,7 @@ const Schedule = (props) => {
                 value={name['id']}
                 key={name['id']}
                 onChange={getValue}
+                checked={name['isChecked']}
               ></input>
               <label class='selector option' htmlFor={name['id']}>
                 {name['text']}

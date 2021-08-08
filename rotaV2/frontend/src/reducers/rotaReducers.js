@@ -19,6 +19,7 @@ import {
   ROTA_SET_START_DATE,
   ROTA_SHEET_VALID,
   ROTA_STOP_RUNNING,
+  ROTA_UPDATE_CHECKED_VIEW,
 } from '../constants/userConstants'
 
 export const rotaSheetReducer = (state = { message: [] }, action) => {
@@ -75,6 +76,8 @@ export const rotaSheetReducer = (state = { message: [] }, action) => {
       return { ...state, message: [...state.message, action.payload] }
     case ROTA_CLEAR_MESSAGE:
       return { ...state, message: [] }
+    case ROTA_UPDATE_CHECKED_VIEW:
+      return { ...state, staff: action.payload }
     default:
       return state
   }
