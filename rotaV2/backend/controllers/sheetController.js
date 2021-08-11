@@ -18,6 +18,21 @@ const getSheets = asyncHandler(async (req, res) => {
   }
 })
 
+// @desc    Get all sheets that have a isRequests flag
+// @route   GET /api/sheets
+// @access  Private/Admin
+const getSheetsRequests = asyncHandler(async (req, res) => {
+  const sheets = await Sheet.find({})
+  if (req.user.isAdmin) {
+    res.json(sheets)
+  } else {
+    const resp = sheets.filter((item) => {
+      return item.isRequests == true
+    })
+    res.json(resp)
+  }
+})
+
 // @desc    Delete sheet
 // @route   DELETE /api/sheets/:id
 // @access  Private/Admin
@@ -58,6 +73,7 @@ const updateSheet = asyncHandler(async (req, res) => {
     sheet.name = req.body.name || sheet.name
     sheet.sheet = req.body.sheet || sheet.sheet
     sheet.isPublished = req.body.isPublished
+    sheet.isRequests = req.body.isRequests
 
     const updatedSheet = await sheet.save()
 
@@ -66,6 +82,7 @@ const updateSheet = asyncHandler(async (req, res) => {
       name: updatedSheet.name,
       sheet: updatedSheet.sheet,
       isPublished: updatedSheet.isPublished,
+      isRequests: updatedSheet.isRequests,
     })
   } else {
     res.status(404)
@@ -77,7 +94,7 @@ const updateSheet = asyncHandler(async (req, res) => {
 // @route   POST /api/sheets/add
 // @access  Public
 const addSheet = asyncHandler(async (req, res) => {
-  const { name, sheet, isPublished } = req.body
+  const { name, sheet, isPublished, isRequests } = req.body
 
   const sheetExists = await Sheet.findOne({ name })
 
@@ -90,6 +107,7 @@ const addSheet = asyncHandler(async (req, res) => {
     name,
     sheet,
     isPublished,
+    isRequests,
   })
 
   if (newSheet) {
@@ -98,6 +116,7 @@ const addSheet = asyncHandler(async (req, res) => {
       name: sheet.name,
       sheet: sheet.sheet,
       isPublished: sheet.isPublished,
+      isRequests: sheet.isRequests,
     })
   } else {
     res.status(400)
@@ -105,4 +124,11 @@ const addSheet = asyncHandler(async (req, res) => {
   }
 })
 
-export { getSheets, deleteSheet, getSheetById, updateSheet, addSheet }
+export {
+  getSheets,
+  getSheetsRequests,
+  deleteSheet,
+  getSheetById,
+  updateSheet,
+  addSheet,
+}

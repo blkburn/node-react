@@ -19,6 +19,7 @@ const ScheduleEdit = ({ match, history }) => {
   const [name, setName] = useState('')
   const [url, setURL] = useState('')
   const [isPublished, setIsPublished] = useState(false)
+  const [isRequests, setIsRequests] = useState(false)
 
   const dispatch = useDispatch()
 
@@ -39,13 +40,16 @@ const ScheduleEdit = ({ match, history }) => {
         setName(sheet.name)
         setURL(sheet.sheet)
         setIsPublished(sheet.isPublished)
+        setIsRequests(sheet.isRequests)
       }
     }
   }, [dispatch, history, sheet, sheetId, successUpdate])
 
   const submitHandler = (e) => {
     e.preventDefault()
-    dispatch(updateSheet({ _id: sheetId, name, sheet: url, isPublished }))
+    dispatch(
+      updateSheet({ _id: sheetId, name, sheet: url, isPublished, isRequests })
+    )
   }
 
   return (
@@ -90,6 +94,15 @@ const ScheduleEdit = ({ match, history }) => {
                 label='Is Published'
                 checked={isPublished}
                 onChange={(e) => setIsPublished(e.target.checked)}
+              ></Form.Check>
+            </Form.Group>
+
+            <Form.Group className='my-2' controlId='isrequests'>
+              <Form.Check
+                type='checkbox'
+                label='Requests Preview'
+                checked={isRequests}
+                onChange={(e) => setIsRequests(e.target.checked)}
               ></Form.Check>
             </Form.Group>
 

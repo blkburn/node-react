@@ -84,6 +84,9 @@ def run(ch, method, props, body):
         log = open("log.txt", "w")
         param = json.loads(body.decode('UTF-8'))
 
+        # if (command == 'GET_REQUESTS'):
+        #     param = {'sheet':'1MtaT5Pn0FBGSMQhufrcNuxpr4D62vfeA6IwK6fvE4V4'}
+
         print(param)
         ch.basic_ack(delivery_tag=method.delivery_tag)
         rnd = random()
@@ -148,7 +151,7 @@ def run(ch, method, props, body):
             log.close()
             command = 'none'
 
-        elif (command == 'GET_SCHEDULE'):
+        elif (command == 'GET_SCHEDULE' or command == 'GET_REQUESTS'):
 
             # SPREADSHEET_ID = param['sheet']
             # DATA_TO_PULL = 'Initial'
@@ -174,7 +177,16 @@ def run(ch, method, props, body):
             DATA_TO_PULL = 'Objective'
             log.write("reading Objective sheet\n")
             data = pull_sheet_data(sheet,SPREADSHEET_ID,DATA_TO_PULL)
-            obj = pd.DataFrame(data[1:raw.shape[0]+1], columns=data[0])
+            objective = pd.DataFrame(data[1:raw.shape[0]+1], columns=data[0])
+
+            if (command == 'GET_SCHEDULE'):
+                obj = objective
+                respText = 'schedule'
+                offCheck = 'OFF'
+            else:
+                obj = raw
+                respText = 'requests'
+                offCheck = ''
 
             cols = obj.columns[2:]
             dates = [obj.columns[0], obj.columns[1]]
@@ -208,7 +220,7 @@ def run(ch, method, props, body):
 
                             scheduleJson.append(dict(zip(keys, [shName + ' : ' + stName, row.ID, value, (idx+start).isoformat(), (idx+end).isoformat(), cnt])))
                             cnt += 1
-                        elif (value!='OFF' and any(shifts_nc['ShiftID']==value)):
+                        elif (value!=offCheck and any(shifts_nc['ShiftID']==value)):
                             hr_min = shifts_nc[shifts_nc['ShiftID']==value]['StartTime'].values[0].split(':')
                             start = timedelta(hours=int(hr_min[0]), minutes=int(hr_min[1]))
                             hr_min = shifts_nc[shifts_nc['ShiftID']==value]['EndTime'].values[0].split(':')
@@ -232,8 +244,7 @@ def run(ch, method, props, body):
             ch.basic_publish(exchange='',
                              routing_key=props.reply_to,
                              properties=pika.BasicProperties(correlation_id = props.correlation_id),
-                             body=json.dumps(dict({'isLocked':isLocked, 'startDate':startDate, 'endDate':endDate,'staff':staffJson, 'shift':shiftJson, 'schedule':scheduleJson})))
-            # body=json.dumps(dict({'schedule': schedule})))
+                             body=json.dumps(dict({'isLocked':isLocked, 'startDate':startDate, 'endDate':endDate,'staff':staffJson, 'shift':shiftJson, respText:scheduleJson})))
 
             ch.basic_publish(exchange='',
                              routing_key=props.reply_to,
@@ -297,6 +308,12 @@ def run(ch, method, props, body):
             staff_off = []
             df = pd.DataFrame(columns=['ID', 'MaxShifts', 'MaxTotalMinutes', 'MinTotalMinutes', 'MaxConsecutiveShifts', 'MinConsecutiveShifts', 'MinConsecutiveDaysOff', 'MaxWeekends'])
 
+            # get the total pa's - to calculate the maximum number of OC shifts for each staff member
+            total_pas = 0
+            for index, row in raw.iterrows():
+                total_pas += pd.to_numeric(staff_hours[staff_hours['ID']==row['ID']]['PA']).values[0]
+            prop_pas = 4 * (rota_days / 7) / total_pas
+
             for index, row in raw.iterrows():
                 tmp = sum(row[dates].isin(['AL', 'PL', 'SL']))
                 staff_hols.append(tmp)
@@ -310,7 +327,8 @@ def run(ch, method, props, body):
                 spa = pa - dcc
                 xpa = pd.to_numeric(staff_hours[staff_hours['ID']==row['ID']]['Extra_PA']).values[0]
                 required = np.round(10 * ((pa * rota_days/7 - pa * tmp / 5) - spa * (rota_days/7 - tmp / 5) + xpa)).astype(int)
-                df = df.append({'ID': row['ID'], 'MaxShifts': '', 'MaxTotalMinutes': required, 'MinTotalMinutes': '0', 'MaxConsecutiveShifts': '3', 'MinConsecutiveShifts': '1', 'MinConsecutiveDaysOff': '1', 'MaxWeekends': '3'}, ignore_index=True)
+                oc_max = str(round(pa * prop_pas))
+                df = df.append({'ID': row['ID'], 'MaxShifts': 'OC='+oc_max, 'MaxTotalMinutes': required, 'MinTotalMinutes': '0', 'MaxConsecutiveShifts': '3', 'MinConsecutiveShifts': '1', 'MinConsecutiveDaysOff': '1', 'MaxWeekends': '3'}, ignore_index=True)
                 if required <= 0:
                     log.write("#################\n" + row['ID'] + " ERROR: MaxTotalMinutes < 0\n#################\n")
                     log.write(df[-1:].to_string())
@@ -394,7 +412,7 @@ def run(ch, method, props, body):
                 log.write("\n Running Optimisation...\n")
                 log.close()
                 # os.system('../monolith/bin/shift_scheduling_colgen output.txt >> log.txt 2>&1')
-                os.system('../monolith/bin/shift_scheduling output.txt >> log.txt 2>&1')
+                os.system('../monolith/bin/shift_scheduling_colgen output.txt >> log.txt 2>&1')
                 log = open("log.txt", "a")
                 log.write('\nOptimisation finished\n')
 

@@ -11,6 +11,7 @@ import UserEdit from './screens/UserEdit'
 import SheetNew from './screens/SheetNew'
 import ScheduleScreen from './screens/ScheduleScreen'
 import ScheduleEdit from './screens/ScheduleEdit'
+import RequestsScreen from './screens/RequestsScreen'
 
 const App = () => {
   return (
@@ -23,6 +24,7 @@ const App = () => {
           <Route path='/login' component={Login} />
           <Route path='/profile' component={Profile} />
           <Route path='/schedule' component={ScheduleScreen} />
+          <Route path='/requests' component={RequestsScreen} />
           <Route path='/admin/userlist' component={UserList} />
           <Route path='/admin/sheetnew' component={SheetNew} />
           <Route path='/admin/sheets/:id/edit' component={ScheduleEdit} />

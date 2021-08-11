@@ -10,6 +10,10 @@ import { checkRotaStatus, getSchedule } from '../actions/rotaActions'
 import Loader from '../components/Loader'
 import Message from '../components/Message'
 import SheetListAdmin from '../components/SheetsListAdmin'
+import {
+  ROTA_CLEAR_SCHEDULE,
+  SHEET_DETAILS_RESET,
+} from '../constants/userConstants'
 // import { appointments } from '../appointments'
 
 const ScheduleScreen = (props) => {
@@ -21,12 +25,20 @@ const ScheduleScreen = (props) => {
   const rota = useSelector((state) => state.rota)
 
   useEffect(() => {
-    if (sheet.sheet) {
-      console.log('get schedule')
-      // get the current schedule
-      dispatch(getSchedule())
+    return () => {
+      console.log('clear sheet details schedule')
+      dispatch({ type: SHEET_DETAILS_RESET })
+      dispatch({ type: ROTA_CLEAR_SCHEDULE })
     }
-  }, [sheet.sheet, dispatch])
+  }, [dispatch])
+
+  // useEffect(() => {
+  //   if (sheet.sheet) {
+  //     console.log('get schedule')
+  //     // get the current schedule
+  //     dispatch(getSchedule())
+  //   }
+  // }, [sheet.sheet, dispatch])
 
   return (
     <FormContainer>
@@ -34,7 +46,6 @@ const ScheduleScreen = (props) => {
         <Message variant='info'>Running : {rota.count}s</Message>
       )}
       {userInfo.isAdmin ? <SheetListAdmin /> : <SheetList />}
-      {/* {userInfo.isAdmin ? <Schedule /> : <Schedule />} */}
       <Schedule />
     </FormContainer>
   )

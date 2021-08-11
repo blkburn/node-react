@@ -204,6 +204,14 @@ const Schedule = (props) => {
     setCurrentViewName('Month')
   }, [setCurrentDate, setCurrentViewName])
 
+  // useEffect(() => {
+  //   if (sheet.sheet) {
+  //     console.log('get requests')
+  //     // get the current schedule
+  //     // dispatch(getRequests())
+  //   }
+  // }, [sheet.sheet, dispatch])
+
   useEffect(() => {
     console.log(`rota count ${rota.count}`)
     const statusSubmit = () => {
@@ -245,7 +253,6 @@ const Schedule = (props) => {
         let fStaff = rota.staff.find(({ id }) => id === item.staff)
         return fStaff['isChecked'] === true
       })
-      console.log(filtered)
       dispatch({
         type: ROTA_FILTER_SCHEDULE,
         payload: filtered,

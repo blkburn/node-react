@@ -16,6 +16,11 @@ const sheetSchema = mongoose.Schema(
       required: true,
       default: false,
     },
+    isRequests: {
+      type: Boolean,
+      required: true,
+      default: false,
+    },
   },
   {
     timestamps: true,

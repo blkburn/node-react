@@ -12,6 +12,7 @@ import {
   ROTA_SCHEDULE_VIEW_NAME,
   ROTA_SET_END_DATE,
   ROTA_SET_LOCKED,
+  ROTA_SET_REQUESTS,
   ROTA_SET_RUNNING,
   ROTA_SET_SCHEDULE,
   ROTA_SET_SHEET,
@@ -47,6 +48,14 @@ export const rotaSheetReducer = (state = { message: [] }, action) => {
         ...state,
         schedule: JSON.parse(action.payload)['schedule'],
         filtered: JSON.parse(action.payload)['schedule'],
+        staff: JSON.parse(action.payload)['staff'],
+        shift: JSON.parse(action.payload)['shift'],
+      }
+    case ROTA_SET_REQUESTS:
+      return {
+        ...state,
+        schedule: JSON.parse(action.payload)['requests'],
+        filtered: JSON.parse(action.payload)['requests'],
         staff: JSON.parse(action.payload)['staff'],
         shift: JSON.parse(action.payload)['shift'],
       }

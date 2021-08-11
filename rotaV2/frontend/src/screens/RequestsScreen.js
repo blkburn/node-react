@@ -6,7 +6,11 @@ import RotaAdmin from '../components/rotaAdmin'
 import Schedule from '../components/Schedule'
 import ScheduleOld from '../components/Schedule_old'
 
-import { checkRotaStatus, getSchedule } from '../actions/rotaActions'
+import {
+  checkRotaStatus,
+  getRequests,
+  getSchedule,
+} from '../actions/rotaActions'
 import Loader from '../components/Loader'
 import Message from '../components/Message'
 import SheetListAdmin from '../components/SheetsListAdmin'
@@ -17,19 +21,17 @@ import {
 } from '../constants/userConstants'
 // import { appointments } from '../appointments'
 
-const Rota = (props) => {
+const RequestsScreen = (props) => {
   const userLogin = useSelector((state) => state.userLogin)
   const { userInfo } = userLogin
   const sheetDetails = useSelector((state) => state.sheetDetails)
   const { loading, error, sheet } = sheetDetails
   const dispatch = useDispatch()
   const rota = useSelector((state) => state.rota)
-  const sheetList = useSelector((state) => state.sheetList)
-  const { sheets } = sheetList
 
   useEffect(() => {
     return () => {
-      console.log('clear sheet details schedule')
+      console.log('clear sheet details requests')
       dispatch({ type: SHEET_DETAILS_RESET })
       dispatch({ type: ROTA_CLEAR_SCHEDULE })
       dispatch({ type: SHEET_LIST_RESET })
@@ -37,32 +39,23 @@ const Rota = (props) => {
   }, [dispatch])
 
   // useEffect(() => {
-  //   if (!userInfo.isAdmin) {
-  //     if (sheet.sheet && sheets.sheets) {
-  //       console.log('get schedule')
-  //       // get the current schedule
-  //       dispatch(getSchedule())
-  //     }
-  //   }
-  // }, [userInfo.isAdmin, sheet, sheets, dispatch])
-
-  // useEffect(() => {
-  //   if (sheet.sheet) {
-  //     console.log('get schedule')
+  //   if ('name' in sheet) {
+  //     console.log(sheet)
+  //     console.log('get requests')
   //     // get the current schedule
-  //     dispatch(getSchedule())
+  //     dispatch(getRequests())
   //   }
-  // }, [sheet.sheet, dispatch])
+  // }, [sheet, dispatch])
 
   return (
     <FormContainer>
       {rota.running && (
         <Message variant='info'>Running : {rota.count}s</Message>
       )}
-      {userInfo.isAdmin ? <SheetListAdmin /> : <SheetList />}
-      {userInfo.isAdmin ? <RotaAdmin /> : <Schedule />}
+      {userInfo.isAdmin ? <SheetListAdmin /> : <SheetList type='requests' />}
+      <Schedule />
     </FormContainer>
   )
 }
 
-export default Rota
+export default RequestsScreen

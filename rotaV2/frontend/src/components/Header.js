@@ -50,6 +50,11 @@ const Header = () => {
                   </LinkContainer>
                 </>
               )}
+              {userInfo && (
+                <LinkContainer to='/requests'>
+                  <Nav.Link>Requests</Nav.Link>
+                </LinkContainer>
+              )}
               {userInfo && userInfo.isAdmin && (
                 <>
                   <LinkContainer to='/schedule'>

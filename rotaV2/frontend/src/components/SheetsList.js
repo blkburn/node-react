@@ -12,7 +12,7 @@ import {
 import BootstrapTable from 'react-bootstrap-table-next'
 import { SHEET_DETAILS_RESET } from '../constants/userConstants'
 
-const SheetList = ({ history }) => {
+const SheetList = ({ type, history }) => {
   const dispatch = useDispatch()
 
   const userLogin = useSelector((state) => state.userLogin)
@@ -26,7 +26,7 @@ const SheetList = ({ history }) => {
 
   useEffect(() => {
     if (userInfo) {
-      dispatch(listSheets())
+      dispatch(listSheets(type))
     } else {
       history.push('/login')
     }

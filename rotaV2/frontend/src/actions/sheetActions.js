@@ -81,9 +81,9 @@ export const getSheetDetails = (id) => async (dispatch, getState) => {
       type: SHEET_DETAILS_SUCCESS,
       payload: data,
     })
-    dispatch({
-      type: ROTA_CLEAR_SCHEDULE,
-    })
+    // dispatch({
+    //   type: ROTA_CLEAR_SCHEDULE,
+    // })
   } catch (error) {
     const message =
       error.response && error.response.data.message
@@ -99,7 +99,7 @@ export const getSheetDetails = (id) => async (dispatch, getState) => {
   }
 }
 
-export const listSheets = () => async (dispatch, getState) => {
+export const listSheets = (type) => async (dispatch, getState) => {
   try {
     dispatch({
       type: SHEET_LIST_REQUEST,
@@ -114,9 +114,15 @@ export const listSheets = () => async (dispatch, getState) => {
         Authorization: `Bearer ${userInfo.token}`,
       },
     }
+    let resp
+    if (type === 'requests') {
+      resp = await axios.get(`/api/sheets/requests`, config)
+    } else {
+      resp = await axios.get(`/api/sheets`, config)
+    }
 
-    const { data } = await axios.get(`/api/sheets`, config)
-
+    const data = resp.data
+    console.log(data)
     dispatch({
       type: SHEET_LIST_SUCCESS,
       payload: data,

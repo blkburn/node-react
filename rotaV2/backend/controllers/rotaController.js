@@ -14,6 +14,7 @@ let running = false
 let verifying = false
 let locked = ''
 let schedule = ''
+let requests = ''
 let startDate = ''
 let endDate = ''
 
@@ -49,6 +50,7 @@ const getRotaStatus = asyncHandler(async (req, res) => {
       endDate: endDate,
       message: deque.toString(),
       scheduleData: schedule,
+      requestsData: requests,
     })
     // locked = ''
   }
@@ -83,6 +85,7 @@ const verifyRotaSheet = (req, res) => {
   // deque.clear()
   cnt = 0
   schedule = ''
+  requests = ''
   console.log('started verify ' + req.body.sheet)
   amqp.connect('amqp://localhost', function (error0, connection) {
     if (error0) {
@@ -165,6 +168,7 @@ const verifyRotaSheet = (req, res) => {
 const runRotaSheet = (req, res) => {
   cnt = 0
   schedule = ''
+  requests = ''
   console.log('started')
   amqp.connect('amqp://localhost', function (error0, connection) {
     console.log('access queue')
@@ -232,6 +236,7 @@ const runRotaSheet = (req, res) => {
 const runGetSchedule = (req, res) => {
   cnt = 0
   schedule = ''
+  requests = ''
   console.log('started')
   amqp.connect('amqp://localhost', function (error0, connection) {
     console.log('access queue')
@@ -303,4 +308,87 @@ const runGetSchedule = (req, res) => {
   res.status(202).json({ running: true, message: 'get schedule started...' })
 }
 
-export { getRotaStatus, verifyRotaSheet, runRotaSheet, runGetSchedule }
+// @desc    Get rota requests
+// @route   GET /api/requests
+// @access  Private
+const runGetRequests = (req, res) => {
+  cnt = 0
+  requests = ''
+  schedule = ''
+  console.log('started')
+  amqp.connect('amqp://localhost', function (error0, connection) {
+    console.log('access queue')
+    if (error0) {
+      throw error0
+    }
+    connection.createChannel(function (error1, channel) {
+      if (error1) {
+        throw error1
+      }
+      channel.assertQueue(
+        '',
+        {
+          exclusive: true,
+        },
+        function (error2, q) {
+          if (error2) {
+            throw error2
+          }
+          var correlationId = generateUuid()
+          console.log(req.body)
+          console.log(' [x] ', 'GET_REQUESTS')
+          channel.consume(
+            q.queue,
+            function (msg) {
+              if (msg.properties.correlationId == correlationId) {
+                console.log(' [.] Got %s', msg.content.toString())
+                if (msg.content.toString() == 'Complete') {
+                  connection.close()
+                  console.log('Process Complete...')
+                  running = false
+                } else {
+                  const resp = JSON.parse(msg.content)
+                  locked = resp['isLocked']
+                  startDate = resp['startDate']
+                  endDate = resp['endDate']
+                  requests = msg.content.toString()
+                  console.log(' [.] Locked = %s', locked)
+                  console.log(' [.] Start Date = %s', startDate)
+                  console.log(' [.] End Date = %s', endDate)
+                }
+              }
+            },
+            {
+              noAck: true,
+            }
+          )
+          const params = req.body
+          console.log(params)
+          channel.sendToQueue('rpc_queue', Buffer.from('GET_REQUESTS'), {
+            correlationId: correlationId,
+            replyTo: q.queue,
+          })
+          deque.clear()
+          channel.sendToQueue(
+            'rpc_queue',
+            Buffer.from(JSON.stringify(params)),
+            {
+              correlationId: correlationId,
+              replyTo: q.queue,
+            }
+          )
+          running = true
+        }
+      )
+    })
+  })
+  res.status(202).json({ running: true, message: 'get requests started...' })
+}
+
+export {
+  getRotaStatus,
+  verifyRotaSheet,
+  runRotaSheet,
+  runGetSchedule,
+  runGetRequests,
+}

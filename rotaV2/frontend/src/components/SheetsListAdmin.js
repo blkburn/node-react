@@ -12,7 +12,7 @@ import {
 import BootstrapTable from 'react-bootstrap-table-next'
 import { SHEET_DETAILS_RESET } from '../constants/userConstants'
 
-const SheetListAdmin = ({ history }) => {
+const SheetListAdmin = ({ type, history }) => {
   const dispatch = useDispatch()
 
   const userLogin = useSelector((state) => state.userLogin)
@@ -66,6 +66,27 @@ const SheetListAdmin = ({ history }) => {
     {
       dataField: 'isPublished',
       text: 'Published',
+      style: {
+        textAlign: 'center',
+      },
+      headerStyle: (colum, colIndex) => {
+        return {
+          width: '10%',
+          textAlign: 'center',
+        }
+      },
+      formatter: (rowContent, row) => {
+        const style = rowContent ? (
+          <i className='fas fa-check' style={{ color: 'green' }}></i>
+        ) : (
+          <i className='fas fa-times' style={{ color: 'red' }}></i>
+        )
+        return style
+      },
+    },
+    {
+      dataField: 'isRequests',
+      text: 'Requests',
       style: {
         textAlign: 'center',
       },
