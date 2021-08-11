@@ -32,13 +32,14 @@ import {
 import {
   ROTA_CLEAR_FILTER_SCHEDULE,
   ROTA_CLEAR_FILTER_SCHEDULE_ID,
+  ROTA_CLEAR_UPDATE_SCHEDULE,
   ROTA_FILTER_SCHEDULE,
   ROTA_FILTER_SCHEDULE_ID,
   ROTA_SCHEDULE_DATE,
   ROTA_SCHEDULE_VIEW_NAME,
   ROTA_UPDATE_CHECKED_VIEW,
 } from '../constants/userConstants'
-import { checkRotaStatus } from '../actions/rotaActions'
+import { checkRotaStatus, getRequests } from '../actions/rotaActions'
 
 const Schedule = (props) => {
   const dispatch = useDispatch()
@@ -203,14 +204,6 @@ const Schedule = (props) => {
     setCurrentDate(new Date())
     setCurrentViewName('Month')
   }, [setCurrentDate, setCurrentViewName])
-
-  // useEffect(() => {
-  //   if (sheet.sheet) {
-  //     console.log('get requests')
-  //     // get the current schedule
-  //     // dispatch(getRequests())
-  //   }
-  // }, [sheet.sheet, dispatch])
 
   useEffect(() => {
     console.log(`rota count ${rota.count}`)

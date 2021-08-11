@@ -5,6 +5,7 @@ import {
   ROTA_CLEAR_FILTER_SCHEDULE_ID,
   ROTA_CLEAR_MESSAGE,
   ROTA_CLEAR_SCHEDULE,
+  ROTA_CLEAR_UPDATE_SCHEDULE,
   ROTA_FILTER_SCHEDULE,
   ROTA_FILTER_SCHEDULE_ID,
   ROTA_INC_COUNT,
@@ -21,6 +22,7 @@ import {
   ROTA_SHEET_VALID,
   ROTA_STOP_RUNNING,
   ROTA_UPDATE_CHECKED_VIEW,
+  ROTA_UPDATE_SCHEDULE,
 } from '../constants/userConstants'
 
 export const rotaSheetReducer = (state = { message: [] }, action) => {
@@ -43,6 +45,10 @@ export const rotaSheetReducer = (state = { message: [] }, action) => {
       return { ...state, running: false }
     case ROTA_CLEAR_COUNT:
       return { ...state, count: 0 }
+    case ROTA_UPDATE_SCHEDULE:
+      return { ...state, update: true }
+    case ROTA_CLEAR_UPDATE_SCHEDULE:
+      return { ...state, update: false }
     case ROTA_SET_SCHEDULE:
       return {
         ...state,

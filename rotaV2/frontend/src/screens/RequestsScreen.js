@@ -16,6 +16,7 @@ import Message from '../components/Message'
 import SheetListAdmin from '../components/SheetsListAdmin'
 import {
   ROTA_CLEAR_SCHEDULE,
+  ROTA_CLEAR_UPDATE_SCHEDULE,
   SHEET_DETAILS_RESET,
   SHEET_LIST_RESET,
 } from '../constants/userConstants'
@@ -38,21 +39,21 @@ const RequestsScreen = (props) => {
     }
   }, [dispatch])
 
-  // useEffect(() => {
-  //   if ('name' in sheet) {
-  //     console.log(sheet)
-  //     console.log('get requests')
-  //     // get the current schedule
-  //     dispatch(getRequests())
-  //   }
-  // }, [sheet, dispatch])
+  useEffect(() => {
+    if (sheet.sheet && rota.update) {
+      console.log('get requests')
+      // get the current schedule
+      dispatch(getRequests())
+      dispatch({ type: ROTA_CLEAR_UPDATE_SCHEDULE })
+    }
+  }, [sheet.sheet, rota.update, dispatch])
 
   return (
     <FormContainer>
       {rota.running && (
         <Message variant='info'>Running : {rota.count}s</Message>
       )}
-      {userInfo.isAdmin ? <SheetListAdmin /> : <SheetList type='requests' />}
+      <SheetList type='requests' />
       <Schedule />
     </FormContainer>
   )

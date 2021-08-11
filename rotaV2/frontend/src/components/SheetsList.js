@@ -10,7 +10,10 @@ import {
   listSheets,
 } from '../actions/sheetActions'
 import BootstrapTable from 'react-bootstrap-table-next'
-import { SHEET_DETAILS_RESET } from '../constants/userConstants'
+import {
+  ROTA_UPDATE_SCHEDULE,
+  SHEET_DETAILS_RESET,
+} from '../constants/userConstants'
 
 const SheetList = ({ type, history }) => {
   const dispatch = useDispatch()
@@ -45,6 +48,7 @@ const SheetList = ({ type, history }) => {
       console.log(sheets[rowIndex])
       if (e.target.cellIndex < 2) {
         dispatch(getSheetDetails(sheets[rowIndex]._id))
+        dispatch({ type: ROTA_UPDATE_SCHEDULE })
       }
     },
     // onMouseEnter: (e, row, rowIndex) => {

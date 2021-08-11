@@ -414,10 +414,6 @@ export const getRequests = () => async (dispatch, getState) => {
         Authorization: `Bearer ${userInfo.token}`,
       },
     }
-    console.log(!sheet)
-    if (!!sheet) {
-      return
-    }
     console.log(sheet)
     let spreadsheetId = new RegExp('/spreadsheets/d/([a-zA-Z0-9-_]+)').exec(
       sheet.sheet

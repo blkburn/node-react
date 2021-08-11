@@ -312,7 +312,8 @@ def run(ch, method, props, body):
             total_pas = 0
             for index, row in raw.iterrows():
                 total_pas += pd.to_numeric(staff_hours[staff_hours['ID']==row['ID']]['PA']).values[0]
-            prop_pas = 4 * (rota_days / 7) / total_pas
+            prop_4max = 4 * (rota_days / 7) / total_pas
+            prop_5max = 5 * (rota_days / 7) / total_pas
 
             for index, row in raw.iterrows():
                 tmp = sum(row[dates].isin(['AL', 'PL', 'SL']))
@@ -324,11 +325,15 @@ def run(ch, method, props, body):
                 staff_off.append(s_off)
                 dcc = pd.to_numeric(staff_hours[staff_hours['ID']==row['ID']]['DCC']).values[0]
                 pa = pd.to_numeric(staff_hours[staff_hours['ID']==row['ID']]['PA']).values[0]
-                spa = pa - dcc
                 xpa = pd.to_numeric(staff_hours[staff_hours['ID']==row['ID']]['Extra_PA']).values[0]
-                required = np.round(10 * ((pa * rota_days/7 - pa * tmp / 5) - spa * (rota_days/7 - tmp / 5) + xpa)).astype(int)
-                oc_max = str(round(pa * prop_pas))
-                df = df.append({'ID': row['ID'], 'MaxShifts': 'OC='+oc_max, 'MaxTotalMinutes': required, 'MinTotalMinutes': '0', 'MaxConsecutiveShifts': '3', 'MinConsecutiveShifts': '1', 'MinConsecutiveDaysOff': '1', 'MaxWeekends': '3'}, ignore_index=True)
+                required = np.round(10 * (dcc*(rota_days/7 - tmp / 5) + xpa)).astype(int)
+                oc_max = str(round(pa * prop_4max))
+                bs_max = str(round(pa * prop_4max))
+                ds_max = str(round(pa * prop_5max)+3)
+                wrm_max = str(round(pa * prop_5max)+3)
+                fs_max = str(round(pa * prop_5max)+3)
+
+                df = df.append({'ID': row['ID'], 'MaxShifts': 'OC='+oc_max+'|BS='+bs_max+'|DS='+ds_max+'|WRM='+wrm_max+'|FS='+fs_max, 'MaxTotalMinutes': required, 'MinTotalMinutes': '0', 'MaxConsecutiveShifts': '3', 'MinConsecutiveShifts': '1', 'MinConsecutiveDaysOff': '1', 'MaxWeekends': '3'}, ignore_index=True)
                 if required <= 0:
                     log.write("#################\n" + row['ID'] + " ERROR: MaxTotalMinutes < 0\n#################\n")
                     log.write(df[-1:].to_string())
@@ -411,8 +416,8 @@ def run(ch, method, props, body):
                 f.close()
                 log.write("\n Running Optimisation...\n")
                 log.close()
-                # os.system('../monolith/bin/shift_scheduling_colgen output.txt >> log.txt 2>&1')
                 os.system('../monolith/bin/shift_scheduling_colgen output.txt >> log.txt 2>&1')
+                # os.system('../monolith/bin/shift_scheduling output.txt >> log.txt 2>&1')
                 log = open("log.txt", "a")
                 log.write('\nOptimisation finished\n')
 

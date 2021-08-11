@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react'
+import { useHistory } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import FormContainer from '../components/FormContainer'
 import SheetList from '../components/SheetsList'
@@ -26,6 +27,7 @@ const Rota = (props) => {
   const rota = useSelector((state) => state.rota)
   const sheetList = useSelector((state) => state.sheetList)
   const { sheets } = sheetList
+  let history = useHistory()
 
   useEffect(() => {
     return () => {
@@ -36,31 +38,23 @@ const Rota = (props) => {
     }
   }, [dispatch])
 
-  // useEffect(() => {
-  //   if (!userInfo.isAdmin) {
-  //     if (sheet.sheet && sheets.sheets) {
-  //       console.log('get schedule')
-  //       // get the current schedule
-  //       dispatch(getSchedule())
-  //     }
-  //   }
-  // }, [userInfo.isAdmin, sheet, sheets, dispatch])
-
-  // useEffect(() => {
-  //   if (sheet.sheet) {
-  //     console.log('get schedule')
-  //     // get the current schedule
-  //     dispatch(getSchedule())
-  //   }
-  // }, [sheet.sheet, dispatch])
-
   return (
     <FormContainer>
       {rota.running && (
         <Message variant='info'>Running : {rota.count}s</Message>
       )}
-      {userInfo.isAdmin ? <SheetListAdmin /> : <SheetList />}
-      {userInfo.isAdmin ? <RotaAdmin /> : <Schedule />}
+      {userInfo.isAdmin ? (
+        <>
+          <SheetListAdmin />
+          <RotaAdmin />
+        </>
+      ) : (
+        history.push('/schedule')
+        // <>
+        //   <SheetList />
+        //   <Schedule />
+        // </>
+      )}
     </FormContainer>
   )
 }
