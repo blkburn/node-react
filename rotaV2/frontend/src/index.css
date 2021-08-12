@@ -148,3 +148,22 @@ main {
   /* color: white !important; */
 
 }
+
+.request-form,
+.request-item {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+}
+.request-form > * {
+  padding: 1rem 3rem;
+  margin: 0 1rem;
+}
+.request-item > span {
+  border-bottom: white 2px solid;
+  padding: 1rem 3rem;
+}
+.del-button .btn-danger {
+  padding: 4px 8px;
+}

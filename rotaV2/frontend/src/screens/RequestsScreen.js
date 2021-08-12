@@ -5,6 +5,7 @@ import SheetList from '../components/SheetsList'
 import RotaAdmin from '../components/rotaAdmin'
 import Schedule from '../components/Schedule'
 import ScheduleOld from '../components/Schedule_old'
+import Requests from '../components/Requests'
 
 import {
   checkRotaStatus,
@@ -20,7 +21,6 @@ import {
   SHEET_DETAILS_RESET,
   SHEET_LIST_RESET,
 } from '../constants/userConstants'
-// import { appointments } from '../appointments'
 
 const RequestsScreen = (props) => {
   const userLogin = useSelector((state) => state.userLogin)
@@ -54,6 +54,7 @@ const RequestsScreen = (props) => {
         <Message variant='info'>Running : {rota.count}s</Message>
       )}
       <SheetListAdmin type='requests' />
+      <Requests />
       <Schedule />
     </FormContainer>
   )
