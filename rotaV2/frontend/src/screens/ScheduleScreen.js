@@ -14,6 +14,7 @@ import {
   ROTA_CLEAR_SCHEDULE,
   ROTA_CLEAR_UPDATE_SCHEDULE,
   SHEET_DETAILS_RESET,
+  SHEET_LIST_RESET,
 } from '../constants/userConstants'
 // import { appointments } from '../appointments'
 
@@ -27,9 +28,10 @@ const ScheduleScreen = (props) => {
 
   useEffect(() => {
     return () => {
-      console.log('clear sheet details schedule')
+      console.log('clear sheet details requests')
       dispatch({ type: SHEET_DETAILS_RESET })
       dispatch({ type: ROTA_CLEAR_SCHEDULE })
+      dispatch({ type: SHEET_LIST_RESET })
     }
   }, [dispatch])
 

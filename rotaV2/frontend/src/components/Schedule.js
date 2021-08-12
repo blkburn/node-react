@@ -142,14 +142,14 @@ const Schedule = (props) => {
     },
   })
 
-  const ToolbarWithLoading = withStyles(styles, { name: 'Toolbar' })(
-    ({ children, classes, ...restProps }) => (
-      <div className={classes.toolbarRoot}>
-        <Toolbar.Root {...restProps}>{children}</Toolbar.Root>
-        <LinearProgress className={classes.progress} />
-      </div>
-    )
-  )
+  // const ToolbarWithLoading = withStyles(styles, { name: 'Toolbar' })(
+  //   ({ children, classes, ...restProps }) => (
+  //     <div className={classes.toolbarRoot}>
+  //       <Toolbar.Root {...restProps}>{children}</Toolbar.Root>
+  //       <LinearProgress className={classes.progress} />
+  //     </div>
+  //   )
+  // )
 
   const resources = [
     {
@@ -306,7 +306,7 @@ const Schedule = (props) => {
       <div className='pill-container'>
         {rota.staff &&
           rota.staff.map((name, index) => (
-            <div className='option'>
+            <div className='option' key={name['id']}>
               <input
                 type='checkbox'
                 id={name['id']}
@@ -339,8 +339,8 @@ const Schedule = (props) => {
           <Resources data={resources} mainResourceName={resourceName} />
 
           <Toolbar
-            // flexibleSpaceComponent={FlexibleSpace}
-            {...(rota.running ? { rootComponent: ToolbarWithLoading } : null)}
+          // flexibleSpaceComponent={FlexibleSpace}
+          // {...(rota.running ? { rootComponent: ToolbarWithLoading } : null)}
           />
           <DateNavigator />
           <TodayButton />

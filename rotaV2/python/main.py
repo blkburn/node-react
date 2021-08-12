@@ -204,6 +204,8 @@ def run(ch, method, props, body):
 
             for index, row in obj.iterrows():
                 for idx, value in row.iteritems():
+                    if (value.endswith('r')):
+                        value = value[:-1]
                     # if (idx == 'ID'):
                     #     id = value
                     if (isinstance(idx, datetime)):
@@ -437,12 +439,17 @@ def run(ch, method, props, body):
                 obj.insert(0, 'ID', raw['ID'])
                 obj.insert(0, 'Name', raw['Name'])
 
+                obj_orig = obj.copy()
+                for idx, row in obj.iterrows():
+                    a=raw.loc[idx][2:]==row[2:]
+                    row[2:][a] = row[2:][a].values+'r'
+
             obj_pas = obj[dates].copy()
             #iterate over obj
             for idx, row in obj_pas.iterrows():
                 all_updates = row == ' '
                 for _, shift in shifts.iterrows():
-                    update = row == shift['ShiftID']
+                    update = (row == shift['ShiftID']) | (row == shift['ShiftID']+'r')
                     all_updates |= update
                     obj_pas.loc[idx][update] = shift['PAs']/10
 
@@ -472,7 +479,7 @@ def run(ch, method, props, body):
             t = [['Name', 'ID'], shifts['ShiftID'], shifts_nc['ShiftID'].to_list()]
             flat_list = [item for sublist in t for item in sublist]
             worked_shifts = pd.DataFrame(columns=flat_list)
-            for idx, row in obj.iterrows():
+            for idx, row in obj_orig.iterrows():
                 s = row[dates].value_counts()
                 worked_shifts.loc[idx] = s.to_frame().transpose().iloc[0]
             worked_shifts['Name'] = raw['Name']
@@ -502,7 +509,7 @@ def run(ch, method, props, body):
                     wks.add_conditional_formatting((col, idx+3), (col, idx+3), 'NUMBER_NOT_EQ', {'backgroundColor':{'red':1}}, [str(int(r))])
 
             original = raw[dates]
-            results = obj[dates]
+            results = obj_orig[dates]
 
             for index, row in shifts.iterrows():
                 if row['Color'] is None:
@@ -511,8 +518,9 @@ def run(ch, method, props, body):
                     color = row['Color'].lstrip('#')
                 rgb = tuple(float(int(color[i:i+2], 16))/255 for i in (0, 2, 4))
                 d = '{"backgroundColor":{"red": '+str(rgb[0])+', "green": '+str(rgb[1])+', "blue": '+str(rgb[2])+'}}'
-                wks.add_conditional_formatting((1, 3), (20, 100), 'TEXT_EQ', json.loads(d), [row['ShiftID']])
-
+                wks.add_conditional_formatting((1, 3), (20, 100), 'CUSTOM_FORMULA', json.loads(d), ['=OR(C1="'+row['ShiftID']+'",C1="'+row['ShiftID']+'r")'])
+                # wks.add_conditional_formatting((1, 3), (20, 100), 'TEXT_EQ', json.loads(d), [row['ShiftID']])
+                # wks.add_conditional_formatting((1, 3), (20, 100), 'TEXT_EQ', json.loads(d), [row['ShiftID']+'r'])
             for index, row in shifts_nc.iterrows():
                 if row['Color'] is None:
                     color = 'ffffff'
@@ -520,9 +528,9 @@ def run(ch, method, props, body):
                     color = row['Color'].lstrip('#')
                 rgb = tuple(float(int(color[i:i+2], 16))/255 for i in (0, 2, 4))
                 d = '{"backgroundColor":{"red": '+str(rgb[0])+', "green": '+str(rgb[1])+', "blue": '+str(rgb[2])+'}}'
-                wks.add_conditional_formatting((1, 3), (20, 100), 'TEXT_EQ', json.loads(d), [row['ShiftID']])
-
-
+                # wks.add_conditional_formatting((1, 3), (20, 100), 'TEXT_EQ', json.loads(d), [row['ShiftID']])
+                # wks.add_conditional_formatting((1, 3), (20, 100), 'TEXT_EQ', json.loads(d), [row['ShiftID']+'r'])
+                wks.add_conditional_formatting((1, 3), (20, 100), 'CUSTOM_FORMULA', json.loads(d), ['=OR(C1="'+row['ShiftID']+'",C1="'+row['ShiftID']+'r")'])
 
             for index, row in results.iterrows():
                 orig_row = original.loc[[index]].values
@@ -536,8 +544,6 @@ def run(ch, method, props, body):
                         elif o != r:
                             wks.add_conditional_formatting((index+2, idx+3), (index+2, idx+3), 'TEXT_NOT_CONTAINS', {'backgroundColor':{'red':1}}, [o])
                             print(o + ':' + r)
-
-
 
             ch.basic_publish(exchange='',
                              routing_key=props.reply_to,

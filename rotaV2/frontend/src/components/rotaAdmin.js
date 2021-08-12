@@ -17,6 +17,7 @@ import {
   runRotaSheet,
   setRotaName,
 } from '../actions/rotaActions'
+import { ROTA_CLEAR_UPDATE_SCHEDULE } from '../constants/userConstants'
 
 const RotaAdmin = (props) => {
   const dispatch = useDispatch()
@@ -47,7 +48,9 @@ const RotaAdmin = (props) => {
     dispatch(validRotaSheet(false))
   }, [dispatch])
 
-  // useEffect(() => {}, [sheet])
+  useEffect(() => {
+    dispatch({ type: ROTA_CLEAR_UPDATE_SCHEDULE })
+  }, [sheet.sheet])
 
   const handleChange = (name) => (event) => {
     // localStorage.setItem([name], event.target.value)
@@ -55,6 +58,7 @@ const RotaAdmin = (props) => {
     dispatch(validRotaSheet(false))
     dispatch(clearRotaMessage())
     dispatch(setRotaSheet(event.target.value))
+    dispatch({ type: ROTA_CLEAR_UPDATE_SCHEDULE })
 
     // setValues({ ...values, [name]: event.target.value })
   }
