@@ -33,7 +33,7 @@ const SheetList = ({ type, history }) => {
     } else {
       history.push('/login')
     }
-  }, [dispatch, history, successDelete, userInfo])
+  }, [dispatch, history, successDelete, userInfo, type])
 
   const deleteHandler = (id) => {
     console.log(id)

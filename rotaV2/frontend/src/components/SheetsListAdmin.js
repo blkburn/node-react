@@ -51,9 +51,6 @@ const SheetListAdmin = ({ type, history }) => {
         dispatch({ type: ROTA_UPDATE_SCHEDULE })
       }
     },
-    // onMouseEnter: (e, row, rowIndex) => {
-    //   console.log(`enter on row with index: ${rowIndex}`)
-    // },
   }
   const columns = [
     {
@@ -67,6 +64,8 @@ const SheetListAdmin = ({ type, history }) => {
         }
       },
     },
+  ]
+  const adminColumns = [
     {
       dataField: 'isPublished',
       text: 'Published',
@@ -154,7 +153,7 @@ const SheetListAdmin = ({ type, history }) => {
         <BootstrapTable
           keyField='name'
           data={sheets}
-          columns={columns}
+          columns={userInfo.isAdmin ? columns.concat(adminColumns) : columns}
           striped={true}
           hover={true}
           rowEvents={rowEvents}

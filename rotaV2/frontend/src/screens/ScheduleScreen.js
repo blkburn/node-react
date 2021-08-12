@@ -47,7 +47,7 @@ const ScheduleScreen = (props) => {
       {rota.running && (
         <Message variant='info'>Running : {rota.count}s</Message>
       )}
-      <SheetList />
+      <SheetListAdmin />
       <Schedule />
     </FormContainer>
   )

@@ -53,7 +53,7 @@ const RequestsScreen = (props) => {
       {rota.running && (
         <Message variant='info'>Running : {rota.count}s</Message>
       )}
-      <SheetList type='requests' />
+      <SheetListAdmin type='requests' />
       <Schedule />
     </FormContainer>
   )

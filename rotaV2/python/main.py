@@ -416,7 +416,7 @@ def run(ch, method, props, body):
                 f.close()
                 log.write("\n Running Optimisation...\n")
                 log.close()
-                os.system('../monolith/bin/shift_scheduling_colgen output.txt >> log.txt 2>&1')
+                os.system('../monolith/bin/shift_scheduling_colgen output.txt  >> log.txt 2>&1')
                 # os.system('../monolith/bin/shift_scheduling output.txt >> log.txt 2>&1')
                 log = open("log.txt", "a")
                 log.write('\nOptimisation finished\n')
