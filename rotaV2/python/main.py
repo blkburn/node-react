@@ -381,6 +381,13 @@ def run(ch, method, props, body):
                 data = pull_sheet_data(sheet,SPREADSHEET_ID,DATA_TO_PULL)
                 obj = pd.DataFrame(data[1:raw.shape[0]+1], columns=data[0])
 
+                obj_orig = obj.copy()
+                for index, row in obj.iterrows():
+                    for idx, value in row.iteritems():
+                        if (value.endswith('r')):
+                            value = value[:-1]
+                            obj_orig.iloc[index][idx] = value
+
             else:
 
                 f= open("output.txt","w")

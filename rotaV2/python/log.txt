@@ -1,6 +1,0 @@
-check if sheet is locked
-reading Initial sheet
-reading Staff sheet
-reading Shifts sheet
-reading Non Clinical Shifts sheet
-reading Objective sheet
