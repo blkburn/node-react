@@ -50,9 +50,9 @@ export const requestsReducer = (
     case REQUESTS_ADD_FAIL:
       return { ...state, load: false }
     case REQUESTS_DELETE_REQUEST:
-      return { ...state, load: true }
+      return { ...state, load: true, success: false }
     case REQUESTS_DELETE_SUCCESS:
-      return { ...state, load: false }
+      return { ...state, load: false, success: true }
     case REQUESTS_DELETE_FAIL:
       return { ...state, load: false }
 

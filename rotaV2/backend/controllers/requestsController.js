@@ -15,8 +15,9 @@ const getRequests = asyncHandler(async (req, res) => {
   if (requests.length > 0) {
     res.json(requests)
   } else {
-    res.status(404)
-    throw new Error('No requests found')
+    res.json([])
+    // res.status(404)
+    // throw new Error('No requests found')
   }
 })
 

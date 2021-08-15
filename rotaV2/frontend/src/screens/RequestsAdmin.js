@@ -6,12 +6,13 @@ import BootstrapTable from 'react-bootstrap-table-next'
 import { LinkContainer } from 'react-router-bootstrap'
 import { Table, Button } from 'react-bootstrap'
 import { deleteRequests, getServerRequest } from '../actions/requestsActions'
+import { REQUESTS_ADD_ERROR_CLEAR } from '../constants/userConstants'
 
 const RequestsAdmin = () => {
   const dispatch = useDispatch()
   const rota = useSelector((state) => state.rota)
   const requests = useSelector((state) => state.requests)
-  const { serverRequests } = requests
+  const { serverRequests, success: successDeleteRequest } = requests
 
   const userLogin = useSelector((state) => state.userLogin)
   const { userInfo } = userLogin
@@ -20,13 +21,13 @@ const RequestsAdmin = () => {
     console.log(id)
     if (window.confirm('Are you sure')) {
       dispatch(deleteRequests(id))
-      dispatch(getServerRequest())
     }
   }
 
   useEffect(() => {
     dispatch(getServerRequest())
-  }, [dispatch])
+    // dispatch({ type: REQUESTS_ADD_ERROR_CLEAR })
+  }, [dispatch, successDeleteRequest])
 
   const columns = [
     {
@@ -130,17 +131,22 @@ const RequestsAdmin = () => {
   ]
 
   return (
-    <div hidden={serverRequests.length === 0} className='requests-local'>
-      <h3>Current Requests</h3>
-      <BootstrapTable
-        keyField='_id'
-        data={serverRequests}
-        columns={columns}
-        striped={true}
-        hover={true}
-        rowEvents={null}
-      />
-    </div>
+    <>
+      <div hidden={serverRequests.length === 0} className='requests-local'>
+        <h3>Current Requests</h3>
+        <BootstrapTable
+          keyField='_id'
+          data={serverRequests}
+          columns={columns}
+          striped={true}
+          hover={true}
+          rowEvents={null}
+        />
+      </div>
+      <div hidden={serverRequests.length !== 0} className='requests-local'>
+        <h3>No Requests</h3>
+      </div>
+    </>
   )
 }
 
