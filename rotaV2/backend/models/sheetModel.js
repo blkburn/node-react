@@ -27,13 +27,6 @@ const sheetSchema = mongoose.Schema(
   }
 )
 
-// rotaSchema.pre('save', async function (next) {
-//   if (!this.isModified('sheet')) {
-//     next()
-//   }
-
-// })
-
 const Sheet = mongoose.model('Sheet', sheetSchema)
 
 export default Sheet

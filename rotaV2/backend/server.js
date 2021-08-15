@@ -10,6 +10,7 @@ import connectDB from './config/db.js'
 import userRoutes from './routes/usersRoutes.js'
 import rotaRoutes from './routes/rotaRoutes.js'
 import sheetRoutes from './routes/sheetsRoutes.js'
+import requestsRoutes from './routes/requestsRoutes.js'
 
 // import orderRoutes from './routes/orderRoutes.js'
 // import uploadRoutes from './routes/uploadRoutes.js'
@@ -37,6 +38,7 @@ app.use(express.json())
 app.use('/api/users', userRoutes)
 app.use('/api/rota', rotaRoutes)
 app.use('/api/sheets', sheetRoutes)
+app.use('/api/requests', requestsRoutes)
 // app.use('/api/orders', orderRoutes)
 // app.use('/api/upload', uploadRoutes)
 

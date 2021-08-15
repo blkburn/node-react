@@ -46,6 +46,10 @@ const Schedule = (props) => {
   const rota = useSelector((state) => state.rota)
   const sheetDetails = useSelector((state) => state.sheetDetails)
   const { loading, error, sheet } = sheetDetails
+  const requests = useSelector((state) => state.requests)
+  const { serverRequests } = requests
+  const userLogin = useSelector((state) => state.userLogin)
+  const { userInfo } = userLogin
 
   const styles = ({ spacing, palette }) => ({
     flexibleSpace: {
@@ -242,16 +246,32 @@ const Schedule = (props) => {
   }
   useEffect(() => {
     if (rota.schedule) {
-      const filtered = rota.schedule.filter((item) => {
+      let filtered = rota.schedule.filter((item) => {
         let fStaff = rota.staff.find(({ id }) => id === item.staff)
         return fStaff['isChecked'] === true
       })
+      if (serverRequests) {
+        // let fStaff = rota.staff.find(({ name }) => name === 'Fiona Duncan')
+
+        const addFiltered = serverRequests.map((item) => {
+          return {
+            title: item.status + ' ' + item.shift,
+            staff: 'FD',
+            shift: item.shift,
+            startDate: item.startDate,
+            endDate: item.endDate,
+            id: item._id,
+          }
+        })
+        console.log(addFiltered)
+        filtered = filtered.concat(addFiltered)
+      }
       dispatch({
         type: ROTA_FILTER_SCHEDULE,
         payload: filtered,
       })
     }
-  }, [rota.staff, rota.schedule, dispatch])
+  }, [rota.staff, rota.schedule, serverRequests, dispatch])
 
   const createICS = () => {
     if (rota.filtered) {

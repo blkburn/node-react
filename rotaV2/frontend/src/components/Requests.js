@@ -8,7 +8,6 @@ import {
 import { createTheme } from '@material-ui/core/styles'
 import blue from '@material-ui/core/colors/blue'
 import { ThemeProvider } from '@material-ui/styles'
-import { purple } from '@material-ui/core/colors'
 import Button from '@material-ui/core/Button'
 import { Button as BsButton } from 'react-bootstrap'
 import ClickAwayListener from '@material-ui/core/ClickAwayListener'
@@ -18,41 +17,26 @@ import Popper from '@material-ui/core/Popper'
 import MenuItem from '@material-ui/core/MenuItem'
 import MenuList from '@material-ui/core/MenuList'
 import { makeStyles } from '@material-ui/core/styles'
-import { Card } from '@material-ui/core'
 import { format } from 'date-fns'
-import { ROTA_UPDATE_CHECKED_VIEW } from '../constants/userConstants'
-
-const RequestItem = ({ request, index, removeRequest }) => {
-  return (
-    <div className='request-item'>
-      <span style={{ textDecoration: request.isAccept ? 'line-through' : '' }}>
-        {format(request.startDate, 'eeee do MMMM yyyy')}
-      </span>
-      <span style={{ textDecoration: request.isAccept ? 'line-through' : '' }}>
-        {format(request.endDate, 'eeee do MMMM yyyy')}
-      </span>
-      <span style={{ textDecoration: request.isAccept ? 'line-through' : '' }}>
-        {request.shift}
-      </span>
-      <div className='del-button'>
-        {/* <Button variant='outline-success' onClick={() => markTodo(index)}>
-          ✓
-        </Button>{' '} */}
-        <BsButton
-          variant='danger'
-          className='btn-sm btn-danger'
-          onClick={() => removeRequest(index)}
-        >
-          <i className='fas fa-trash'></i>
-        </BsButton>
-      </div>
-    </div>
-  )
-}
+import {
+  REQUESTS_LOCAL_ADD,
+  REQUESTS_LOCAL_CLEAR,
+  REQUESTS_LOCAL_REMOVE,
+  ROTA_UPDATE_CHECKED_VIEW,
+} from '../constants/userConstants'
+import BootstrapTable from 'react-bootstrap-table-next'
+import { v4 as uuidv4 } from 'uuid'
+import InputLabel from '@material-ui/core/InputLabel'
+import FormControl from '@material-ui/core/FormControl'
+import NativeSelect from '@material-ui/core/NativeSelect'
+import ServerRequests from './ServerRequests'
+import { getServerRequest, postServerRequest } from '../actions/requestsActions'
 
 const Requests = () => {
   const dispatch = useDispatch()
   const rota = useSelector((state) => state.rota)
+  const requests = useSelector((state) => state.requests)
+  const { localRequests } = requests
 
   const userLogin = useSelector((state) => state.userLogin)
   const { userInfo } = userLogin
@@ -69,27 +53,26 @@ const Requests = () => {
       type: 'dark',
     },
   })
-  const [requests, setRequests] = useState([])
 
   const onSubmit = (event) => {
     event.preventDefault(event)
-    setRequests((prevState) => [
-      ...prevState,
-      {
-        startDate: selectedStartDate,
-        endDate: selectedEndDate,
-        shift: selectedShift,
-      },
-    ])
+    console.log('onsubmit')
+    const req = {
+      userID: userInfo._id,
+      startDate: selectedStartDate,
+      endDate: selectedEndDate,
+      type: selectedType,
+      shift: selectedShift,
+      _id: uuidv4(),
+    }
+    dispatch({ type: REQUESTS_LOCAL_ADD, payload: req })
+    console.log(req)
   }
-
-  useEffect(() => {
-    console.log(requests)
-  }, [requests])
 
   const [selectedStartDate, setSelectedStartDate] = useState(new Date())
   const [selectedEndDate, setSelectedEndDate] = useState(new Date())
   const [selectedShift, setSelectedShift] = useState('Select Shift')
+  const [selectedType, setSelectedType] = useState('Request Shift')
 
   const handleStartDateChange = (date) => {
     setSelectedStartDate(date)
@@ -118,12 +101,14 @@ const Requests = () => {
     setOpen((prevOpen) => !prevOpen)
   }
 
-  const handleClose = (event) => {
+  const handleShiftClose = (event) => {
     if (anchorRef.current && anchorRef.current.contains(event.target)) {
       return
     }
-    console.log(event.target.id)
-    setSelectedShift(event.target.id)
+    if (event.target.id) {
+      console.log(event.target.id)
+      setSelectedShift(event.target.id)
+    }
     setOpen(false)
   }
 
@@ -135,9 +120,7 @@ const Requests = () => {
   }
 
   const removeRequest = (index) => {
-    const newRequests = [...requests]
-    newRequests.splice(index, 1)
-    setRequests(newRequests)
+    dispatch({ type: REQUESTS_LOCAL_REMOVE, payload: index })
   }
   // return focus to the button when we transitioned from !open -> open
   const prevOpen = React.useRef(open)
@@ -149,22 +132,110 @@ const Requests = () => {
     prevOpen.current = open
   }, [open])
 
+  const columns = [
+    {
+      dataField: 'startDate',
+      text: 'Start Date',
+      formatter: (rowContent, row) => {
+        const style = (
+          <>
+            <span>{format(rowContent, 'eeee do MMMM yyyy')}</span>
+          </>
+        )
+        return style
+      },
+      style: { whiteSpace: 'wrap', textOverlow: 'clip' },
+      headerStyle: (colum, colIndex) => {
+        return {
+          width: '50%',
+        }
+      },
+    },
+    {
+      dataField: 'endDate',
+      text: 'End Date',
+      formatter: (rowContent, row) => {
+        const style = (
+          <>
+            <span>{format(rowContent, 'eeee do MMMM yyyy')}</span>
+          </>
+        )
+        return style
+      },
+      style: { whiteSpace: 'wrap', textOverlow: 'clip' },
+      headerStyle: (colum, colIndex) => {
+        return {
+          width: '50%',
+        }
+      },
+    },
+    {
+      dataField: 'type',
+      text: 'Rquest Type',
+      style: { whiteSpace: 'wrap', textOverlow: 'clip' },
+      headerStyle: (colum, colIndex) => {
+        return {
+          width: '50%',
+        }
+      },
+    },
+    {
+      dataField: 'shift',
+      text: 'Shift',
+      style: { whiteSpace: 'wrap', textOverlow: 'clip' },
+      headerStyle: (colum, colIndex) => {
+        return {
+          width: '50%',
+        }
+      },
+    },
+    {
+      dataField: 'Edit',
+      text: 'Edit',
+      formatter: (rowContent, row) => {
+        const style = (
+          <BsButton
+            variant='danger'
+            className='btn-sm '
+            onClick={() => removeRequest(row)}
+          >
+            <i className='fas fa-trash'></i>
+          </BsButton>
+        )
+        return style
+      },
+      style: {
+        textAlign: 'center',
+      },
+      headerStyle: (colum, colIndex) => {
+        return {
+          width: '10%',
+          textAlign: 'center',
+        }
+      },
+    },
+  ]
+
+  const handleChange = (event) => {
+    console.log(event.target.value)
+    setSelectedType(event.target.value)
+  }
+
   const [viewRequests, setViewRequests] = useState(false)
   return (
     <div hidden={!rota.startDate}>
       <ThemeProvider theme={theme}>
         <BsButton
+          className='show-requests'
           onClick={() => {
             setViewRequests(!viewRequests)
-            // let updateStaff = rota.staff.map((item) => {
-            //   return { ...item, isChecked: false }
-            // })
             const updateStaff = rota.staff.map((item) => {
               return item.id === 'FD'
                 ? { ...item, isChecked: true }
                 : { ...item, isChecked: false }
             })
             dispatch({ type: ROTA_UPDATE_CHECKED_VIEW, payload: updateStaff })
+            dispatch(getServerRequest())
           }}
           color='primary'
         >
@@ -207,7 +278,23 @@ const Requests = () => {
               }}
             />
           </MuiPickersUtilsProvider>
-          <div>
+          <FormControl className='requests-type-control'>
+            <InputLabel shrink htmlFor='request-type-placeholder'>
+              Request Type
+            </InputLabel>
+            <NativeSelect
+              value={selectedType}
+              onChange={handleChange}
+              inputProps={{
+                name: 'Request Type',
+                id: 'request-type',
+              }}
+            >
+              <option value={'Request Shift'}>Request Shift</option>
+              <option value={'Reject Shift'}>Reject Shift</option>
+            </NativeSelect>
+          </FormControl>
+          <div className='shift-select'>
             <Button
               ref={anchorRef}
               aria-controls={open ? 'menu-list-grow' : undefined}
@@ -232,7 +319,7 @@ const Requests = () => {
                   }}
                 >
                   <Paper>
-                    <ClickAwayListener onClickAway={handleClose}>
+                    <ClickAwayListener onClickAway={handleShiftClose}>
                       <MenuList
                         autoFocusItem={open}
                         id='menu-list-grow'
@@ -243,7 +330,7 @@ const Requests = () => {
                             <MenuItem
                               key={name['id']}
                               id={name['id']}
-                              onClick={handleClose}
+                              onClick={handleShiftClose}
                             >
                               {name['text']}
                             </MenuItem>
@@ -262,17 +349,29 @@ const Requests = () => {
           </div>
         </form>
       </ThemeProvider>
-      <div className='requests'>
-        {requests &&
-          requests.map((request, index) => (
-            <RequestItem
-              key={index}
-              index={index}
-              request={request}
-              removeRequest={removeRequest}
-            />
-          ))}
+      <div hidden={localRequests.length === 0} className='requests-local'>
+        <BootstrapTable
+          keyField='_id'
+          data={localRequests}
+          columns={columns}
+          striped={true}
+          hover={true}
+          rowEvents={null}
+        />
+        <BsButton
+          // variant='danger'
+          className='btn-lg submit-button'
+          onClick={() => {
+            dispatch(postServerRequest(localRequests))
+            dispatch({ type: REQUESTS_LOCAL_CLEAR })
+            dispatch(getServerRequest())
+          }}
+        >
+          {' '}
+          Submit Requests
+        </BsButton>
       </div>
+      <ServerRequests />
     </div>
   )
 }

@@ -19,6 +19,7 @@ import {
   sheetListReducer,
   sheetUpdateReducer,
 } from './reducers/sheetReducers'
+import { requestsReducer } from './reducers/requestsReducer'
 
 const reducer = combineReducers({
   userLogin: userLoginReducer,
@@ -34,6 +35,7 @@ const reducer = combineReducers({
   sheetUpdate: sheetUpdateReducer,
   sheetList: sheetListReducer,
   sheetDelete: sheetDeleteReducer,
+  requests: requestsReducer,
 })
 
 // const cartItemsFromStorage = localStorage.getItem('cartItems')

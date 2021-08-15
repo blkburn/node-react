@@ -12,6 +12,7 @@ import SheetNew from './screens/SheetNew'
 import ScheduleScreen from './screens/ScheduleScreen'
 import ScheduleEdit from './screens/ScheduleEdit'
 import RequestsScreen from './screens/RequestsScreen'
+import RequestsAdmin from './screens/RequestsAdmin'
 
 const App = () => {
   return (
@@ -26,6 +27,7 @@ const App = () => {
           <Route path='/schedule' component={ScheduleScreen} />
           <Route path='/requests' component={RequestsScreen} />
           <Route path='/admin/userlist' component={UserList} />
+          <Route path='/admin/requestsAdmin' component={RequestsAdmin} />
           <Route path='/admin/sheetnew' component={SheetNew} />
           <Route path='/admin/sheets/:id/edit' component={ScheduleEdit} />
           <Route path='/admin/user/:id/edit' component={UserEdit} />
