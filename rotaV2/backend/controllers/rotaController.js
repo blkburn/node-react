@@ -35,11 +35,11 @@ const getRotaStatus = asyncHandler(async (req, res) => {
     if (!deque.isEmpty()) {
       res.status(202).json({
         running: running,
-        message: deque.toString(),
+        message: deque.toString() + '\n' + message,
       })
       deque.clear()
     } else {
-      res.status(202).json({ running: running, message: '' })
+      res.status(202).json({ running: running, message: message })
     }
   } else {
     console.log('status response - not running')
@@ -49,10 +49,9 @@ const getRotaStatus = asyncHandler(async (req, res) => {
       locked: locked,
       startDate: startDate,
       endDate: endDate,
-      message: deque.toString(),
+      message: deque.toString() + '\n' + message,
       scheduleData: schedule,
       requestsData: requests,
-      message: message,
     })
     // locked = ''
   }
@@ -209,6 +208,13 @@ const runRotaSheet = (req, res) => {
                   connection.close()
                   console.log('Process Complete...')
                   running = false
+                } else {
+                  //(msg.content.toString().startsWith('Error')) {
+                  console.log('sheet returned error: ' + msg.content.toString())
+                  running = false
+                  message = msg.content.toString()
+                  connection.close()
+                  // res.status(404).send(msg.content.toString())
                 }
               }
             },
@@ -277,6 +283,12 @@ const runGetSchedule = (req, res) => {
                   connection.close()
                   console.log('Process Complete...')
                   running = false
+                } else if (msg.content.toString().startsWith('Error')) {
+                  console.log('sheet returned error: ' + msg.content.toString())
+                  running = false
+                  message = msg.content.toString()
+                  connection.close()
+                  // res.status(404).send(msg.content.toString())
                 } else {
                   // schedule = msg.content.toString()
                   const resp = JSON.parse(msg.content)
@@ -355,6 +367,12 @@ const runGetRequests = (req, res) => {
                   connection.close()
                   console.log('Process Complete...')
                   running = false
+                } else if (msg.content.toString().startsWith('Error')) {
+                  console.log('sheet returned error: ' + msg.content.toString())
+                  running = false
+                  message = msg.content.toString()
+                  connection.close()
+                  // res.status(404).send(msg.content.toString())
                 } else {
                   const resp = JSON.parse(msg.content)
                   locked = resp['isLocked']

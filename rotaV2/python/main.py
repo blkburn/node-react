@@ -58,6 +58,7 @@ def pull_sheet_data(sheet,SPREADSHEET_ID,DATA_TO_PULL):
             range=DATA_TO_PULL).execute()
     except:
         print('No sheet found')
+
         return None
 
     values = result.get('values', [])
@@ -128,6 +129,15 @@ def run(ch, method, props, body):
         DATA_TO_PULL = 'Initial'
         log.write("reading Initial sheet\n")
         data = pull_sheet_data(sheet,SPREADSHEET_ID,DATA_TO_PULL)
+        if data==None:
+            ch.basic_publish(exchange='',
+                             routing_key=props.reply_to,
+                             properties=pika.BasicProperties(correlation_id = \
+                                                                 props.correlation_id),
+                             body=str('Error: Sheet not found'))
+            log.close()
+            command = 'none'
+            return
         raw = pd.DataFrame(data[1:], columns=data[0])
         cols = raw.columns[2:]
         startDate = cols[0]
@@ -162,21 +172,57 @@ def run(ch, method, props, body):
             DATA_TO_PULL = 'Staff'
             log.write("reading Staff sheet\n")
             data = pull_sheet_data(sheet,SPREADSHEET_ID,DATA_TO_PULL)
+            if data==None:
+                ch.basic_publish(exchange='',
+                                 routing_key=props.reply_to,
+                                 properties=pika.BasicProperties(correlation_id = \
+                                                                     props.correlation_id),
+                                 body=str('Error: Sheet not found'))
+                log.close()
+                command = 'none'
+                return
             staff_hours = pd.DataFrame(data[1:], columns=data[0])
 
             DATA_TO_PULL = 'Shifts'
             log.write("reading Shifts sheet\n")
             data = pull_sheet_data(sheet,SPREADSHEET_ID,DATA_TO_PULL)
+            if data==None:
+                ch.basic_publish(exchange='',
+                                 routing_key=props.reply_to,
+                                 properties=pika.BasicProperties(correlation_id = \
+                                                                     props.correlation_id),
+                                 body=str('Error: Sheet not found'))
+                log.close()
+                command = 'none'
+                return
             shifts = pd.DataFrame(data[1:], columns=data[0])
 
             DATA_TO_PULL = 'Non_Clinical_Shifts'
             log.write("reading Non Clinical Shifts sheet\n")
             data = pull_sheet_data(sheet,SPREADSHEET_ID,DATA_TO_PULL)
+            if data==None:
+                ch.basic_publish(exchange='',
+                                 routing_key=props.reply_to,
+                                 properties=pika.BasicProperties(correlation_id = \
+                                                                     props.correlation_id),
+                                 body=str('Error: Sheet not found'))
+                log.close()
+                command = 'none'
+                return
             shifts_nc = pd.DataFrame(data[1:], columns=data[0])
 
             DATA_TO_PULL = 'Objective'
             log.write("reading Objective sheet\n")
             data = pull_sheet_data(sheet,SPREADSHEET_ID,DATA_TO_PULL)
+            if data==None:
+                ch.basic_publish(exchange='',
+                                 routing_key=props.reply_to,
+                                 properties=pika.BasicProperties(correlation_id = \
+                                                                     props.correlation_id),
+                                 body=str('Error: Sheet not found'))
+                log.close()
+                command = 'none'
+                return
             objective = pd.DataFrame(data[1:raw.shape[0]+1], columns=data[0])
 
             if (command == 'GET_SCHEDULE'):
@@ -270,21 +316,57 @@ def run(ch, method, props, body):
             DATA_TO_PULL = 'Shifts'
             log.write("reading Shifts sheet\n")
             data = pull_sheet_data(sheet,SPREADSHEET_ID,DATA_TO_PULL)
+            if data==None:
+                ch.basic_publish(exchange='',
+                                 routing_key=props.reply_to,
+                                 properties=pika.BasicProperties(correlation_id = \
+                                                                     props.correlation_id),
+                                 body=str('Error: Sheet not found'))
+                log.close()
+                command = 'none'
+                return
             shifts = pd.DataFrame(data[1:], columns=data[0])
 
             DATA_TO_PULL = 'Non_Clinical_Shifts'
             log.write("reading Non Clinical Shifts sheet\n")
             data = pull_sheet_data(sheet,SPREADSHEET_ID,DATA_TO_PULL)
+            if data==None:
+                ch.basic_publish(exchange='',
+                                 routing_key=props.reply_to,
+                                 properties=pika.BasicProperties(correlation_id = \
+                                                                     props.correlation_id),
+                                 body=str('Error: Sheet not found'))
+                log.close()
+                command = 'none'
+                return
             shifts_nc = pd.DataFrame(data[1:], columns=data[0])
 
             DATA_TO_PULL = 'Shifts_Setup'
             log.write("reading Shifts_Setup sheet\n")
             data = pull_sheet_data(sheet,SPREADSHEET_ID,DATA_TO_PULL)
+            if data==None:
+                ch.basic_publish(exchange='',
+                                 routing_key=props.reply_to,
+                                 properties=pika.BasicProperties(correlation_id = \
+                                                                     props.correlation_id),
+                                 body=str('Error: Sheet not found'))
+                log.close()
+                command = 'none'
+                return
             shifts_setup = pd.DataFrame(data[1:], columns=data[0])
 
             DATA_TO_PULL = 'Staff'
             log.write("reading Staff sheet\n")
             data = pull_sheet_data(sheet,SPREADSHEET_ID,DATA_TO_PULL)
+            if data==None:
+                ch.basic_publish(exchange='',
+                                 routing_key=props.reply_to,
+                                 properties=pika.BasicProperties(correlation_id = \
+                                                                     props.correlation_id),
+                                 body=str('Error: Sheet not found'))
+                log.close()
+                command = 'none'
+                return
             staff_hours = pd.DataFrame(data[1:], columns=data[0])
 
             log.write("Generating optimisation file...\n")
@@ -379,6 +461,15 @@ def run(ch, method, props, body):
                 DATA_TO_PULL = 'Objective'
                 log.write("reading Objective sheet\n")
                 data = pull_sheet_data(sheet,SPREADSHEET_ID,DATA_TO_PULL)
+                if data==None:
+                    ch.basic_publish(exchange='',
+                                     routing_key=props.reply_to,
+                                     properties=pika.BasicProperties(correlation_id = \
+                                                                         props.correlation_id),
+                                     body=str('Error: Sheet not found'))
+                    log.close()
+                    command = 'none'
+                    return
                 obj = pd.DataFrame(data[1:raw.shape[0]+1], columns=data[0])
 
                 obj_orig = obj.copy()
