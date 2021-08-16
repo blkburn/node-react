@@ -56,7 +56,10 @@ def pull_sheet_data(sheet,SPREADSHEET_ID,DATA_TO_PULL):
         result = sheet.values().get(
             spreadsheetId=SPREADSHEET_ID,
             range=DATA_TO_PULL).execute()
-    except:
+    except Exception as ex:
+        template = "An exception of type {0} occurred. Arguments:\n{1!r}"
+        message = template.format(type(ex).__name__, ex.args)
+        print(message)
         print('No sheet found')
 
         return None
