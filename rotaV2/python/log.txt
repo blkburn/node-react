@@ -1,4 +1,67 @@
 check if sheet is locked
 reading Initial sheet
-check if sheet is locked
-LOCKED = TRUE
+reading sheet
+reading Shifts sheet
+reading Non Clinical Shifts sheet
+reading Shifts_Setup sheet
+reading Staff sheet
+Generating optimisation file...
+Sheet locked - skipping optimisationreading Objective sheet
+
+Nilesh 4/10/21 requested: OFF rostered: EPA
+Nilesh 7/10/21 requested: OFF rostered: EPA
+Nilesh 8/10/21 requested: OFF rostered: EPA
+Nilesh 15/10/21 requested: FOC rostered: SFOC
+Nilesh 18/10/21 requested: OFF rostered: EPA
+Nilesh 20/10/21 requested: OFF rostered: EPA
+Nilesh 1/11/21 requested: OC rostered: SOC
+Nilesh 15/11/21 requested: OC rostered: SOC
+Nilesh 13/12/21 requested: OC rostered: EOC
+Lorna 7/10/21 requested: OFF rostered: SPA
+Lorna 28/10/21 requested: OFF rostered: SPA
+Julie 8/10/21 requested: FOC rostered: SFOC
+Julie 13/10/21 requested: OFF rostered: SPA
+Julie 15/10/21 requested: OFF rostered: EPAu
+Julie 29/10/21 requested: FOC rostered: SFOC
+Julie 19/11/21 requested: FOC rostered: EtFOC
+Surinder 7/10/21 requested: OC rostered: SOC
+Surinder 28/10/21 requested: OC rostered: SOC
+Surinder 4/11/21 requested: OFF rostered: EPA
+Surinder 5/11/21 requested: FOC rostered: SFOC
+Surinder 10/11/21 requested: OFF rostered: SPA
+Surinder 18/11/21 requested: OC rostered: SOC
+Surinder 25/11/21 requested: OC rostered: EOC
+Surinder 2/12/21 requested: OFF rostered: SPA
+Surinder 3/12/21 requested: FOC rostered: EFOC
+Surinder 8/12/21 requested: OFF rostered: SPA
+Kate 8/10/21 requested: OFF rostered: SPA
+Kate 13/10/21 requested: OFF rostered: SPA
+Kate 25/11/21 requested: OFF rostered: SPA
+Kate 8/12/21 requested: OFF rostered: SPA
+Rav 20/10/21 requested: SPA rostered: DS
+Rav 21/10/21 requested: OFF rostered: WRM
+Rav 22/10/21 requested: FBS rostered: OFF
+Rav 10/11/21 requested: SPA rostered: OFF
+Rav 24/11/21 requested: SPA rostered: OFF
+Rav 15/12/21 requested: SPA rostered: OFF
+Melvin 27/10/21 requested: OC rostered: SOC
+Melvin 28/10/21 requested: OFF rostered: SPA
+Melvin 3/11/21 requested: OFF rostered: SPA
+Melvin 25/11/21 requested: OFF rostered: EPA
+Melvin 26/11/21 requested: FOC rostered: SFOC
+Melvin 1/12/21 requested: OFF rostered: EPA
+Melvin 2/12/21 requested: OFF rostered: EPA
+Fiona 6/10/21 requested: OFF rostered: OC
+Fiona 13/10/21 requested: OFF rostered: OC
+Fiona 22/10/21 requested: FOC rostered: SFOC
+Fiona 25/10/21 requested: OFF rostered: CA
+Fiona 28/10/21 requested: OFF rostered: SPA
+Fiona 29/10/21 requested: OFF rostered: EPA
+Fiona 17/12/21 requested: FOC rostered: EFOC
+Claire 5/10/21 requested: OC rostered: SOC
+Claire 28/10/21 requested: OFF rostered: SPA
+Claire 29/10/21 requested: OFF rostered: SPA
+Claire 11/11/21 requested: OFF rostered: SPA
+Claire 2/12/21 requested: OFF rostered: SPA
+Keith 7/10/21 requested: AL rostered: FS
+Keith 28/10/21 requested: OFF rostered: AL

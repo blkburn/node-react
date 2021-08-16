@@ -21,7 +21,7 @@ import http.client
 # google-auth-oauthlib==0.4.0
 
 connection = pika.BlockingConnection(
-    pika.ConnectionParameters(host='localhost'))
+    pika.ConnectionParameters(host='localhost', heartbeat=600))
 
 channel = connection.channel()
 
@@ -604,6 +604,7 @@ def run(ch, method, props, body):
             wks.set_dataframe(worked_shifts, start=(2*(len(obj)+3)+len(staff_pas)+4+3,1))
             wks.update_row(2*(len(obj)+3)+len(staff_pas)+4+3+len(worked_shifts)+1, ws_cnt)
 
+            print('sheet updated... adding conditional formatting')
             for idx, (a, r) in enumerate(zip(cnt[2:],required_pas[2:])):
                 col = 2*(len(obj)+3)-1
                 if a != r:
@@ -633,6 +634,7 @@ def run(ch, method, props, body):
                 # wks.add_conditional_formatting((1, 3), (20, 100), 'TEXT_EQ', json.loads(d), [row['ShiftID']+'r'])
                 wks.add_conditional_formatting((1, 3), (20, 100), 'CUSTOM_FORMULA', json.loads(d), ['=OR(C1="'+row['ShiftID']+'",C1="'+row['ShiftID']+'r")'])
 
+            message = ''
             for index, row in results.iterrows():
                 orig_row = original.loc[[index]].values
                 for idx, (o, r) in enumerate(zip(orig_row.tolist()[0], row.tolist())):
@@ -641,10 +643,12 @@ def run(ch, method, props, body):
                             negs = list(filter(None,re.split(',|-|\n',o.replace(' ', ''))))
                             if r in negs:
                                 wks.add_conditional_formatting((index+2, idx+3), (index+2, idx+3), 'TEXT_NOT_CONTAINS', {'backgroundColor':{'red':1,'green':1}}, [o])
-                                print(o + ':' + r)
+                                print(obj['Name'][index] + ' ' + row.index[idx] + ' requested: ' + o + ' rostered: ' + r)
+                                log.write('\n' + obj['Name'][index] + ' ' + row.index[idx] + ' requested: ' + o + ' rostered: ' + r)
                         elif o != r:
                             wks.add_conditional_formatting((index+2, idx+3), (index+2, idx+3), 'TEXT_NOT_CONTAINS', {'backgroundColor':{'red':1}}, [o])
-                            print(o + ':' + r)
+                            log.write('\n' + obj['Name'][index] + ' ' + row.index[idx] + ' requested: ' + o + ' rostered: ' + r)
+                            print(obj['Name'][index] + ' ' + row.index[idx] + ' requested: ' + o + ' rostered: ' + r)
 
             ch.basic_publish(exchange='',
                              routing_key=props.reply_to,
@@ -654,6 +658,7 @@ def run(ch, method, props, body):
 
             command = 'none'
             log.close()
+            print('finished')
 
 channel.basic_qos(prefetch_count=1)
 channel.basic_consume(queue='rpc_queue', on_message_callback=run)
