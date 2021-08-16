@@ -114,11 +114,11 @@ def run(ch, method, props, body):
                              properties=pika.BasicProperties(correlation_id = \
                                                                  props.correlation_id),
                              body=str('Error: Sheet not found'))
-            ch.basic_publish(exchange='',
-                             routing_key=props.reply_to,
-                             properties=pika.BasicProperties(correlation_id = \
-                                                                 props.correlation_id),
-                             body=str('Complete'))
+            # ch.basic_publish(exchange='',
+            #                  routing_key=props.reply_to,
+            #                  properties=pika.BasicProperties(correlation_id = \
+            #                                                      props.correlation_id),
+            #                  body=str('Complete'))
             log.close()
             command = 'none'
             return

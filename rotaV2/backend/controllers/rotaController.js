@@ -17,6 +17,7 @@ let schedule = ''
 let requests = ''
 let startDate = ''
 let endDate = ''
+let message = ''
 
 const child = spawn('tail', ['-f', './python/log.txt'])
 
@@ -51,6 +52,7 @@ const getRotaStatus = asyncHandler(async (req, res) => {
       message: deque.toString(),
       scheduleData: schedule,
       requestsData: requests,
+      message: message,
     })
     // locked = ''
   }
@@ -86,6 +88,7 @@ const verifyRotaSheet = (req, res) => {
   cnt = 0
   schedule = ''
   requests = ''
+  message = ''
   console.log('started verify ' + req.body.sheet)
   amqp.connect('amqp://localhost', function (error0, connection) {
     if (error0) {
@@ -121,6 +124,12 @@ const verifyRotaSheet = (req, res) => {
                   console.log('Process Complete...')
                   running = false
                   // deque.clear()
+                } else if (msg.content.toString().startsWith('Error')) {
+                  console.log('sheet returned error: ' + msg.content.toString())
+                  running = false
+                  message = msg.content.toString()
+                  connection.close()
+                  // res.status(404).send(msg.content.toString())
                 } else {
                   const resp = JSON.parse(msg.content)
                   locked = resp['isLocked']
