@@ -48,7 +48,7 @@ const SheetListAdmin = ({ type, history }) => {
       console.log(sheets[rowIndex])
       if (e.target.cellIndex < 2) {
         dispatch(getSheetDetails(sheets[rowIndex]._id))
-        dispatch({ type: ROTA_UPDATE_SCHEDULE })
+        // dispatch({ type: ROTA_UPDATE_SCHEDULE })
       }
     },
   }

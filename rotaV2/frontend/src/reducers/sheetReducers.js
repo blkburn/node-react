@@ -40,7 +40,7 @@ export const sheetDetailsReducer = (state = { sheet: {} }, action) => {
     case SHEET_DETAILS_REQUEST:
       return { ...state, loading: true }
     case SHEET_DETAILS_SUCCESS:
-      return { loading: false, sheet: action.payload }
+      return { loading: false, success: true, sheet: action.payload }
     case SHEET_DETAILS_FAIL:
       return { loading: false, error: action.payload }
     case SHEET_DETAILS_RESET:

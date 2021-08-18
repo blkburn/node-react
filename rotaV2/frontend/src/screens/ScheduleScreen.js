@@ -22,7 +22,7 @@ const ScheduleScreen = (props) => {
   const userLogin = useSelector((state) => state.userLogin)
   const { userInfo } = userLogin
   const sheetDetails = useSelector((state) => state.sheetDetails)
-  const { loading, error, sheet } = sheetDetails
+  const { loading, error, sheet, success } = sheetDetails
   const dispatch = useDispatch()
   const rota = useSelector((state) => state.rota)
 
@@ -36,13 +36,13 @@ const ScheduleScreen = (props) => {
   }, [dispatch])
 
   useEffect(() => {
-    if (sheet.sheet && rota.update) {
-      console.log('get requests')
+    if (success) {
+      console.log('get schedule')
       // get the current schedule
       dispatch(getSchedule())
-      dispatch({ type: ROTA_CLEAR_UPDATE_SCHEDULE })
+      dispatch({ type: SHEET_DETAILS_RESET })
     }
-  }, [sheet.sheet, rota.update, dispatch])
+  }, [success, dispatch])
 
   return (
     <FormContainer>
