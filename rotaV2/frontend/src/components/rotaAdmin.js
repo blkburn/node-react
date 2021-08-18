@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { Form, Button } from 'react-bootstrap'
 import FormContainer from '../components/FormContainer'
@@ -27,6 +27,8 @@ const RotaAdmin = (props) => {
   const rota = useSelector((state) => state.rota)
   const sheetDetails = useSelector((state) => state.sheetDetails)
   const { loading, error, sheet } = sheetDetails
+
+  const [condFormatting, setCondFormatting] = useState(false)
 
   useEffect(() => {
     console.log(`rota count ${rota.count}`)
@@ -77,7 +79,7 @@ const RotaAdmin = (props) => {
   }
   const runHandler = (e) => {
     e.preventDefault()
-    dispatch(runRotaSheet())
+    dispatch(runRotaSheet(condFormatting))
   }
 
   return (
@@ -129,8 +131,15 @@ const RotaAdmin = (props) => {
         </Button>
       </Form>
       <Form onSubmit={runHandler}>
+        <Form.Group className='my-2' controlId='runConditionalFormating'>
+          <Form.Check
+            type='checkbox'
+            onChange={(e) => setCondFormatting(e.target.checked)}
+            label='Run sheet conditional formatting (very slow)'
+          />
+        </Form.Group>
         <Button
-          className='my-3'
+          className='my-2'
           disabled={rota.running || !rota.valid}
           type='submit'
           variant='primary'

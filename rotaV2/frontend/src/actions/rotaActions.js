@@ -55,14 +55,14 @@ export const appendRotaMessage = (msg) => async (dispatch) => {
 
 export const setSchedule = (schedule) => async (dispatch) => {
   try {
-    // console.log(JSON.parse(JSON.stringify(schedule)))
+    // console.log(schedule)
     if (schedule) {
       dispatch({
         type: ROTA_SET_SCHEDULE,
-        payload: JSON.parse(JSON.stringify(schedule)),
+        payload: schedule,
       })
-      setSartDate(schedule.startDate)
-      setEndDate(schedule.endDate)
+      // setSartDate(schedule.startDate)
+      // setEndDate(schedule.endDate)
     }
   } catch (error) {
     rotaFail(dispatch, error)
@@ -75,8 +75,8 @@ export const setRequests = (requests) => async (dispatch) => {
         type: ROTA_SET_REQUESTS,
         payload: JSON.parse(JSON.stringify(requests)),
       })
-      setSartDate(requests.startDate)
-      setEndDate(requests.endDate)
+      // setSartDate(requests.startDate)
+      // setEndDate(requests.endDate)
     }
   } catch (error) {
     rotaFail(dispatch, error)
@@ -238,6 +238,7 @@ export const checkRotaStatus = () => async (dispatch, getState) => {
     if (data.requestsData && data.requestsData !== '') {
       dispatch(setRequests(data.requestsData))
     }
+    // console.log('finsihed')
   } catch (error) {
     const message =
       error.response && error.response.data.message
@@ -300,7 +301,7 @@ export const verifyRotaSheet = (sheet) => async (dispatch, getState) => {
   }
 }
 
-export const runRotaSheet = (sheet) => async (dispatch, getState) => {
+export const runRotaSheet = (condFormatting) => async (dispatch, getState) => {
   try {
     console.log('run sheet')
     dispatch(clearRotaCount())
@@ -324,7 +325,11 @@ export const runRotaSheet = (sheet) => async (dispatch, getState) => {
 
     const { data } = await axios.post(
       `/api/rota/run`,
-      { sheet: spreadsheetId, locked: rota.locked ? 'true' : 'false' },
+      {
+        sheet: spreadsheetId,
+        locked: rota.locked ? 'true' : 'false',
+        doConditioanlFormatting: condFormatting,
+      },
       config
     )
     // console.log(data)

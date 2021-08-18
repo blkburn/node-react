@@ -19,6 +19,15 @@ let startDate = ''
 let endDate = ''
 let message = ''
 
+function IsJsonString(str) {
+  try {
+    JSON.parse(str)
+  } catch (e) {
+    return false
+  }
+  return true
+}
+
 const child = spawn('tail', ['-f', './python/log.txt'])
 
 child.stdout.on('data', (data) => {
@@ -35,21 +44,22 @@ const getRotaStatus = asyncHandler(async (req, res) => {
     if (!deque.isEmpty()) {
       res.status(202).json({
         running: running,
-        message: deque.toString() + '\n' + message,
+        message: deque.toString().split(',').join('\n'),
       })
       deque.clear()
     } else {
       res.status(202).json({ running: running, message: message })
     }
+    message = ''
   } else {
     console.log('status response - not running')
-    console.log(deque.toString())
+    console.log(deque.toString().split(',').join('\n'))
     res.status(200).json({
       running: running,
       locked: locked,
       startDate: startDate,
       endDate: endDate,
-      message: deque.toString() + '\n' + message,
+      message: deque.toString().split(',').join('\n'),
       scheduleData: schedule,
       requestsData: requests,
     })
@@ -112,6 +122,7 @@ const verifyRotaSheet = (req, res) => {
           // console.log(req.params)
           // console.log(req.body)
           const params = req.body
+          params.command = 'VERIFY_SHEET'
           console.log(params)
 
           channel.consume(
@@ -130,13 +141,17 @@ const verifyRotaSheet = (req, res) => {
                   connection.close()
                   // res.status(404).send(msg.content.toString())
                 } else {
-                  const resp = JSON.parse(msg.content)
-                  locked = resp['isLocked']
-                  startDate = resp['startDate']
-                  endDate = resp['endDate']
-                  console.log(' [.] Locked = %s', locked)
-                  console.log(' [.] Start Date = %s', startDate)
-                  console.log(' [.] End Date = %s', endDate)
+                  if (IsJsonString(msg.content)) {
+                    const resp = JSON.parse(msg.content)
+                    locked = resp['isLocked']
+                    startDate = resp['startDate']
+                    endDate = resp['endDate']
+                    console.log(' [.] Locked = %s', locked)
+                    console.log(' [.] Start Date = %s', startDate)
+                    console.log(' [.] End Date = %s', endDate)
+                  } else {
+                    deque.push(msg.content.toString())
+                  }
                 }
               }
             },
@@ -145,11 +160,11 @@ const verifyRotaSheet = (req, res) => {
             }
           )
 
-          channel.sendToQueue('rpc_queue', Buffer.from('VERIFY_SHEET'), {
-            correlationId: correlationId,
-            replyTo: q.queue,
-          })
           deque.clear()
+          // channel.sendToQueue('rpc_queue', Buffer.from('VERIFY_SHEET'), {
+          //   correlationId: correlationId,
+          //   replyTo: q.queue,
+          // })
           channel.sendToQueue(
             'rpc_queue',
             Buffer.from(JSON.stringify(params)),
@@ -208,13 +223,24 @@ const runRotaSheet = (req, res) => {
                   connection.close()
                   console.log('Process Complete...')
                   running = false
-                } else {
-                  //(msg.content.toString().startsWith('Error')) {
+                } else if (msg.content.toString().startsWith('Error')) {
                   console.log('sheet returned error: ' + msg.content.toString())
                   running = false
                   message = msg.content.toString()
                   connection.close()
                   // res.status(404).send(msg.content.toString())
+                } else {
+                  // if (IsJsonString(msg.content)) {
+                  //   const resp = JSON.parse(msg.content)
+                  //   locked = resp['isLocked']
+                  //   startDate = resp['startDate']
+                  //   endDate = resp['endDate']
+                  //   console.log(' [.] Locked = %s', locked)
+                  //   console.log(' [.] Start Date = %s', startDate)
+                  //   console.log(' [.] End Date = %s', endDate)
+                  // } else {
+                  deque.push(msg.content.toString())
+                  // }
                 }
               }
             },
@@ -223,11 +249,8 @@ const runRotaSheet = (req, res) => {
             }
           )
           const params = req.body
+          params.command = 'RUN_MODEL'
           console.log(params)
-          channel.sendToQueue('rpc_queue', Buffer.from('RUN_MODEL'), {
-            correlationId: correlationId,
-            replyTo: q.queue,
-          })
           deque.clear()
           channel.sendToQueue(
             'rpc_queue',
@@ -272,8 +295,12 @@ const runGetSchedule = (req, res) => {
             throw error2
           }
           var correlationId = generateUuid()
-          console.log(req.body)
-          console.log(' [x] ', 'GET_SCHEDULE')
+          // console.log(req.body)
+          // console.log(' [x] ', 'GET_SCHEDULE')
+          const params = req.body
+          params.command = 'GET_SCHEDULE'
+          console.log(params)
+
           channel.consume(
             q.queue,
             function (msg) {
@@ -290,15 +317,26 @@ const runGetSchedule = (req, res) => {
                   connection.close()
                   // res.status(404).send(msg.content.toString())
                 } else {
-                  // schedule = msg.content.toString()
-                  const resp = JSON.parse(msg.content)
-                  locked = resp['isLocked']
-                  startDate = resp['startDate']
-                  endDate = resp['endDate']
-                  schedule = msg.content.toString()
-                  console.log(' [.] Locked = %s', locked)
-                  console.log(' [.] Start Date = %s', startDate)
-                  console.log(' [.] End Date = %s', endDate)
+                  if (IsJsonString(msg.content)) {
+                    const resp = JSON.parse(msg.content)
+                    locked = resp['isLocked']
+                    startDate = resp['startDate']
+                    endDate = resp['endDate']
+                    schedule = msg.content.toString()
+                    console.log(' [.] Locked = %s', locked)
+                    console.log(' [.] Start Date = %s', startDate)
+                    console.log(' [.] End Date = %s', endDate)
+                  } else {
+                    deque.push(msg.content.toString())
+                  }
+                  // // schedule = msg.content.toString()
+                  // const resp = JSON.parse(msg.content)
+                  // locked = resp['isLocked']
+                  // startDate = resp['startDate']
+                  // endDate = resp['endDate']
+                  // console.log(' [.] Locked = %s', locked)
+                  // console.log(' [.] Start Date = %s', startDate)
+                  // console.log(' [.] End Date = %s', endDate)
                 }
               }
             },
@@ -306,13 +344,13 @@ const runGetSchedule = (req, res) => {
               noAck: true,
             }
           )
-          const params = req.body
-          console.log(params)
-          channel.sendToQueue('rpc_queue', Buffer.from('GET_SCHEDULE'), {
-            correlationId: correlationId,
-            replyTo: q.queue,
-          })
-          deque.clear()
+          // const params = req.body
+          // console.log(params)
+          // channel.sendToQueue('rpc_queue', Buffer.from('GET_SCHEDULE'), {
+          //   correlationId: correlationId,
+          //   replyTo: q.queue,
+          // })
+          // deque.clear()
           channel.sendToQueue(
             'rpc_queue',
             Buffer.from(JSON.stringify(params)),
