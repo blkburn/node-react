@@ -38,7 +38,7 @@ export const sheetAddReducer = (state = {}, action) => {
 export const sheetDetailsReducer = (state = { sheet: {} }, action) => {
   switch (action.type) {
     case SHEET_DETAILS_REQUEST:
-      return { ...state, loading: true }
+      return { ...state, loading: true, success: false }
     case SHEET_DETAILS_SUCCESS:
       return { loading: false, success: true, sheet: action.payload }
     case SHEET_DETAILS_FAIL:
@@ -53,7 +53,7 @@ export const sheetDetailsReducer = (state = { sheet: {} }, action) => {
 export const sheetUpdateReducer = (state = {}, action) => {
   switch (action.type) {
     case SHEET_UPDATE_REQUEST:
-      return { loading: true }
+      return { loading: true, success: false }
     case SHEET_UPDATE_SUCCESS:
       return { loading: false, success: true, sheetInfo: action.payload }
     case SHEET_UPDATE_FAIL:
@@ -68,9 +68,9 @@ export const sheetUpdateReducer = (state = {}, action) => {
 export const sheetListReducer = (state = { sheets: [] }, action) => {
   switch (action.type) {
     case SHEET_LIST_REQUEST:
-      return { loading: true }
+      return { loading: true, success: false }
     case SHEET_LIST_SUCCESS:
-      return { loading: false, sheets: action.payload }
+      return { loading: false, success: true, sheets: action.payload }
     case SHEET_LIST_FAIL:
       return { loading: false, error: action.payload }
     case SHEET_LIST_RESET:

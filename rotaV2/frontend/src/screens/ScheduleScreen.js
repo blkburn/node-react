@@ -40,7 +40,7 @@ const ScheduleScreen = (props) => {
       console.log('get schedule')
       // get the current schedule
       dispatch(getSchedule())
-      dispatch({ type: SHEET_DETAILS_RESET })
+      // dispatch({ type: SHEET_DETAILS_RESET })
     }
   }, [success, dispatch])
 
@@ -49,7 +49,7 @@ const ScheduleScreen = (props) => {
       {rota.running && (
         <Message variant='info'>Running : {rota.count}s</Message>
       )}
-      <SheetListAdmin />
+      {userInfo.isAdmin ? <SheetListAdmin /> : <SheetListAdmin />}
       <Schedule />
     </FormContainer>
   )

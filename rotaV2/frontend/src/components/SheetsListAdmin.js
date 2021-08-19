@@ -14,15 +14,17 @@ import {
   ROTA_UPDATE_SCHEDULE,
   SHEET_DETAILS_RESET,
 } from '../constants/userConstants'
+import { rotaSheetReducer } from '../reducers/rotaReducers'
 
 const SheetListAdmin = ({ type, history }) => {
   const dispatch = useDispatch()
+  const rota = useSelector((state) => state.rota)
 
   const userLogin = useSelector((state) => state.userLogin)
   const { userInfo } = userLogin
 
   const sheetList = useSelector((state) => state.sheetList)
-  const { loading, error, sheets } = sheetList
+  const { loading, error, sheets, success: listsSuccess } = sheetList
 
   const sheetDelete = useSelector((state) => state.sheetDelete)
   const { success: successDelete } = sheetDelete
@@ -35,6 +37,14 @@ const SheetListAdmin = ({ type, history }) => {
     }
   }, [dispatch, history, successDelete, userInfo])
 
+  useEffect(() => {
+    if (listsSuccess) {
+      if (sheets[0]) {
+        dispatch(getSheetDetails(sheets[0]._id))
+      }
+    }
+  }, [dispatch, listsSuccess])
+
   const deleteHandler = (id) => {
     console.log(id)
     if (window.confirm('Are you sure')) {
@@ -45,8 +55,9 @@ const SheetListAdmin = ({ type, history }) => {
   const rowEvents = {
     onClick: (e, row, rowIndex) => {
       console.log(`clicked on row with index: ${rowIndex}`)
-      console.log(sheets[rowIndex])
+      // console.log(sheets[rowIndex])
       if (e.target.cellIndex < 2) {
+        console.log(sheets[rowIndex])
         dispatch(getSheetDetails(sheets[rowIndex]._id))
         // dispatch({ type: ROTA_UPDATE_SCHEDULE })
       }
@@ -59,7 +70,29 @@ const SheetListAdmin = ({ type, history }) => {
       style: { whiteSpace: 'wrap', textOverlow: 'clip' },
       headerStyle: (colum, colIndex) => {
         return {
-          width: '50%',
+          width: '40%',
+          // textAlign: 'center',
+        }
+      },
+    },
+    {
+      dataField: 'startDate',
+      text: 'Start Date',
+      style: { whiteSpace: 'wrap', textOverlow: 'clip' },
+      headerStyle: (colum, colIndex) => {
+        return {
+          width: '10%',
+          // textAlign: 'center',
+        }
+      },
+    },
+    {
+      dataField: 'endDate',
+      text: 'End Date',
+      style: { whiteSpace: 'wrap', textOverlow: 'clip' },
+      headerStyle: (colum, colIndex) => {
+        return {
+          width: '10%',
           // textAlign: 'center',
         }
       },

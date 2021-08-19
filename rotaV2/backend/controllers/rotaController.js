@@ -2,10 +2,20 @@ import asyncHandler from 'express-async-handler'
 // import generateToken from '../utils/generateToken.js'
 // import User from '../models/userModel.js'
 
+import moment from 'moment'
+import mongoose from 'mongoose'
 import amqp from 'amqplib/callback_api.js'
 import deq from 'double-ended-queue'
 import { spawn } from 'child_process'
 // import { json } from 'express'
+import {
+  CacheSheetDetails,
+  CacheSheetStaff,
+  CacheSheetShifts,
+  CacheSheetSchedule,
+  CacheSheetRequests,
+} from '../models/scheduleModel.js'
+import Sheet from '../models/sheetModel.js'
 
 let deque = new deq()
 
@@ -13,11 +23,17 @@ let cnt = 0
 let running = false
 let verifying = false
 let locked = ''
-let schedule = ''
+let scheduleData = ''
 let requests = ''
 let startDate = ''
 let endDate = ''
 let message = ''
+let updatePublished = false
+let reloadPublished = false
+let updateRequests = false
+let reloadRequests = false
+let spreadsheetId = ''
+let sheet_id = ''
 
 function IsJsonString(str) {
   try {
@@ -54,16 +70,87 @@ const getRotaStatus = asyncHandler(async (req, res) => {
   } else {
     console.log('status response - not running')
     console.log(deque.toString().split(',').join('\n'))
+    if (updatePublished && reloadPublished) {
+      console.log('updating schedule data in database')
+      console.log(sheet_id)
+      const { staff, shift, schedule, requests } = JSON.parse(scheduleData)
+
+      let sheet = await Sheet.findById(sheet_id)
+      console.log(req)
+      if (sheet) {
+        sheet.startDate = startDate
+        sheet.endDate = endDate
+        sheet = await sheet.save()
+        console.log(sheet)
+      }
+
+      let results = await CacheSheetStaff.deleteMany({
+        sheet_id: sheet_id,
+      })
+      results = await Promise.all(
+        staff.map(async (req) => {
+          // console.log(req)
+          let r = await CacheSheetStaff.create({
+            ...req,
+            sheet_id: sheet_id,
+          })
+          // console.log(requests)
+        })
+      )
+      results = await CacheSheetShifts.deleteMany({
+        sheet_id: sheet_id,
+      })
+      results = await Promise.all(
+        shift.map(async (req) => {
+          // console.log(req)
+          let r = await CacheSheetShifts.create({
+            ...req,
+            sheet_id: sheet_id,
+          })
+          // console.log(requests)
+        })
+      )
+      results = await CacheSheetSchedule.deleteMany({
+        sheet_id: sheet_id,
+      })
+      // console.log(schedule)
+      results = await Promise.all(
+        schedule.map(async (req) => {
+          // console.log(req)
+          let r = await CacheSheetSchedule.create({
+            ...req,
+            sheet_id: sheet_id,
+          })
+          // console.log(requests)
+        })
+      )
+      results = await CacheSheetDetails.deleteMany({
+        sheet_id: sheet_id,
+      })
+      // console.log(schedule)
+      results = await CacheSheetDetails.create({
+        sheet: 'sheet name',
+        isLocked: locked === 'TRUE',
+        startDate: startDate, //moment.utc(startDate, 'DD/MM/YY').toDate(),
+        endDate: endDate, //moment.utc(endDate, 'DD/MM/YY').toDate(),
+        sheet_id: sheet_id,
+      })
+    }
+
     res.status(200).json({
       running: running,
       locked: locked,
       startDate: startDate,
       endDate: endDate,
       message: deque.toString().split(',').join('\n'),
-      scheduleData: schedule,
+      scheduleData: scheduleData,
       requestsData: requests,
     })
-    // locked = ''
+    updatePublished = false
+    reloadPublished = false
+    updateRequests = false
+    reloadRequests = false
+    spreadsheetId = ''
   }
 
   // const user = await User.findById(req.user._id)
@@ -95,7 +182,7 @@ function generateUuid() {
 const verifyRotaSheet = (req, res) => {
   // deque.clear()
   cnt = 0
-  schedule = ''
+  scheduleData = ''
   requests = ''
   message = ''
   console.log('started verify ' + req.body.sheet)
@@ -190,7 +277,7 @@ const verifyRotaSheet = (req, res) => {
 // @access  Private
 const runRotaSheet = (req, res) => {
   cnt = 0
-  schedule = ''
+  scheduleData = ''
   requests = ''
   console.log('started')
   amqp.connect('amqp://localhost', function (error0, connection) {
@@ -268,14 +355,7 @@ const runRotaSheet = (req, res) => {
   res.status(202).json({ running: true, message: 'rota started...' })
 }
 
-// @desc    Get rota schedule
-// @route   GET /api/schedule
-// @access  Private
-const runGetSchedule = (req, res) => {
-  cnt = 0
-  schedule = ''
-  requests = ''
-  console.log('started')
+const startAmqp = (req, res) => {
   amqp.connect('amqp://localhost', function (error0, connection) {
     console.log('access queue')
     if (error0) {
@@ -295,17 +375,14 @@ const runGetSchedule = (req, res) => {
             throw error2
           }
           var correlationId = generateUuid()
-          // console.log(req.body)
-          // console.log(' [x] ', 'GET_SCHEDULE')
           const params = req.body
-          params.command = 'GET_SCHEDULE'
           console.log(params)
 
           channel.consume(
             q.queue,
             function (msg) {
               if (msg.properties.correlationId == correlationId) {
-                console.log(' [.] Got %s', msg.content.toString())
+                // console.log(' [.] Got %s', msg.content.toString())
                 if (msg.content.toString() == 'Complete') {
                   connection.close()
                   console.log('Process Complete...')
@@ -322,21 +399,13 @@ const runGetSchedule = (req, res) => {
                     locked = resp['isLocked']
                     startDate = resp['startDate']
                     endDate = resp['endDate']
-                    schedule = msg.content.toString()
+                    scheduleData = msg.content.toString()
                     console.log(' [.] Locked = %s', locked)
                     console.log(' [.] Start Date = %s', startDate)
                     console.log(' [.] End Date = %s', endDate)
                   } else {
                     deque.push(msg.content.toString())
                   }
-                  // // schedule = msg.content.toString()
-                  // const resp = JSON.parse(msg.content)
-                  // locked = resp['isLocked']
-                  // startDate = resp['startDate']
-                  // endDate = resp['endDate']
-                  // console.log(' [.] Locked = %s', locked)
-                  // console.log(' [.] Start Date = %s', startDate)
-                  // console.log(' [.] End Date = %s', endDate)
                 }
               }
             },
@@ -344,13 +413,6 @@ const runGetSchedule = (req, res) => {
               noAck: true,
             }
           )
-          // const params = req.body
-          // console.log(params)
-          // channel.sendToQueue('rpc_queue', Buffer.from('GET_SCHEDULE'), {
-          //   correlationId: correlationId,
-          //   replyTo: q.queue,
-          // })
-          // deque.clear()
           channel.sendToQueue(
             'rpc_queue',
             Buffer.from(JSON.stringify(params)),
@@ -364,7 +426,57 @@ const runGetSchedule = (req, res) => {
       )
     })
   })
-  res.status(202).json({ running: true, message: 'get schedule started...' })
+}
+// @desc    Get rota schedule
+// @route   GET /api/schedule
+// @access  Private
+const runGetSchedule = async (req, res) => {
+  cnt = 0
+  scheduleData = ''
+  requests = ''
+  const params = req.body
+  updatePublished = params.updatePublished
+  reloadPublished = params.reloadPublished
+  updateRequests = params.updateRequests
+  reloadRequests = params.reloadRequests
+  spreadsheetId = params.sheet
+  sheet_id = params.sheet_id
+
+  if (updatePublished && reloadPublished) {
+    startAmqp(req, res)
+    res.status(202).json({ running: true, message: 'get schedule started...' })
+  } else {
+    const staff = await CacheSheetStaff.find({
+      sheet_id: mongoose.Types.ObjectId(sheet_id),
+    })
+    const shift = await CacheSheetShifts.find({
+      sheet_id: mongoose.Types.ObjectId(sheet_id),
+    })
+    const schedule = await CacheSheetSchedule.find({
+      sheet_id: mongoose.Types.ObjectId(sheet_id),
+    })
+    // console.log(staff)
+    const scheduleData = { staff, shift, schedule }
+
+    const sheet = await CacheSheetDetails.find({
+      sheet_id: mongoose.Types.ObjectId(sheet_id),
+    })
+    console.log(sheet[0])
+    res.status(200).json({
+      running: false,
+      locked: sheet[0].isLocked,
+      startDate: sheet[0].startDate,
+      endDate: sheet[0].endDate,
+      message: 'using cached schedule data',
+      scheduleData: scheduleData,
+      requestsData: requests,
+    })
+    updatePublished = false
+    reloadPublished = false
+    // updateRequests = false
+    // reloadRequests = false
+    spreadsheetId = ''
+  }
 }
 
 // @desc    Get rota requests
@@ -373,7 +485,7 @@ const runGetSchedule = (req, res) => {
 const runGetRequests = (req, res) => {
   cnt = 0
   requests = ''
-  schedule = ''
+  scheduleData = ''
   console.log('started')
   amqp.connect('amqp://localhost', function (error0, connection) {
     console.log('access queue')
@@ -400,7 +512,7 @@ const runGetRequests = (req, res) => {
             q.queue,
             function (msg) {
               if (msg.properties.correlationId == correlationId) {
-                console.log(' [.] Got %s', msg.content.toString())
+                // console.log(' [.] Got %s', msg.content.toString())
                 if (msg.content.toString() == 'Complete') {
                   connection.close()
                   console.log('Process Complete...')

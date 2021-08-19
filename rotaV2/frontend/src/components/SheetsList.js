@@ -14,6 +14,7 @@ import {
   ROTA_UPDATE_SCHEDULE,
   SHEET_DETAILS_RESET,
 } from '../constants/userConstants'
+import { setSchedule } from '../actions/rotaActions'
 
 const SheetList = ({ type, history }) => {
   const dispatch = useDispatch()
@@ -22,7 +23,7 @@ const SheetList = ({ type, history }) => {
   const { userInfo } = userLogin
 
   const sheetList = useSelector((state) => state.sheetList)
-  const { loading, error, sheets } = sheetList
+  const { loading, error, sheets, success: successList } = sheetList
 
   const sheetDelete = useSelector((state) => state.sheetDelete)
   const { success: successDelete } = sheetDelete
@@ -33,28 +34,19 @@ const SheetList = ({ type, history }) => {
     } else {
       history.push('/login')
     }
-  }, [dispatch, history, successDelete, userInfo, type])
+  }, [dispatch, history, userInfo, type])
 
-  const deleteHandler = (id) => {
-    console.log(id)
-    if (window.confirm('Are you sure')) {
-      dispatch(deleteSheet(id))
-      dispatch({ type: SHEET_DETAILS_RESET })
+  useEffect(() => {
+    if (successList) {
+      console.log('load all the published rotas')
+      const ids = sheets.map((sheet) => {
+        dispatch(getSheetDetails(sheet._id))
+        return sheet._id
+      })
+    } else {
     }
-  }
-  const rowEvents = {
-    onClick: (e, row, rowIndex) => {
-      console.log(`clicked on row with index: ${rowIndex}`)
-      console.log(sheets[rowIndex])
-      if (e.target.cellIndex < 2) {
-        dispatch(getSheetDetails(sheets[rowIndex]._id))
-        dispatch({ type: ROTA_UPDATE_SCHEDULE })
-      }
-    },
-    // onMouseEnter: (e, row, rowIndex) => {
-    //   console.log(`enter on row with index: ${rowIndex}`)
-    // },
-  }
+  }, [dispatch, history, successList, userInfo, type])
+
   const columns = [
     {
       dataField: 'name',
@@ -67,11 +59,33 @@ const SheetList = ({ type, history }) => {
         }
       },
     },
+    {
+      dataField: 'startDate',
+      text: 'Start Date',
+      style: { whiteSpace: 'wrap', textOverlow: 'clip' },
+      headerStyle: (colum, colIndex) => {
+        return {
+          width: '20%',
+          // textAlign: 'center',
+        }
+      },
+    },
+    {
+      dataField: 'endDate',
+      text: 'End Date',
+      style: { whiteSpace: 'wrap', textOverlow: 'clip' },
+      headerStyle: (colum, colIndex) => {
+        return {
+          width: '20%',
+          // textAlign: 'center',
+        }
+      },
+    },
   ]
 
   return (
     <>
-      <h2>List of Rotas</h2>
+      <h2>Published Rotas</h2>
       {loading ? (
         <Loader />
       ) : error ? (
@@ -82,8 +96,8 @@ const SheetList = ({ type, history }) => {
           data={sheets}
           columns={columns}
           striped={true}
-          hover={true}
-          rowEvents={rowEvents}
+          hover={false}
+          rowEvents={null}
         />
       )}
     </>

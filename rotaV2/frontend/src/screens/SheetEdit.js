@@ -8,7 +8,7 @@ import FormContainer from '../components/FormContainer'
 import { SHEET_UPDATE_RESET } from '../constants/userConstants'
 import { getSheetDetails, updateSheet } from '../actions/sheetActions'
 
-const ScheduleEdit = ({ match, history }) => {
+const SheetEdit = ({ match, history }) => {
   const sheetId = match.params.id
 
   const sheetDetails = useSelector((state) => state.sheetDetails)
@@ -58,7 +58,7 @@ const ScheduleEdit = ({ match, history }) => {
         Go Back
       </Link>
       <FormContainer>
-        <h1>Edit Schedule Details</h1>
+        <h1>Edit Sheet Details</h1>
         {loadingUpdate && <Loader />}
         {errorUpdate && <Message variant='danger'>{errorUpdate}</Message>}
         {loading ? (
@@ -116,4 +116,4 @@ const ScheduleEdit = ({ match, history }) => {
   )
 }
 
-export default ScheduleEdit
+export default SheetEdit

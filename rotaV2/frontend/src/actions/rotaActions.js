@@ -15,8 +15,11 @@ import {
   ROTA_SET_START_DATE,
   ROTA_SET_END_DATE,
   ROTA_SET_REQUESTS,
+  ROTA_SET_NAME,
+  ROTA_SUCCESS_SET,
+  ROTA_SET_DATES,
 } from '../constants/userConstants'
-import moment from 'moment'
+import moment, { now } from 'moment'
 
 const rotaFail = (dispatch, error) => {
   console.log(error)
@@ -53,10 +56,23 @@ export const appendRotaMessage = (msg) => async (dispatch) => {
   }
 }
 
-export const setSchedule = (schedule) => async (dispatch) => {
+export const setSchedule = (data) => async (dispatch, getState) => {
   try {
-    // console.log(schedule)
+    const {
+      userLogin: { userInfo },
+    } = getState()
+    const schedule = data.scheduleData
+
     if (schedule) {
+      const staff = schedule.staff.filter((s) => {
+        if (userInfo.name === s.text) {
+          s.isChecked = true
+        }
+        return s
+      })
+      // console.log(staff)
+      schedule.staff = staff
+      // console.log(schedule)
       dispatch({
         type: ROTA_SET_SCHEDULE,
         payload: schedule,
@@ -168,6 +184,32 @@ export const setRotaLocked = (isLocked) => async (dispatch) => {
   }
 }
 
+export const setDates = (data) => async (dispatch, getState) => {
+  try {
+    const {
+      rota: { scheduleDate },
+    } = getState()
+
+    let scheduleDateUpdate = moment().toDate()
+    let { startDate, endDate } = data
+    startDate = moment.utc(startDate, 'DD/MM/YY').toDate()
+    endDate = moment.utc(endDate, 'DD/MM/YY').toDate()
+    if (scheduleDateUpdate < startDate) {
+      scheduleDateUpdate = startDate
+    } else if (scheduleDateUpdate > endDate) {
+      scheduleDateUpdate = endDate
+    }
+    console.log(scheduleDateUpdate)
+
+    dispatch({
+      type: ROTA_SET_DATES,
+      payload: { startDate, endDate, scheduleDateUpdate },
+    })
+  } catch (error) {
+    rotaFail(dispatch, error)
+  }
+}
+
 export const setSartDate = (date) => async (dispatch) => {
   try {
     let dateObject = moment.utc(date, 'DD/MM/YY').toDate()
@@ -192,7 +234,24 @@ export const setEndDate = (date) => async (dispatch) => {
   }
 }
 
-const updateStatus = (data) => (dispatch) => {
+export const setSheetName = (name) => async (dispatch) => {
+  try {
+    dispatch({
+      type: ROTA_SET_NAME,
+      payload: name,
+    })
+  } catch (error) {
+    rotaFail(dispatch, error)
+  }
+}
+
+const updateStatus = (data) => (dispatch, getState) => {
+  const {
+    sheetDetails: { sheet },
+  } = getState()
+
+  console.log('update status')
+  console.log(sheet.name)
   dispatch(clearRotaCount())
   dispatch(stopRotaRunning())
   dispatch(setRotaLocked(data.locked === 'TRUE'))
@@ -203,12 +262,19 @@ const updateStatus = (data) => (dispatch) => {
     console.log('sheet unlocked')
     dispatch(appendRotaMessage('Sheet is UNLOCKED'))
   }
-  dispatch(setSartDate(data.startDate))
-  dispatch(setEndDate(data.endDate))
+  // dispatch(setSartDate(data.startDate))
+  // dispatch(setEndDate(data.endDate))
+  dispatch(setDates(data))
+  dispatch(setSheetName(sheet.name))
   dispatch(appendRotaMessage(`Rota start date : ${data.startDate}`))
   dispatch(appendRotaMessage(`Rota end date : ${data.endDate}`))
+  if (data.scheduleData && data.scheduleData !== '') {
+    console.log('set schedule data')
+    dispatch(setSchedule(data))
+  }
   // dispatch(appendRotaMessage(data.message))
   dispatch(validRotaSheet(true))
+  dispatch({ type: ROTA_SUCCESS_SET })
 }
 
 export const checkRotaStatus = () => async (dispatch, getState) => {
@@ -233,7 +299,7 @@ export const checkRotaStatus = () => async (dispatch, getState) => {
       dispatch(appendRotaMessage(data.message))
     }
     if (data.scheduleData && data.scheduleData !== '') {
-      dispatch(setSchedule(data.scheduleData))
+      dispatch(setSchedule(data))
     }
     if (data.requestsData && data.requestsData !== '') {
       dispatch(setRequests(data.requestsData))
@@ -378,7 +444,15 @@ export const getSchedule = () => async (dispatch, getState) => {
 
     const { data } = await axios.post(
       `/api/rota/schedule`,
-      { sheet: spreadsheetId },
+      {
+        sheet: spreadsheetId,
+        sheet_id: sheet._id,
+        command: 'GET_SCHEDULE',
+        updatePublished: sheet.isPubUpdate,
+        reloadPublished: sheet.isPubReload,
+        updateRequests: sheet.isReqUpdate,
+        reloadRequests: sheet.isReqReload,
+      },
       config
     )
     // console.log(data)
@@ -427,7 +501,7 @@ export const getRequests = () => async (dispatch, getState) => {
 
     const { data } = await axios.post(
       `/api/rota/requests`,
-      { sheet: spreadsheetId },
+      { sheet: spreadsheetId, command: 'GET_REQUESTS' },
       config
     )
     // console.log(data)

@@ -11,6 +11,16 @@ const sheetSchema = mongoose.Schema(
       type: String,
       required: true,
     },
+    startDate: {
+      type: String,
+      required: false,
+      default: '',
+    },
+    endDate: {
+      type: String,
+      required: false,
+      default: '',
+    },
     isPublished: {
       type: Boolean,
       required: true,

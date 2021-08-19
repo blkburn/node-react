@@ -52,7 +52,7 @@ const RotaAdmin = (props) => {
 
   useEffect(() => {
     dispatch({ type: ROTA_CLEAR_UPDATE_SCHEDULE })
-  }, [sheet.sheet])
+  }, [sheet.sheet, dispatch])
 
   const handleChange = (name) => (event) => {
     // localStorage.setItem([name], event.target.value)

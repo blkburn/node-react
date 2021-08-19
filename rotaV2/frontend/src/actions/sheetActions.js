@@ -195,7 +195,7 @@ export const updateSheet = (sheet) => async (dispatch, getState) => {
 
     const { data } = await axios.put(`/api/sheets/${sheet._id}`, sheet, config)
 
-    dispatch({ type: SHEET_UPDATE_SUCCESS })
+    dispatch({ type: SHEET_UPDATE_SUCCESS, payload: data })
 
     dispatch({ type: SHEET_DETAILS_SUCCESS, payload: data })
 

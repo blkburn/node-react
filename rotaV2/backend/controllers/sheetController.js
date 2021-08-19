@@ -70,6 +70,22 @@ const updateSheet = asyncHandler(async (req, res) => {
   const sheet = await Sheet.findById(req.params.id)
 
   if (sheet) {
+    let isPubUpdate = false
+    let isPubReload = false
+    let isReqUpdate = false
+    let isReqReload = false
+    if (sheet.isPublished !== req.body.isPublished) {
+      isPubUpdate = true
+      if (req.body.isPublished) {
+        isPubReload = true
+      }
+    }
+    if (sheet.isRequests !== req.body.isRequests) {
+      isReqUpdate = true
+      if (req.body.isRequests) {
+        isReqReload = true
+      }
+    }
     sheet.name = req.body.name || sheet.name
     sheet.sheet = req.body.sheet || sheet.sheet
     sheet.isPublished = req.body.isPublished
@@ -83,6 +99,10 @@ const updateSheet = asyncHandler(async (req, res) => {
       sheet: updatedSheet.sheet,
       isPublished: updatedSheet.isPublished,
       isRequests: updatedSheet.isRequests,
+      isPubUpdate: isPubUpdate,
+      isReqUpdate: isReqUpdate,
+      isPubReload: isPubReload,
+      isReqReload: isReqReload,
     })
   } else {
     res.status(404)

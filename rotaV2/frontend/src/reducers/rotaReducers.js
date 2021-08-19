@@ -11,8 +11,10 @@ import {
   ROTA_INC_COUNT,
   ROTA_SCHEDULE_DATE,
   ROTA_SCHEDULE_VIEW_NAME,
+  ROTA_SET_DATES,
   ROTA_SET_END_DATE,
   ROTA_SET_LOCKED,
+  ROTA_SET_NAME,
   ROTA_SET_REQUESTS,
   ROTA_SET_RUNNING,
   ROTA_SET_SCHEDULE,
@@ -21,6 +23,8 @@ import {
   ROTA_SET_START_DATE,
   ROTA_SHEET_VALID,
   ROTA_STOP_RUNNING,
+  ROTA_SUCCESS_CLEAR,
+  ROTA_SUCCESS_SET,
   ROTA_UPDATE_CHECKED_VIEW,
   ROTA_UPDATE_SCHEDULE,
 } from '../constants/userConstants'
@@ -37,8 +41,19 @@ export const rotaSheetReducer = (state = { message: [] }, action) => {
       return { ...state, locked: action.payload }
     case ROTA_SET_START_DATE:
       return { ...state, startDate: action.payload }
+    case ROTA_SET_NAME:
+      return { ...state, sheetName: action.payload }
     case ROTA_SET_END_DATE:
       return { ...state, endDate: action.payload }
+    case ROTA_SET_DATES:
+      const { startDate, endDate, scheduleDateUpdate } = action.payload
+      // console.log(scheduleDateUpdate)
+      return {
+        ...state,
+        startDate: startDate,
+        endDate: endDate,
+        scheduleDate: scheduleDateUpdate,
+      }
     case ROTA_SET_RUNNING:
       return { ...state, running: true }
     case ROTA_STOP_RUNNING:
@@ -50,12 +65,17 @@ export const rotaSheetReducer = (state = { message: [] }, action) => {
     case ROTA_CLEAR_UPDATE_SCHEDULE:
       return { ...state, update: false }
     case ROTA_SET_SCHEDULE:
+      // console.log(action.payload)
       return {
         ...state,
-        schedule: JSON.parse(action.payload)['schedule'],
-        filtered: JSON.parse(action.payload)['schedule'],
-        staff: JSON.parse(action.payload)['staff'],
-        shift: JSON.parse(action.payload)['shift'],
+        schedule: action.payload['schedule'],
+        filtered: action.payload['schedule'],
+        staff: action.payload['staff'],
+        shift: action.payload['shift'],
+        // schedule: JSON.parse(action.payload)['schedule'],
+        // filtered: JSON.parse(action.payload)['schedule'],
+        // staff: JSON.parse(action.payload)['staff'],
+        // shift: JSON.parse(action.payload)['shift'],
       }
     case ROTA_SET_REQUESTS:
       return {
@@ -93,6 +113,10 @@ export const rotaSheetReducer = (state = { message: [] }, action) => {
       return { ...state, message: [] }
     case ROTA_UPDATE_CHECKED_VIEW:
       return { ...state, staff: action.payload }
+    case ROTA_SUCCESS_SET:
+      return { ...state, success: true }
+    case ROTA_SUCCESS_CLEAR:
+      return { ...state, success: false }
     default:
       return state
   }
