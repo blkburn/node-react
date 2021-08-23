@@ -19,21 +19,95 @@ import Sheet from '../models/sheetModel.js'
 
 let deque = new deq()
 
-let cnt = 0
 let running = false
-let verifying = false
-let locked = ''
-let scheduleData = ''
-let requests = ''
-let startDate = ''
-let endDate = ''
-let message = ''
 let updatePublished = false
 let reloadPublished = false
 let updateRequests = false
 let reloadRequests = false
-let spreadsheetId = ''
-let sheet_id = ''
+// let spreadsheetId = ''
+
+class fVerifyData {
+  constructor(params) {
+    this.params = params
+  }
+  check(field) {
+    if (!field) {
+      throw new Error('Missing Verify Data')
+    }
+  }
+  set(data) {
+    console.log(data)
+    this.startDate = data.startDate
+    this.endDate = data.endDate
+    this.isLocked = data.isLocked
+    this.message = data.message || ''
+  }
+  get() {
+    return {
+      startDate: this.startDate,
+      endDate: this.endDate,
+      isLocked: this.isLocked,
+      message: this.message,
+    }
+  }
+}
+
+class fRunData {
+  constructor(params) {
+    this.params = params
+  }
+  check(field) {
+    if (!field) {
+      throw new Error('Missing Run/Generate Data')
+    }
+  }
+  set(data) {
+    this.startDate = data.startDate
+    this.endDate = data.endDate
+    this.isLocked = data.isLocked
+    this.message = data.message || ''
+  }
+  get() {
+    return { message: this.message }
+  }
+}
+
+class fScheduleData {
+  constructor(params) {
+    this.params = params
+  }
+  check(field) {
+    if (!field) {
+      throw new Error('Missing Schedule/Request Data')
+    }
+  }
+  set(data) {
+    this.startDate = data.startDate
+    this.endDate = data.endDate
+    this.isLocked = data.isLocked
+    this.message = data.message || ''
+    this.staff = data.staff
+    this.shift = data.shift
+    this.schedule = data.schedule
+    this.requests = data.requests
+  }
+  get() {
+    return {
+      startDate: this.startDate,
+      endDate: this.endDate,
+      isLocked: this.isLocked,
+      message: this.message,
+      scheduleData: {
+        staff: this.staff,
+        shift: this.shift,
+        schedule: this.schedule,
+        requests: this.requests,
+      },
+    }
+  }
+}
+
+let fRabbitData = null
 
 function IsJsonString(str) {
   try {
@@ -64,93 +138,95 @@ const getRotaStatus = asyncHandler(async (req, res) => {
       })
       deque.clear()
     } else {
-      res.status(202).json({ running: running, message: message })
+      res.status(202).json({ running: running, message: '' })
     }
-    message = ''
   } else {
     console.log('status response - not running')
     console.log(deque.toString().split(',').join('\n'))
-    if (updatePublished && reloadPublished) {
-      console.log('updating schedule data in database')
-      console.log(sheet_id)
-      const { staff, shift, schedule, requests } = JSON.parse(scheduleData)
+    fRabbitData.message = deque.toString().split(',').join('\n')
+    res.status(200).json(fRabbitData.get())
 
-      let sheet = await Sheet.findById(sheet_id)
-      console.log(req)
-      if (sheet) {
-        sheet.startDate = startDate
-        sheet.endDate = endDate
-        sheet = await sheet.save()
-        console.log(sheet)
-      }
+    // if (updatePublished && reloadPublished) {
+    //   console.log('updating schedule data in database')
+    //   console.log(sheet_id)
+    //   const { staff, shift, schedule, requests } = JSON.parse(scheduleData)
 
-      let results = await CacheSheetStaff.deleteMany({
-        sheet_id: sheet_id,
-      })
-      results = await Promise.all(
-        staff.map(async (req) => {
-          // console.log(req)
-          let r = await CacheSheetStaff.create({
-            ...req,
-            sheet_id: sheet_id,
-          })
-          // console.log(requests)
-        })
-      )
-      results = await CacheSheetShifts.deleteMany({
-        sheet_id: sheet_id,
-      })
-      results = await Promise.all(
-        shift.map(async (req) => {
-          // console.log(req)
-          let r = await CacheSheetShifts.create({
-            ...req,
-            sheet_id: sheet_id,
-          })
-          // console.log(requests)
-        })
-      )
-      results = await CacheSheetSchedule.deleteMany({
-        sheet_id: sheet_id,
-      })
-      // console.log(schedule)
-      results = await Promise.all(
-        schedule.map(async (req) => {
-          // console.log(req)
-          let r = await CacheSheetSchedule.create({
-            ...req,
-            sheet_id: sheet_id,
-          })
-          // console.log(requests)
-        })
-      )
-      results = await CacheSheetDetails.deleteMany({
-        sheet_id: sheet_id,
-      })
-      // console.log(schedule)
-      results = await CacheSheetDetails.create({
-        sheet: 'sheet name',
-        isLocked: locked === 'TRUE',
-        startDate: startDate, //moment.utc(startDate, 'DD/MM/YY').toDate(),
-        endDate: endDate, //moment.utc(endDate, 'DD/MM/YY').toDate(),
-        sheet_id: sheet_id,
-      })
-    }
+    //   let sheet = await Sheet.findById(sheet_id)
+    //   console.log(req)
+    //   if (sheet) {
+    //     sheet.startDate = startDate
+    //     sheet.endDate = endDate
+    //     sheet = await sheet.save()
+    //     console.log(sheet)
+    //   }
 
-    res.status(200).json({
-      running: running,
-      locked: locked,
-      startDate: startDate,
-      endDate: endDate,
-      message: deque.toString().split(',').join('\n'),
-      scheduleData: scheduleData,
-      requestsData: requests,
-    })
-    updatePublished = false
-    reloadPublished = false
-    updateRequests = false
-    reloadRequests = false
-    spreadsheetId = ''
+    //   let results = await CacheSheetStaff.deleteMany({
+    //     sheet_id: sheet_id,
+    //   })
+    //   results = await Promise.all(
+    //     staff.map(async (req) => {
+    //       // console.log(req)
+    //       let r = await CacheSheetStaff.create({
+    //         ...req,
+    //         sheet_id: sheet_id,
+    //       })
+    //       // console.log(requests)
+    //     })
+    //   )
+    //   results = await CacheSheetShifts.deleteMany({
+    //     sheet_id: sheet_id,
+    //   })
+    //   results = await Promise.all(
+    //     shift.map(async (req) => {
+    //       // console.log(req)
+    //       let r = await CacheSheetShifts.create({
+    //         ...req,
+    //         sheet_id: sheet_id,
+    //       })
+    //       // console.log(requests)
+    //     })
+    //   )
+    //   results = await CacheSheetSchedule.deleteMany({
+    //     sheet_id: sheet_id,
+    //   })
+    //   // console.log(schedule)
+    //   results = await Promise.all(
+    //     schedule.map(async (req) => {
+    //       // console.log(req)
+    //       let r = await CacheSheetSchedule.create({
+    //         ...req,
+    //         sheet_id: sheet_id,
+    //       })
+    //       // console.log(requests)
+    //     })
+    //   )
+    //   results = await CacheSheetDetails.deleteMany({
+    //     sheet_id: sheet_id,
+    //   })
+    //   // console.log(schedule)
+    //   results = await CacheSheetDetails.create({
+    //     sheet: 'sheet name',
+    //     isLocked: locked === 'TRUE',
+    //     startDate: startDate, //moment.utc(startDate, 'DD/MM/YY').toDate(),
+    //     endDate: endDate, //moment.utc(endDate, 'DD/MM/YY').toDate(),
+    //     sheet_id: sheet_id,
+    //   })
+    // }
+
+    // res.status(200).json({
+    //   running: running,
+    //   locked: locked,
+    //   startDate: startDate,
+    //   endDate: endDate,
+    //   message: deque.toString().split(',').join('\n'),
+    //   scheduleData: scheduleData,
+    //   requestsData: requests,
+    // })
+    // updatePublished = false
+    // reloadPublished = false
+    // updateRequests = false
+    // reloadRequests = false
+    // spreadsheetId = ''
   }
 
   // const user = await User.findById(req.user._id)
@@ -180,178 +256,19 @@ function generateUuid() {
 // @route   GET /api/admin/verify
 // @access  Private
 const verifyRotaSheet = (req, res) => {
-  // deque.clear()
-  cnt = 0
-  scheduleData = ''
-  requests = ''
-  message = ''
-  console.log('started verify ' + req.body.sheet)
-  amqp.connect('amqp://localhost', function (error0, connection) {
-    if (error0) {
-      throw error0
-    }
-    connection.createChannel(function (error1, channel) {
-      if (error1) {
-        throw error1
-      }
-      channel.assertQueue(
-        '',
-        {
-          exclusive: true,
-        },
-        function (error2, q) {
-          if (error2) {
-            throw error2
-          }
-          var correlationId = generateUuid()
+  fRabbitData = new fVerifyData(req.body)
 
-          console.log(' [x] ', 'VERIFY_SHEET')
-          // console.log(req.params)
-          // console.log(req.body)
-          const params = req.body
-          params.command = 'VERIFY_SHEET'
-          console.log(params)
-
-          channel.consume(
-            q.queue,
-            function (msg) {
-              if (msg.properties.correlationId == correlationId) {
-                if (msg.content.toString() == 'Complete') {
-                  connection.close()
-                  console.log('Process Complete...')
-                  running = false
-                  // deque.clear()
-                } else if (msg.content.toString().startsWith('Error')) {
-                  console.log('sheet returned error: ' + msg.content.toString())
-                  running = false
-                  message = msg.content.toString()
-                  connection.close()
-                  // res.status(404).send(msg.content.toString())
-                } else {
-                  if (IsJsonString(msg.content)) {
-                    const resp = JSON.parse(msg.content)
-                    locked = resp['isLocked']
-                    startDate = resp['startDate']
-                    endDate = resp['endDate']
-                    console.log(' [.] Locked = %s', locked)
-                    console.log(' [.] Start Date = %s', startDate)
-                    console.log(' [.] End Date = %s', endDate)
-                  } else {
-                    deque.push(msg.content.toString())
-                  }
-                }
-              }
-            },
-            {
-              noAck: true,
-            }
-          )
-
-          deque.clear()
-          // channel.sendToQueue('rpc_queue', Buffer.from('VERIFY_SHEET'), {
-          //   correlationId: correlationId,
-          //   replyTo: q.queue,
-          // })
-          channel.sendToQueue(
-            'rpc_queue',
-            Buffer.from(JSON.stringify(params)),
-            {
-              correlationId: correlationId,
-              replyTo: q.queue,
-            }
-          )
-
-          running = true
-        }
-      )
-    })
-  })
-  res.status(202).json({
-    running: true,
-    message: 'verifying sheet...',
-  })
+  startAmqp(req, res)
+  res.status(202).json({ running: true, message: 'verfiy sheet started...' })
 }
 
 // @desc    Get rota run optimiser
 // @route   GET /api/admin/run
 // @access  Private
 const runRotaSheet = (req, res) => {
-  cnt = 0
-  scheduleData = ''
-  requests = ''
-  console.log('started')
-  amqp.connect('amqp://localhost', function (error0, connection) {
-    console.log('access queue')
-    if (error0) {
-      throw error0
-    }
-    connection.createChannel(function (error1, channel) {
-      if (error1) {
-        throw error1
-      }
-      channel.assertQueue(
-        '',
-        {
-          exclusive: true,
-        },
-        function (error2, q) {
-          if (error2) {
-            throw error2
-          }
-          var correlationId = generateUuid()
-          console.log(req.body)
-          console.log(' [x] ', 'RUN_SHEET')
-          channel.consume(
-            q.queue,
-            function (msg) {
-              if (msg.properties.correlationId == correlationId) {
-                console.log(' [.] Got %s', msg.content.toString())
-                if (msg.content.toString() == 'Complete') {
-                  connection.close()
-                  console.log('Process Complete...')
-                  running = false
-                } else if (msg.content.toString().startsWith('Error')) {
-                  console.log('sheet returned error: ' + msg.content.toString())
-                  running = false
-                  message = msg.content.toString()
-                  connection.close()
-                  // res.status(404).send(msg.content.toString())
-                } else {
-                  // if (IsJsonString(msg.content)) {
-                  //   const resp = JSON.parse(msg.content)
-                  //   locked = resp['isLocked']
-                  //   startDate = resp['startDate']
-                  //   endDate = resp['endDate']
-                  //   console.log(' [.] Locked = %s', locked)
-                  //   console.log(' [.] Start Date = %s', startDate)
-                  //   console.log(' [.] End Date = %s', endDate)
-                  // } else {
-                  deque.push(msg.content.toString())
-                  // }
-                }
-              }
-            },
-            {
-              noAck: true,
-            }
-          )
-          const params = req.body
-          params.command = 'RUN_MODEL'
-          console.log(params)
-          deque.clear()
-          channel.sendToQueue(
-            'rpc_queue',
-            Buffer.from(JSON.stringify(params)),
-            {
-              correlationId: correlationId,
-              replyTo: q.queue,
-            }
-          )
-          running = true
-        }
-      )
-    })
-  })
+  fRabbitData = new fRunData(req.body)
+
+  startAmqp(req, res)
   res.status(202).json({ running: true, message: 'rota started...' })
 }
 
@@ -395,14 +312,16 @@ const startAmqp = (req, res) => {
                   // res.status(404).send(msg.content.toString())
                 } else {
                   if (IsJsonString(msg.content)) {
-                    const resp = JSON.parse(msg.content)
-                    locked = resp['isLocked']
-                    startDate = resp['startDate']
-                    endDate = resp['endDate']
-                    scheduleData = msg.content.toString()
-                    console.log(' [.] Locked = %s', locked)
-                    console.log(' [.] Start Date = %s', startDate)
-                    console.log(' [.] End Date = %s', endDate)
+                    // const resp = JSON.parse(msg.content)
+                    console.log(JSON.parse(msg.content))
+                    fRabbitData.set(JSON.parse(msg.content))
+                    // locked = resp['isLocked']
+                    // startDate = resp['startDate']
+                    // endDate = resp['endDate']
+                    // scheduleData = msg.content.toString()
+                    // console.log(' [.] Locked = %s', locked)
+                    // console.log(' [.] Start Date = %s', startDate)
+                    // console.log(' [.] End Date = %s', endDate)
                   } else {
                     deque.push(msg.content.toString())
                   }
@@ -431,16 +350,17 @@ const startAmqp = (req, res) => {
 // @route   GET /api/schedule
 // @access  Private
 const runGetSchedule = async (req, res) => {
-  cnt = 0
-  scheduleData = ''
-  requests = ''
   const params = req.body
-  updatePublished = params.updatePublished
-  reloadPublished = params.reloadPublished
-  updateRequests = params.updateRequests
-  reloadRequests = params.reloadRequests
-  spreadsheetId = params.sheet
-  sheet_id = params.sheet_id
+  console.log('params: ', params)
+  fRabbitData = new fScheduleData(req.body)
+  fRabbitData.set(params)
+
+  let updatePublished = params.updatePublished
+  let reloadPublished = params.reloadPublished
+  let updateRequests = params.updateRequests
+  let reloadRequests = params.reloadRequests
+  // spreadsheetId = params.sheet
+  let sheet_id = params.sheet_id
 
   if (updatePublished && reloadPublished) {
     startAmqp(req, res)
@@ -462,20 +382,21 @@ const runGetSchedule = async (req, res) => {
       sheet_id: mongoose.Types.ObjectId(sheet_id),
     })
     console.log(sheet[0])
-    res.status(200).json({
-      running: false,
-      locked: sheet[0].isLocked,
+    fRabbitData.set({
+      islocaked: sheet[0].isLocked,
       startDate: sheet[0].startDate,
       endDate: sheet[0].endDate,
       message: 'using cached schedule data',
-      scheduleData: scheduleData,
-      requestsData: requests,
+      staff,
+      shift,
+      schedule,
     })
-    updatePublished = false
-    reloadPublished = false
+
+    res.status(200).json(fRabbitData.get())
+    // updatePublished = false
+    // reloadPublished = false
     // updateRequests = false
     // reloadRequests = false
-    spreadsheetId = ''
   }
 }
 
@@ -483,7 +404,6 @@ const runGetSchedule = async (req, res) => {
 // @route   GET /api/requests
 // @access  Private
 const runGetRequests = (req, res) => {
-  cnt = 0
   requests = ''
   scheduleData = ''
   console.log('started')

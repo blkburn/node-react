@@ -71,10 +71,10 @@ const RotaAdmin = (props) => {
   const handleSubmit = (e) => {
     e.preventDefault()
 
-    dispatch(validRotaSheet(false))
-    dispatch(clearRotaMessage())
+    // dispatch(validRotaSheet(false))
+    // dispatch(clearRotaMessage())
     dispatch(setRotaSheet(sheet.sheet))
-    dispatch(setRotaName(sheet.name))
+    // dispatch(setRotaName(sheet.name))
     dispatch(verifyRotaSheet())
   }
   const runHandler = (e) => {
@@ -140,7 +140,7 @@ const RotaAdmin = (props) => {
         </Form.Group>
         <Button
           className='my-2'
-          disabled={rota.running || !rota.valid}
+          disabled={rota.running || !rota.success}
           type='submit'
           variant='primary'
         >

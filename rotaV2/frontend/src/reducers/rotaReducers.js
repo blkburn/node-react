@@ -9,6 +9,7 @@ import {
   ROTA_FILTER_SCHEDULE,
   ROTA_FILTER_SCHEDULE_ID,
   ROTA_INC_COUNT,
+  ROTA_RUN_VERIFY,
   ROTA_SCHEDULE_DATE,
   ROTA_SCHEDULE_VIEW_NAME,
   ROTA_SET_DATES,
@@ -35,16 +36,16 @@ export const rotaSheetReducer = (state = { message: [] }, action) => {
       return { ...state, sheet: action.payload, locked: true, count: 0 }
     case ROTA_SET_SHEET_NAME:
       return { ...state, name: action.payload }
-    case ROTA_SHEET_VALID:
-      return { ...state, valid: action.payload }
+    // case ROTA_SHEET_VALID:
+    //   return { ...state, valid: action.payload }
     case ROTA_SET_LOCKED:
       return { ...state, locked: action.payload }
-    case ROTA_SET_START_DATE:
-      return { ...state, startDate: action.payload }
+    // case ROTA_SET_START_DATE:
+    //   return { ...state, startDate: action.payload }
     case ROTA_SET_NAME:
       return { ...state, sheetName: action.payload }
-    case ROTA_SET_END_DATE:
-      return { ...state, endDate: action.payload }
+    // case ROTA_SET_END_DATE:
+    //   return { ...state, endDate: action.payload }
     case ROTA_SET_DATES:
       const { startDate, endDate, scheduleDateUpdate } = action.payload
       // console.log(scheduleDateUpdate)
@@ -54,12 +55,15 @@ export const rotaSheetReducer = (state = { message: [] }, action) => {
         endDate: endDate,
         scheduleDate: scheduleDateUpdate,
       }
-    case ROTA_SET_RUNNING:
-      return { ...state, running: true }
+    case ROTA_RUN_VERIFY:
+      return { ...state, count: 0, message: [], running: true, success: false }
+
+    // case ROTA_SET_RUNNING:
+    //   return { ...state, running: true }
     case ROTA_STOP_RUNNING:
       return { ...state, running: false }
-    case ROTA_CLEAR_COUNT:
-      return { ...state, count: 0 }
+    // case ROTA_CLEAR_COUNT:
+    //   return { ...state, count: 0 }
     case ROTA_UPDATE_SCHEDULE:
       return { ...state, update: true }
     case ROTA_CLEAR_UPDATE_SCHEDULE:
@@ -72,10 +76,6 @@ export const rotaSheetReducer = (state = { message: [] }, action) => {
         filtered: action.payload['schedule'],
         staff: action.payload['staff'],
         shift: action.payload['shift'],
-        // schedule: JSON.parse(action.payload)['schedule'],
-        // filtered: JSON.parse(action.payload)['schedule'],
-        // staff: JSON.parse(action.payload)['staff'],
-        // shift: JSON.parse(action.payload)['shift'],
       }
     case ROTA_SET_REQUESTS:
       return {
@@ -109,8 +109,8 @@ export const rotaSheetReducer = (state = { message: [] }, action) => {
       return { ...state, count: state.count + 1 }
     case ROTA_APPEND_MESSAGE:
       return { ...state, message: [...state.message, action.payload] }
-    case ROTA_CLEAR_MESSAGE:
-      return { ...state, message: [] }
+    // case ROTA_CLEAR_MESSAGE:
+    //   return { ...state, message: [] }
     case ROTA_UPDATE_CHECKED_VIEW:
       return { ...state, staff: action.payload }
     case ROTA_SUCCESS_SET:

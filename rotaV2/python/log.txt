@@ -1,0 +1,1000 @@
+Number of days: 77
+-- Shift DS, 25 min.
+-- Shift WRM, 25 min.
+-- Shift BS, 20 min.
+-- Shift FS, 25 min.
+-- Shift OC, 25 min.
+-- Shift WDS, 30 min.
+-- Shift WOC, 40 min.
+-- Shift FBS, 20 min.
+-- Shift FOC, 25 min.
+-- Shift SOC, 25 min.
+-- Shift EOC, 25 min.
+-- Shift SEOC, 25 min.
+-- Shift SFOC, 25 min.
+-- Shift CA, 20 min.
+-- Shift MI, 25 min.
+-- Shift WFS, 33 min.
+Number of shifts: 16
+-- Shift 0. OK after = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15] forbidden_after = []
+-- Shift 1. OK after = [0, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15] forbidden_after = [1]
+-- Shift 2. OK after = [3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15] forbidden_after = [0, 1, 2]
+-- Shift 3. OK after = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15] forbidden_after = [0]
+-- Shift 4. OK after = [7, 8, 9, 10, 11, 12, 13, 14, 15] forbidden_after = [0, 1, 2, 6, 5, 4, 3]
+-- Shift 5. OK after = [0, 1, 2, 3, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15] forbidden_after = [4]
+-- Shift 6. OK after = [3, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15] forbidden_after = [0, 1, 2, 4]
+-- Shift 7. OK after = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15] forbidden_after = []
+-- Shift 8. OK after = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15] forbidden_after = []
+-- Shift 9. OK after = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15] forbidden_after = []
+-- Shift 10. OK after = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15] forbidden_after = []
+-- Shift 11. OK after = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15] forbidden_after = []
+-- Shift 12. OK after = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15] forbidden_after = []
+-- Shift 13. OK after = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15] forbidden_after = []
+-- Shift 14. OK after = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15] forbidden_after = []
+-- Shift 15. OK after = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15] forbidden_after = []
+-- Staff BR: Consequtive limit [1, 3]. Time limit [0, 405]. Max weekends: 3. Max shifts: [2, 2, 6, 6, 6].
+-- Staff NC: Consequtive limit [1, 3]. Time limit [0, 564]. Max weekends: 3. Max shifts: [4, 4, 8, 8, 8].
+-- Staff LJ: Consequtive limit [1, 3]. Time limit [0, 371]. Max weekends: 3. Max shifts: [2, 2, 5, 5, 5].
+-- Staff MC: Consequtive limit [1, 3]. Time limit [0, 420]. Max weekends: 3. Max shifts: [3, 3, 6, 6, 6].
+-- Staff JT: Consequtive limit [1, 3]. Time limit [0, 504]. Max weekends: 3. Max shifts: [4, 4, 8, 8, 8].
+-- Staff SP: Consequtive limit [1, 3]. Time limit [0, 608]. Max weekends: 3. Max shifts: [4, 4, 8, 8, 8].
+-- Staff KS: Consequtive limit [1, 3]. Time limit [0, 589]. Max weekends: 3. Max shifts: [3, 3, 7, 7, 7].
+-- Staff RK: Consequtive limit [1, 3]. Time limit [0, 600]. Max weekends: 3. Max shifts: [3, 3, 7, 7, 7].
+-- Staff MCW: Consequtive limit [1, 3]. Time limit [0, 588]. Max weekends: 3. Max shifts: [4, 4, 8, 8, 8].
+-- Staff JH: Consequtive limit [1, 3]. Time limit [0, 400]. Max weekends: 3. Max shifts: [2, 2, 5, 5, 5].
+-- Staff FD: Consequtive limit [1, 3]. Time limit [0, 500]. Max weekends: 3. Max shifts: [2, 2, 6, 6, 6].
+-- Staff CS: Consequtive limit [1, 3]. Time limit [0, 450]. Max weekends: 3. Max shifts: [2, 2, 6, 6, 6].
+-- Staff EP: Consequtive limit [1, 3]. Time limit [0, 546]. Max weekends: 3. Max shifts: [3, 3, 7, 7, 7].
+-- Staff RA: Consequtive limit [1, 3]. Time limit [0, 220]. Max weekends: 3. Max shifts: [1, 1, 4, 4, 4].
+-- Staff KJ: Consequtive limit [1, 3]. Time limit [0, 608]. Max weekends: 3. Max shifts: [4, 4, 8, 8, 8].
+-- Staff RR: Consequtive limit [1, 3]. Time limit [0, 602]. Max weekends: 3. Max shifts: [3, 3, 7, 7, 7].
+Number of staff: 16
+Read 81 shift on requests.
+Read 101 shift off requests.
+Read 1232 cover constraints.
+## id: BR
+verify_bound(worker.time_limit());
+lower: 0
+upper: 405
+verify_bound(worker.consecutive_shifts_limit());
+lower: 1
+upper: 3
+verify_bound(worker.consecutive_days_off_limit());
+lower: 1
+upper: 77
+verify_bound(worker.has_working_weekends_limit());
+lower: 0
+upper: 3
+## id: NC
+verify_bound(worker.time_limit());
+lower: 0
+upper: 564
+verify_bound(worker.consecutive_shifts_limit());
+lower: 1
+upper: 3
+verify_bound(worker.consecutive_days_off_limit());
+lower: 1
+upper: 77
+verify_bound(worker.has_working_weekends_limit());
+lower: 0
+upper: 3
+## id: LJ
+verify_bound(worker.time_limit());
+lower: 0
+upper: 371
+verify_bound(worker.consecutive_shifts_limit());
+lower: 1
+upper: 3
+verify_bound(worker.consecutive_days_off_limit());
+lower: 1
+upper: 77
+verify_bound(worker.has_working_weekends_limit());
+lower: 0
+upper: 3
+## id: MC
+verify_bound(worker.time_limit());
+lower: 0
+upper: 420
+verify_bound(worker.consecutive_shifts_limit());
+lower: 1
+upper: 3
+verify_bound(worker.consecutive_days_off_limit());
+lower: 1
+upper: 77
+verify_bound(worker.has_working_weekends_limit());
+lower: 0
+upper: 3
+## id: JT
+verify_bound(worker.time_limit());
+lower: 0
+upper: 504
+verify_bound(worker.consecutive_shifts_limit());
+lower: 1
+upper: 3
+verify_bound(worker.consecutive_days_off_limit());
+lower: 1
+upper: 77
+verify_bound(worker.has_working_weekends_limit());
+lower: 0
+upper: 3
+## id: SP
+verify_bound(worker.time_limit());
+lower: 0
+upper: 608
+verify_bound(worker.consecutive_shifts_limit());
+lower: 1
+upper: 3
+verify_bound(worker.consecutive_days_off_limit());
+lower: 1
+upper: 77
+verify_bound(worker.has_working_weekends_limit());
+lower: 0
+upper: 3
+## id: KS
+verify_bound(worker.time_limit());
+lower: 0
+upper: 589
+verify_bound(worker.consecutive_shifts_limit());
+lower: 1
+upper: 3
+verify_bound(worker.consecutive_days_off_limit());
+lower: 1
+upper: 77
+verify_bound(worker.has_working_weekends_limit());
+lower: 0
+upper: 3
+## id: RK
+verify_bound(worker.time_limit());
+lower: 0
+upper: 600
+verify_bound(worker.consecutive_shifts_limit());
+lower: 1
+upper: 3
+verify_bound(worker.consecutive_days_off_limit());
+lower: 1
+upper: 77
+verify_bound(worker.has_working_weekends_limit());
+lower: 0
+upper: 3
+## id: MCW
+verify_bound(worker.time_limit());
+lower: 0
+upper: 588
+verify_bound(worker.consecutive_shifts_limit());
+lower: 1
+upper: 3
+verify_bound(worker.consecutive_days_off_limit());
+lower: 1
+upper: 77
+verify_bound(worker.has_working_weekends_limit());
+lower: 0
+upper: 3
+## id: JH
+verify_bound(worker.time_limit());
+lower: 0
+upper: 400
+verify_bound(worker.consecutive_shifts_limit());
+lower: 1
+upper: 3
+verify_bound(worker.consecutive_days_off_limit());
+lower: 1
+upper: 77
+verify_bound(worker.has_working_weekends_limit());
+lower: 0
+upper: 3
+## id: FD
+verify_bound(worker.time_limit());
+lower: 0
+upper: 500
+verify_bound(worker.consecutive_shifts_limit());
+lower: 1
+upper: 3
+verify_bound(worker.consecutive_days_off_limit());
+lower: 1
+upper: 77
+verify_bound(worker.has_working_weekends_limit());
+lower: 0
+upper: 3
+## id: CS
+verify_bound(worker.time_limit());
+lower: 0
+upper: 450
+verify_bound(worker.consecutive_shifts_limit());
+lower: 1
+upper: 3
+verify_bound(worker.consecutive_days_off_limit());
+lower: 1
+upper: 77
+verify_bound(worker.has_working_weekends_limit());
+lower: 0
+upper: 3
+## id: EP
+verify_bound(worker.time_limit());
+lower: 0
+upper: 546
+verify_bound(worker.consecutive_shifts_limit());
+lower: 1
+upper: 3
+verify_bound(worker.consecutive_days_off_limit());
+lower: 1
+upper: 77
+verify_bound(worker.has_working_weekends_limit());
+lower: 0
+upper: 3
+## id: RA
+verify_bound(worker.time_limit());
+lower: 0
+upper: 220
+verify_bound(worker.consecutive_shifts_limit());
+lower: 1
+upper: 3
+verify_bound(worker.consecutive_days_off_limit());
+lower: 1
+upper: 77
+verify_bound(worker.has_working_weekends_limit());
+lower: 0
+upper: 3
+## id: KJ
+verify_bound(worker.time_limit());
+lower: 0
+upper: 608
+verify_bound(worker.consecutive_shifts_limit());
+lower: 1
+upper: 3
+verify_bound(worker.consecutive_days_off_limit());
+lower: 1
+upper: 77
+verify_bound(worker.has_working_weekends_limit());
+lower: 0
+upper: 3
+## id: RR
+verify_bound(worker.time_limit());
+lower: 0
+upper: 602
+verify_bound(worker.consecutive_shifts_limit());
+lower: 1
+upper: 3
+verify_bound(worker.consecutive_days_off_limit());
+lower: 1
+upper: 77
+verify_bound(worker.has_working_weekends_limit());
+lower: 0
+upper: 3
+verify_bound(worker.consecutive_limit());
+verify_bound(worker.consecutive_limit());
+verify_bound(worker.consecutive_limit());
+verify_bound(worker.consecutive_limit());
+verify_bound(worker.consecutive_limit());
+verify_bound(worker.consecutive_limit());
+verify_bound(worker.consecutive_limit());
+verify_bound(worker.consecutive_limit());
+verify_bound(worker.consecutive_limit());
+verify_bound(worker.consecutive_limit());
+verify_bound(worker.consecutive_limit());
+verify_bound(worker.consecutive_limit());
+verify_bound(worker.consecutive_limit());
+verify_bound(worker.consecutive_limit());
+verify_bound(worker.consecutive_limit());
+verify_bound(worker.consecutive_limit());
+## id: BR
+verify_bound(worker.time_limit());
+lower: 0
+upper: 405
+verify_bound(worker.consecutive_shifts_limit());
+lower: 1
+upper: 3
+verify_bound(worker.consecutive_days_off_limit());
+lower: 1
+upper: 77
+verify_bound(worker.has_working_weekends_limit());
+lower: 0
+upper: 3
+## id: NC
+verify_bound(worker.time_limit());
+lower: 0
+upper: 564
+verify_bound(worker.consecutive_shifts_limit());
+lower: 1
+upper: 3
+verify_bound(worker.consecutive_days_off_limit());
+lower: 1
+upper: 77
+verify_bound(worker.has_working_weekends_limit());
+lower: 0
+upper: 3
+## id: LJ
+verify_bound(worker.time_limit());
+lower: 0
+upper: 371
+verify_bound(worker.consecutive_shifts_limit());
+lower: 1
+upper: 3
+verify_bound(worker.consecutive_days_off_limit());
+lower: 1
+upper: 77
+verify_bound(worker.has_working_weekends_limit());
+lower: 0
+upper: 3
+## id: MC
+verify_bound(worker.time_limit());
+lower: 0
+upper: 420
+verify_bound(worker.consecutive_shifts_limit());
+lower: 1
+upper: 3
+verify_bound(worker.consecutive_days_off_limit());
+lower: 1
+upper: 77
+verify_bound(worker.has_working_weekends_limit());
+lower: 0
+upper: 3
+## id: JT
+verify_bound(worker.time_limit());
+lower: 0
+upper: 504
+verify_bound(worker.consecutive_shifts_limit());
+lower: 1
+upper: 3
+verify_bound(worker.consecutive_days_off_limit());
+lower: 1
+upper: 77
+verify_bound(worker.has_working_weekends_limit());
+lower: 0
+upper: 3
+## id: SP
+verify_bound(worker.time_limit());
+lower: 0
+upper: 608
+verify_bound(worker.consecutive_shifts_limit());
+lower: 1
+upper: 3
+verify_bound(worker.consecutive_days_off_limit());
+lower: 1
+upper: 77
+verify_bound(worker.has_working_weekends_limit());
+lower: 0
+upper: 3
+## id: KS
+verify_bound(worker.time_limit());
+lower: 0
+upper: 589
+verify_bound(worker.consecutive_shifts_limit());
+lower: 1
+upper: 3
+verify_bound(worker.consecutive_days_off_limit());
+lower: 1
+upper: 77
+verify_bound(worker.has_working_weekends_limit());
+lower: 0
+upper: 3
+## id: RK
+verify_bound(worker.time_limit());
+lower: 0
+upper: 600
+verify_bound(worker.consecutive_shifts_limit());
+lower: 1
+upper: 3
+verify_bound(worker.consecutive_days_off_limit());
+lower: 1
+upper: 77
+verify_bound(worker.has_working_weekends_limit());
+lower: 0
+upper: 3
+## id: MCW
+verify_bound(worker.time_limit());
+lower: 0
+upper: 588
+verify_bound(worker.consecutive_shifts_limit());
+lower: 1
+upper: 3
+verify_bound(worker.consecutive_days_off_limit());
+lower: 1
+upper: 77
+verify_bound(worker.has_working_weekends_limit());
+lower: 0
+upper: 3
+## id: JH
+verify_bound(worker.time_limit());
+lower: 0
+upper: 400
+verify_bound(worker.consecutive_shifts_limit());
+lower: 1
+upper: 3
+verify_bound(worker.consecutive_days_off_limit());
+lower: 1
+upper: 77
+verify_bound(worker.has_working_weekends_limit());
+lower: 0
+upper: 3
+## id: FD
+verify_bound(worker.time_limit());
+lower: 0
+upper: 500
+verify_bound(worker.consecutive_shifts_limit());
+lower: 1
+upper: 3
+verify_bound(worker.consecutive_days_off_limit());
+lower: 1
+upper: 77
+verify_bound(worker.has_working_weekends_limit());
+lower: 0
+upper: 3
+## id: CS
+verify_bound(worker.time_limit());
+lower: 0
+upper: 450
+verify_bound(worker.consecutive_shifts_limit());
+lower: 1
+upper: 3
+verify_bound(worker.consecutive_days_off_limit());
+lower: 1
+upper: 77
+verify_bound(worker.has_working_weekends_limit());
+lower: 0
+upper: 3
+## id: EP
+verify_bound(worker.time_limit());
+lower: 0
+upper: 546
+verify_bound(worker.consecutive_shifts_limit());
+lower: 1
+upper: 3
+verify_bound(worker.consecutive_days_off_limit());
+lower: 1
+upper: 77
+verify_bound(worker.has_working_weekends_limit());
+lower: 0
+upper: 3
+## id: RA
+verify_bound(worker.time_limit());
+lower: 0
+upper: 220
+verify_bound(worker.consecutive_shifts_limit());
+lower: 1
+upper: 3
+verify_bound(worker.consecutive_days_off_limit());
+lower: 1
+upper: 77
+verify_bound(worker.has_working_weekends_limit());
+lower: 0
+upper: 3
+## id: KJ
+verify_bound(worker.time_limit());
+lower: 0
+upper: 608
+verify_bound(worker.consecutive_shifts_limit());
+lower: 1
+upper: 3
+verify_bound(worker.consecutive_days_off_limit());
+lower: 1
+upper: 77
+verify_bound(worker.has_working_weekends_limit());
+lower: 0
+upper: 3
+## id: RR
+verify_bound(worker.time_limit());
+lower: 0
+upper: 602
+verify_bound(worker.consecutive_shifts_limit());
+lower: 1
+upper: 3
+verify_bound(worker.consecutive_days_off_limit());
+lower: 1
+upper: 77
+verify_bound(worker.has_working_weekends_limit());
+lower: 0
+upper: 3
+verify_bound(worker.consecutive_limit());
+verify_bound(worker.consecutive_limit());
+verify_bound(worker.consecutive_limit());
+verify_bound(worker.consecutive_limit());
+verify_bound(worker.consecutive_limit());
+verify_bound(worker.consecutive_limit());
+verify_bound(worker.consecutive_limit());
+verify_bound(worker.consecutive_limit());
+verify_bound(worker.consecutive_limit());
+verify_bound(worker.consecutive_limit());
+verify_bound(worker.consecutive_limit());
+verify_bound(worker.consecutive_limit());
+verify_bound(worker.consecutive_limit());
+verify_bound(worker.consecutive_limit());
+verify_bound(worker.consecutive_limit());
+verify_bound(worker.consecutive_limit());
+Setting up colgen problem...             [ [0m[33;1mWAIT[0m ] [0m[32;1m  OK  [0m]   0.0270753 s.
+Creating initial rosters...              [ [0m[33;1mWAIT[0m ] [0m[32;1m  OK  [0m]   0.321376 s.
+-- Objective for initial columns: 38500
+  Iter |       Objective      |    Problem   |    Pool   | Fixed  |                  Time                  | Frac. |
+       |    frac.     rounded |   size  diff | size gen. |        |    fix       gen     solve   tot. cum. |       |
+      1      38500      38500        0 2480    2480    0      0         nan       nan  1.56e-02  1.814e-02      0%
+      2      35300      35300       16   16    2496   16      0         nan  2.86e-01  6.68e-03  3.118e-01      0%
+      3    27066.7      27100       31   15    2511   15      0         nan  2.16e-01  7.25e-03  5.370e-01     40%
+      4      22350      23500       46   15    2526   15      0         nan  2.65e-01  1.88e-02  8.251e-01     50%
+      5    18766.7      20500       61   15    2541   15      0     1.5e-03  3.70e-01  1.08e-02  1.208e+00     53%
+      6    17020.8      20800       76   15    2556   15      0     1.8e-03  2.50e-01  9.88e-03  1.471e+00     53%
+      7      14948      18900       84    8    2571   15      0     1.4e-03  2.21e-01  1.25e-02  1.706e+00     54%
+      8    13998.2      18500       96   12    2586   15      0     1.6e-03  2.19e-01  1.22e-02  1.940e+00     54%
+      9    13391.5      18500      109   13    2601   15      0     8.8e-04  1.77e-01  1.35e-02  2.132e+00     58%
+     10    12839.1      20300      119   10    2616   15      0     1.8e-03  2.60e-01  1.77e-02  2.412e+00     58%
+     11      12463      21300      132   13    2631   15      0     1.4e-03  2.37e-01  1.66e-02  2.674e+00     54%
+     12    12013.2      19100      139    7    2646   15      0     1.3e-03  1.73e-01  1.70e-02  2.869e+00     54%
+     13    11850.4      19300      156   17    2661   15      0     1.5e-03  2.37e-01  1.92e-02  3.129e+00     48%
+     14    11445.6      19300      161    5    2676   15      0     9.0e-04  1.72e-01  1.94e-02  3.322e+00     46%
+     15    11165.1      18100      172   11    2691   15      0     1.1e-03  2.26e-01  1.84e-02  3.567e+00     46%
+     16    10717.2      18100      169   -3    2706   15      0     1.1e-03  2.04e-01  2.18e-02  3.794e+00     54%
+     17    10416.7      18700      176    7    2721   15      0     9.1e-04  2.10e-01  2.26e-02  4.028e+00     54%
+     18    9992.85      18500      175   -1    2736   15      0     8.5e-04  2.17e-01  2.07e-02  4.266e+00     53%
+     19    9715.02      17700      189   14    2751   15      0     1.2e-03  2.27e-01  2.30e-02  4.518e+00     53%
+     20     9474.4      17700      187   -2    2766   15      0     9.4e-04  2.28e-01  2.14e-02  4.768e+00     53%
+     21    9252.25      17100      199   12    2781   15      0     1.2e-03  2.29e-01  2.34e-02  5.023e+00     49%
+     22    8896.85      16300      200    1    2796   15      0     1.1e-03  2.41e-01  2.59e-02  5.291e+00     53%
+     23     8381.9      15300      210   10    2811   15      0     1.1e-03  2.07e-01  2.66e-02  5.526e+00     52%
+     24    8049.17      16700      216    6    2826   15      0     9.3e-04  2.25e-01  2.36e-02  5.775e+00     49%
+     25    7895.87      17300      232   16    2841   15      0     9.7e-04  2.19e-01  2.73e-02  6.023e+00     49%
+     26     7461.7      15900      222  -10    2856   15      0     1.1e-03  2.24e-01  2.71e-02  6.275e+00     47%
+     27    7201.83      16300      232   10    2871   15      0     6.7e-04  2.30e-01  2.89e-02  6.535e+00     49%
+     28     7010.8      14700      231   -1    2886   15      0     1.1e-03  2.64e-01  3.09e-02  6.831e+00     49%
+     29    6777.03      15100      235    4    2901   15      0     1.1e-03  2.25e-01  2.80e-02  7.085e+00     47%
+     30    6598.64      13800      238    3    2916   15      0     1.6e-03  2.32e-01  3.27e-02  7.351e+00     50%
+     31    6490.13      13600      237   -1    2931   15      0     4.5e-03  4.47e-01  7.54e-02  7.879e+00     46%
+     32    6420.24      13000      249   12    2946   15      0     8.4e-03  4.48e-01  1.01e-01  8.437e+00     45%
+     33    6318.24      13800      245   -4    2961   15      0     2.6e-03  5.19e-01  7.54e-02  9.035e+00     48%
+     34    6261.32      14200      241   -4    2976   15      0     1.9e-03  4.33e-01  8.61e-02  9.556e+00     49%
+     35    6237.01      13600      257   16    2991   15      0     1.4e-03  6.07e-01  8.48e-02  1.027e+01     47%
+     36    6219.93      13800      243  -14    3006   15      0     1.7e-03  3.62e-01  4.68e-02  1.068e+01     50%
+     37    6184.45      14400      254   11    3021   15      0     1.3e-03  2.38e-01  3.45e-02  1.095e+01     50%
+     38    6101.57      13800      237  -17    3036   15      0     1.1e-03  2.55e-01  2.74e-02  1.124e+01     52%
+     39    6087.54      13800      268   31    3051   15      0     9.0e-04  3.22e-01  3.30e-02  1.159e+01     46%
+     40    5977.84      14400      249  -19    3066   15      0     1.2e-03  2.35e-01  4.10e-02  1.187e+01     48%
+     41    5866.64      14600      272   23    3081   15      0     1.9e-03  2.50e-01  7.62e-02  1.220e+01     45%
+     42    5782.64      14800      262  -10    3096   15      0     2.2e-03  2.89e-01  8.02e-02  1.257e+01     48%
+     43    5734.15      15800      266    4    3111   15      0     2.0e-03  2.90e-01  3.75e-02  1.290e+01     47%
+     44    5663.31      13800      272    6    3126   15      0     1.4e-03  2.30e-01  3.36e-02  1.317e+01     46%
+     45    5603.47      14200      267   -5    3141   15      0     1.1e-03  2.26e-01  3.45e-02  1.343e+01     50%
+     46    5576.02      13600      271    4    3156   15      0     2.0e-03  2.37e-01  4.73e-02  1.372e+01     49%
+     47    5566.54      13600      286   15    3171   15      0     1.3e-03  2.34e-01  5.80e-02  1.401e+01     50%
+     48    5539.81      13600      262  -24    3186   15      0     2.2e-03  2.92e-01  4.23e-02  1.435e+01     54%
+     49    5517.36      14000      279   17    3201   15      0     1.2e-03  2.74e-01  3.58e-02  1.466e+01     51%
+     50    5489.48      14000      274   -5    3216   15      0     1.1e-03  2.81e-01  3.41e-02  1.497e+01     51%
+     51    5463.43      14000      289   15    3231   15      0     1.7e-03  2.29e-01  4.31e-02  1.525e+01     47%
+     52    5420.29      14000      282   -7    3246   15      0     1.6e-03  2.34e-01  4.53e-02  1.553e+01     48%
+     53    5410.77      14800      282    0    3261   15      0     1.7e-03  2.46e-01  4.19e-02  1.582e+01     48%
+     54     5363.9      14800      270  -12    3276   15      0     1.2e-03  2.24e-01  3.44e-02  1.608e+01     51%
+     55    5330.08      14600      292   22    3291   15      0     1.8e-03  2.34e-01  4.14e-02  1.635e+01     47%
+     56     5266.4      15800      275  -17    3306   15      0     2.1e-03  2.32e-01  3.83e-02  1.663e+01     48%
+     57    5218.82      14300      294   19    3321   15      0     1.6e-03  2.72e-01  5.08e-02  1.695e+01     45%
+     58    5162.47      14900      270  -24    3336   15      0     1.9e-03  2.54e-01  5.32e-02  1.726e+01     47%
+     59    5093.87      15700      283   13    3351   15      0     1.6e-03  2.44e-01  4.32e-02  1.755e+01     47%
+     60    5072.79      15500      284    1    3366   15      0     1.6e-03  2.46e-01  3.69e-02  1.783e+01     47%
+     61    5019.68      14500      290    6    3381   15      0     2.4e-03  2.31e-01  4.70e-02  1.812e+01     45%
+     62    5010.31      14100      285   -5    3396   15      0     1.8e-03  2.60e-01  4.03e-02  1.842e+01     45%
+     63    5001.95      13900      286    1    3411   15      0     1.4e-03  2.51e-01  5.55e-02  1.873e+01     43%
+     64    4964.97      14300      287    1    3426   15      0     1.5e-03  2.46e-01  4.84e-02  1.902e+01     45%
+     65    4900.31      14500      286   -1    3441   15      0     1.5e-03  2.37e-01  3.73e-02  1.930e+01     46%
+     66    4835.42      13500      300   14    3456   15      0     1.6e-03  2.19e-01  3.42e-02  1.955e+01     43%
+     67    4830.33      13500      305    5    3471   15      0     1.2e-03  2.21e-01  4.06e-02  1.982e+01     43%
+     68    4810.81      13100      279  -26    3486   15      0     1.2e-03  2.78e-01  6.63e-02  2.016e+01     47%
+     69    4753.58      13500      305   26    3501   15      0     1.6e-03  2.51e-01  4.35e-02  2.046e+01     45%
+     70    4679.21      13900      277  -28    3516   15      0     1.5e-03  3.03e-01  4.47e-02  2.081e+01     47%
+     71    4623.78      13100      342   65    3531   15      0     1.6e-03  2.36e-01  4.90e-02  2.110e+01     39%
+     72    4602.96      13100      295  -47    3546   15      0     1.9e-03  2.47e-01  6.02e-02  2.141e+01     45%
+     73    4577.73      13300      327   32    3561   15      0     1.7e-03  2.62e-01  5.66e-02  2.173e+01     43%
+     74    4562.01      13900      301  -26    3576   15      0     1.5e-03  2.26e-01  5.60e-02  2.201e+01     46%
+     75    4539.33      13500      319   18    3591   15      0     1.4e-03  2.28e-01  3.85e-02  2.228e+01     43%
+     76    4501.85      12900      291  -28    3606   15      0     1.7e-03  1.94e-01  3.65e-02  2.251e+01     46%
+     77    4495.48      12900      381   90    3621   15      0     1.3e-03  2.53e-01  5.90e-02  2.282e+01     36%
+     78    4452.49      13500      274 -107    3636   15      0     1.5e-03  2.78e-01  4.56e-02  2.315e+01     49%
+     79    4424.45      13500      366   92    3651   15      0     1.5e-03  2.13e-01  5.91e-02  2.342e+01     37%
+     80    4360.29      13700      283  -83    3666   15      0     1.4e-03  2.50e-01  5.00e-02  2.373e+01     48%
+     81    4329.75      13500      366   83    3681   15      0     1.6e-03  2.18e-01  5.64e-02  2.400e+01     37%
+     82    4300.68      13500      289  -77    3696   15      0     1.5e-03  2.22e-01  4.27e-02  2.427e+01     47%
+     83    4288.12      12700      352   63    3711   15      0     1.7e-03  2.57e-01  5.07e-02  2.458e+01     39%
+     84    4256.98      13100      287  -65    3726   15      0     1.9e-03  2.14e-01  4.21e-02  2.484e+01     45%
+     85    4245.31      13100      329   42    3741   15      0     1.7e-03  2.24e-01  4.17e-02  2.510e+01     40%
+     86    4214.57      12500      276  -53    3756   15      0     1.9e-03  2.43e-01  7.46e-02  2.542e+01     50%
+     87    4208.25      12900      381  105    3771   15      0     1.7e-03  2.29e-01  6.62e-02  2.572e+01     37%
+     88    4188.44      12900      277 -104    3786   15      0     1.9e-03  2.41e-01  4.05e-02  2.600e+01     49%
+     89    4188.01      12900      367   90    3801   15      0     1.5e-03  2.59e-01  6.86e-02  2.633e+01     38%
+-- Fixed for [BR: 6, NC: 11, LJ: 2, MC: 3, JT: 7, SP: 10, KS: 5, RK: 6, MCW: 7, FD: 6, CS: 4, EP: 3, RA: 3, KJ: 6, RR: 12] at level 0.75.
+-- Fixed to zero for [BR: 1184, NC: 1184, LJ: 1162, MC: 1175, JT: 1167, SP: 1170, KS: 1138, RK: 1139, MCW: 1168, JH: 1154, FD: 1170, CS: 1179, EP: 1131, RA: 1229, KJ: 1147, RR: 1154] at level 0.05.
+-- Members remaining: (BR, 2) (NC, 7) (LJ, 2) (MC, 5) (JT, 7) (SP, 6) (KS, 4) (RK, 7) (MCW, 5) (JH, 6) (FD, 5) (CS, 5) (EP, 6) (KJ, 5) (RR, 2) and total is 15.
+     90    5738.84      11700       92 -275    2559   15     47     4.3e-01  2.42e-02  2.09e-02  2.681e+01     76%
+     91    4678.27      11900      108   16    2574   15      0     1.6e-03  2.62e-02  3.01e-02  2.687e+01     76%
+     92    4329.29      10900      123   15    2589   15      0     2.6e-03  2.05e-02  2.64e-02  2.692e+01     75%
+     93    3968.82      10100      138   15    2604   15      0     2.1e-03  1.73e-02  3.10e-02  2.697e+01     74%
+     94    3792.81      10500      153   15    2619   15      0     1.6e-03  2.07e-02  3.82e-02  2.703e+01     72%
+     95    3589.45      11700      167   14    2634   15      0     1.6e-03  4.35e-02  5.75e-02  2.713e+01     67%
+     96    3296.38      11700      179   12    2649   15      0     2.6e-03  3.04e-02  5.46e-02  2.722e+01     67%
+     97    3122.35      12700      187    8    2664   15      0     1.8e-03  2.54e-02  4.06e-02  2.729e+01     68%
+     98    3001.49      12300      202   15    2679   15      0     1.8e-03  2.21e-02  4.10e-02  2.736e+01     67%
+     99    2868.48      12100      215   13    2694   15      0     1.8e-03  2.26e-02  5.09e-02  2.743e+01     68%
+    100    2736.07      11200      219    4    2709   15      0     2.0e-03  2.17e-02  4.95e-02  2.751e+01     66%
+  Iter |       Objective      |    Problem   |    Pool   | Fixed  |                  Time                  | Frac. |
+       |    frac.     rounded |   size  diff | size gen. |        |    fix       gen     solve   tot. cum. |       |
+    101    2624.69      12400      226    7    2724   15      0     1.7e-03  1.37e-02  4.85e-02  2.757e+01     69%
+    102    2560.93      13200      247   21    2739   15      0     1.9e-03  2.92e-02  4.81e-02  2.765e+01     63%
+    103    2512.87      12400      252    5    2754   15      0     1.8e-03  2.11e-02  5.57e-02  2.773e+01     64%
+    104    2467.62      12300      262   10    2769   15      0     2.0e-03  2.15e-02  6.02e-02  2.781e+01     64%
+    105    2419.86      12300      272   10    2784   15      0     2.0e-03  2.11e-02  5.97e-02  2.790e+01     61%
+    106    2361.39      11800      282   10    2799   15      0     1.9e-03  2.43e-02  5.88e-02  2.798e+01     59%
+    107    2307.97      12300      285    3    2814   15      0     1.2e-03  2.68e-02  5.57e-02  2.806e+01     62%
+    108       2262      12300      295   10    2829   15      0     1.6e-03  1.58e-02  5.55e-02  2.814e+01     60%
+    109     2200.7      11100      299    4    2844   15      0     2.2e-03  2.61e-02  5.59e-02  2.822e+01     59%
+    110    2172.95      10700      304    5    2859   15      0     1.4e-03  1.80e-02  5.26e-02  2.829e+01     58%
+    111    2138.25      10600      299   -5    2874   15      0     1.8e-03  3.25e-02  6.51e-02  2.839e+01     58%
+    112    2108.24      10400      317   18    2889   15      0     1.4e-03  1.98e-02  6.29e-02  2.848e+01     56%
+    113    2087.04      11600      305  -12    2904   15      0     1.6e-03  2.16e-02  5.68e-02  2.856e+01     60%
+    114    2063.65      11100      317   12    2919   15      0     1.3e-03  1.90e-02  6.49e-02  2.864e+01     56%
+    115    2044.32      12600      319    2    2934   15      0     1.5e-03  1.67e-02  6.85e-02  2.873e+01     57%
+    116    2029.06      12200      321    2    2949   15      0     1.6e-03  1.70e-02  6.86e-02  2.882e+01     57%
+    117    2018.74      11800      318   -3    2964   15      0     1.5e-03  2.35e-02  6.93e-02  2.891e+01     57%
+    118    2008.83      11800      327    9    2979   15      0     1.7e-03  1.93e-02  6.40e-02  2.900e+01     56%
+    119    1998.23      11800      316  -11    2994   15      0     1.6e-03  2.45e-02  6.26e-02  2.909e+01     58%
+    120    1979.78      11900      329   13    3009   15      0     1.9e-03  3.08e-02  6.32e-02  2.918e+01     57%
+    121    1967.13      11700      332    3    3024   15      0     1.8e-03  2.69e-02  5.74e-02  2.927e+01     54%
+    122     1954.6      12000      341    9    3039   15      0     1.7e-03  1.74e-02  6.17e-02  2.935e+01     54%
+    123    1940.91      11700      330  -11    3054   15      0     1.7e-03  1.50e-02  7.43e-02  2.944e+01     55%
+    124    1920.65      13100      337    7    3069   15      0     1.4e-03  1.58e-02  6.77e-02  2.953e+01     55%
+    125     1902.7      11300      341    4    3084   15      0     1.5e-03  1.88e-02  7.49e-02  2.962e+01     55%
+    126    1893.68      10800      358   17    3099   15      0     1.9e-03  4.02e-02  9.57e-02  2.976e+01     53%
+    127    1879.55      11400      349   -9    3114   15      0     1.7e-03  3.29e-02  8.00e-02  2.988e+01     54%
+    128    1869.27      11300      346   -3    3129   15      0     1.8e-03  2.42e-02  7.69e-02  2.998e+01     53%
+    129    1857.42      11100      350    4    3144   15      0     1.8e-03  2.48e-02  8.41e-02  3.009e+01     54%
+    130    1845.33      12400      371   21    3159   15      0     1.7e-03  3.08e-02  7.08e-02  3.019e+01     51%
+    131    1836.99      10800      359  -12    3174   15      0     1.5e-03  1.99e-02  8.49e-02  3.030e+01     53%
+    132     1824.6      10200      367    8    3189   15      0     2.1e-03  3.19e-02  7.73e-02  3.041e+01     51%
+    133    1810.59      11200      362   -5    3204   15      0     1.5e-03  3.13e-02  6.42e-02  3.051e+01     52%
+    134    1803.47      13000      378   16    3219   15      0     1.5e-03  2.89e-02  6.77e-02  3.061e+01     49%
+    135    1789.27      10000      357  -21    3234   15      0     2.2e-03  2.22e-02  8.49e-02  3.072e+01     53%
+    136    1779.82      11200      376   19    3249   15      0     1.7e-03  2.80e-02  7.68e-02  3.082e+01     50%
+    137    1775.04      10200      363  -13    3264   15      0     1.6e-03  3.37e-02  6.94e-02  3.093e+01     52%
+    138    1768.85      10200      377   14    3279   15      0     1.7e-03  2.11e-02  7.77e-02  3.103e+01     50%
+    139    1762.33      10200      373   -4    3294   15      0     1.7e-03  1.76e-02  6.76e-02  3.112e+01     51%
+    140    1756.12      10000      388   15    3309   15      0     2.1e-03  2.11e-02  9.78e-02  3.124e+01     50%
+    141    1748.03      10000      380   -8    3324   15      0     1.8e-03  2.48e-02  8.75e-02  3.135e+01     50%
+    142    1743.92      10800      386    6    3339   15      0     2.2e-03  1.87e-02  7.75e-02  3.145e+01     50%
+    143    1736.97      10400      380   -6    3354   15      0     1.9e-03  2.40e-02  7.43e-02  3.155e+01     51%
+    144    1731.37      10200      392   12    3369   15      0     1.5e-03  3.74e-02  8.76e-02  3.168e+01     49%
+    145     1725.6      10400      376  -16    3384   15      0     2.1e-03  1.76e-02  7.29e-02  3.177e+01     51%
+    146    1722.16      10200      408   32    3399   15      0     1.9e-03  2.22e-02  7.43e-02  3.187e+01     48%
+    147     1717.2      11700      385  -23    3414   15      0     1.7e-03  2.54e-02  8.09e-02  3.198e+01     50%
+    148    1713.33      11100      413   28    3429   15      0     2.2e-03  1.69e-02  8.89e-02  3.209e+01     47%
+    149    1710.48      12300      404   -9    3444   15      0     2.5e-03  1.77e-02  8.01e-02  3.219e+01     48%
+    150    1707.03      13300      413    9    3459   15      0     1.8e-03  3.14e-02  7.77e-02  3.230e+01     47%
+    151    1701.96      12300      391  -22    3474   15      0     1.7e-03  1.67e-02  9.03e-02  3.241e+01     49%
+    152       1700      12500      406   15    3489   15      0     1.5e-03  2.74e-02  9.18e-02  3.253e+01     48%
+    153       1700      12500      438   32    3504   15      0     1.6e-03  1.93e-02  9.20e-02  3.264e+01     44%
+    154       1700      12700      476   38    3519   15      0     1.9e-03  1.82e-02  1.24e-01  3.278e+01     41%
+-- Fixed for [NC: 2, KS: 1, RK: 1, MCW: 3, JH: 1, EP: 1, KJ: 4, RR: 1] at level 0.75.
+-- Fixed to zero for [BR: 10, NC: 3, LJ: 19, MC: 9, JT: 10, SP: 8, KS: 21, RK: 32, MCW: 15, JH: 17, FD: 12, CS: 10, EP: 22, KJ: 25, RR: 21] at level 0.05.
+-- Members remaining: (BR, 18) (NC, 8) (LJ, 15) (MC, 9) (JT, 16) (SP, 15) (KS, 9) (RK, 4) (MCW, 4) (JH, 7) (FD, 11) (CS, 11) (EP, 9) (KJ, 2) (RR, 7) and total is 15.
+    155    2397.39      10000      243 -233    2769   15     78     1.0e-02  1.55e-02  4.33e-02  3.285e+01     56%
+    156    2088.63       9000      254   11    2784   15      0     2.2e-03  1.76e-02  5.31e-02  3.293e+01     60%
+    157    1886.96      10300      266   12    2799   15      0     2.6e-03  2.62e-02  6.06e-02  3.302e+01     60%
+    158    1795.08      11100      287   21    2814   15      0     2.5e-03  1.30e-02  8.32e-02  3.312e+01     58%
+    159    1751.57      11500      295    8    2829   15      0     2.3e-03  1.60e-02  6.95e-02  3.320e+01     58%
+    160       1730      11900      306   11    2844   15      0     2.4e-03  1.45e-02  6.72e-02  3.329e+01     58%
+    161    1707.98      11900      310    4    2859   15      0     2.6e-03  2.16e-02  9.05e-02  3.340e+01     58%
+    162       1700      11500      321   11    2874   15      0     2.6e-03  2.00e-02  9.17e-02  3.352e+01     57%
+    163       1700      10900      335   14    2889   15      0     2.1e-03  1.36e-02  8.11e-02  3.362e+01     55%
+    164       1700      11100      338    3    2904   15      0     1.8e-03  1.74e-02  8.98e-02  3.372e+01     55%
+    165       1700      10900      361   23    2919   15      0     2.2e-03  1.52e-02  9.99e-02  3.384e+01     51%
+-- Fixed for [JH: 1, CS: 1] at level 0.75.
+-- Fixed to zero for [MC: 3, KS: 1, RK: 2, MCW: 1, JH: 1, FD: 1, CS: 1, EP: 3, RR: 1] at level 0.05.
+-- Members remaining: (BR, 21) (NC, 14) (LJ, 18) (MC, 11) (JT, 14) (SP, 20) (KS, 14) (RK, 7) (MCW, 7) (JH, 10) (FD, 11) (CS, 9) (EP, 9) (KJ, 7) (RR, 11) and total is 15.
+    166     1754.8      11300      344  -17    2872   15     28     3.7e-03  1.43e-02  8.32e-02  3.394e+01     51%
+    167    1717.38      11100      330  -14    2887   15      0     2.0e-03  2.02e-02  7.47e-02  3.404e+01     53%
+    168    1707.75      11100      324   -6    2902   15      0     2.1e-03  1.58e-02  8.65e-02  3.415e+01     55%
+    169       1700      11700      315   -9    2917   15      0     1.8e-03  1.51e-02  7.80e-02  3.424e+01     57%
+    170       1700      11900      366   51    2932   15      0     2.2e-03  1.31e-02  8.53e-02  3.434e+01     50%
+-- Fixed for [SP: 1] at level 0.75.
+-- Fixed to zero for [KS: 2, MCW: 3, JH: 1] at level 0.05.
+-- Members remaining: (BR, 14) (NC, 14) (LJ, 18) (MC, 10) (JT, 17) (SP, 11) (KS, 13) (RK, 9) (MCW, 6) (JH, 11) (FD, 12) (CS, 12) (EP, 10) (KJ, 11) (RR, 12) and total is 15.
+    171    1710.63      12300      351  -15    2918   15     21     2.6e-03  2.45e-02  6.70e-02  3.444e+01     49%
+    172       1700      11300      330  -21    2933   15      0     1.9e-03  1.83e-02  7.93e-02  3.454e+01     55%
+    173       1700      10300      388   58    2948   15      0     1.9e-03  1.50e-02  8.55e-02  3.464e+01     46%
+-- Fixed for [KS: 2, JH: 2, KJ: 1] at level 0.75.
+-- Fixed to zero for [NC: 1, KS: 1, JH: 2, EP: 1] at level 0.05.
+-- Members remaining: (BR, 15) (NC, 13) (LJ, 17) (MC, 10) (JT, 15) (SP, 14) (KS, 4) (RK, 12) (MCW, 8) (JH, 4) (FD, 10) (CS, 12) (EP, 14) (KJ, 8) (RR, 13) and total is 15.
+    174    2103.38      10500      340  -48    2914   15     41     3.8e-03  2.82e-02  6.98e-02  3.474e+01     45%
+    175    1846.02      10900      340    0    2929   15      0     2.7e-03  1.52e-02  8.64e-02  3.485e+01     46%
+    176    1761.38      11300      334   -6    2944   15      0     2.4e-03  3.03e-02  7.37e-02  3.495e+01     50%
+    177    1717.53      11700      327   -7    2959   15      0     2.3e-03  1.72e-02  7.74e-02  3.505e+01     52%
+    178       1700      10300      354   27    2974   15      0     2.9e-03  1.53e-02  1.06e-01  3.517e+01     49%
+    179       1700      10300      367   13    2989   15      0     1.8e-03  3.76e-02  1.01e-01  3.532e+01     48%
+    180       1700       9900      367    0    3004   15      0     2.1e-03  2.10e-02  9.38e-02  3.543e+01     48%
+-- Fixed for [BR: 1, KS: 1, RK: 1, MCW: 1, CS: 5] at level 0.75.
+-- Fixed to zero for [NC: 1, MC: 1, JH: 4, EP: 2, KJ: 2] at level 0.05.
+-- Members remaining: (BR, 12) (NC, 13) (LJ, 9) (MC, 7) (JT, 19) (SP, 16) (KS, 5) (RK, 9) (MCW, 9) (JH, 4) (FD, 14) (CS, 2) (EP, 13) (KJ, 9) (RR, 14) and total is 15.
+    181    2081.18       9300      320  -47    2902   15     95     3.6e-03  1.89e-02  6.35e-02  3.552e+01     45%
+    182    1812.28      11100      314   -6    2917   15      0     2.4e-03  1.54e-02  5.42e-02  3.559e+01     48%
+    183    1743.68       9900      298  -16    2932   15      0     2.3e-03  1.93e-02  6.12e-02  3.567e+01     53%
+    184    1703.85       9500      311   13    2947   15      0     2.3e-03  1.37e-02  6.53e-02  3.576e+01     50%
+    185       1700       9500      320    9    2962   15      0     2.4e-03  1.26e-02  6.52e-02  3.584e+01     52%
+    186       1700      10500      350   30    2977   15      0     2.6e-03  1.69e-02  7.26e-02  3.593e+01     49%
+-- Fixed for [RK: 1, MCW: 3, FD: 1, CS: 1, RR: 1] at level 0.75.
+-- Fixed to zero for [LJ: 1, MC: 1, JT: 1, KS: 3, JH: 5, CS: 1, EP: 1, KJ: 1, RR: 1] at level 0.05.
+-- Members remaining: (BR, 17) (NC, 11) (LJ, 13) (MC, 11) (JT, 16) (SP, 14) (KS, 6) (RK, 9) (MCW, 5) (JH, 7) (FD, 7) (CS, 2) (EP, 16) (KJ, 14) (RR, 9) and total is 15.
+    187    2051.18       9900      283  -67    2885   15     74     4.9e-03  1.80e-02  5.32e-02  3.601e+01     51%
+    188    1830.14      10300      319   36    2900   15      0     2.9e-03  1.12e-02  5.25e-02  3.607e+01     47%
+    189    1754.55       9900      280  -39    2915   15      0     3.0e-03  1.88e-02  4.87e-02  3.614e+01     54%
+    190    1717.19      10100      321   41    2930   15      0     2.9e-03  1.30e-02  6.67e-02  3.623e+01     48%
+    191       1700       9500      302  -19    2945   15      0     3.4e-03  1.93e-02  7.45e-02  3.632e+01     54%
+    192       1700       9700      324   22    2960   15      0     2.6e-03  4.65e-02  6.89e-02  3.644e+01     50%
+    193       1700       9300      316   -8    2975   15      0     2.4e-03  2.44e-02  7.25e-02  3.654e+01     51%
+    194       1700       9100      325    9    2990   15      0     2.2e-03  4.25e-02  6.80e-02  3.666e+01     50%
+-- Fixed for [RK: 2] at level 0.75.
+-- Fixed to zero for [NC: 1, LJ: 1, KS: 3, MCW: 2, JH: 2, FD: 2, CS: 1, KJ: 1, RR: 1] at level 0.05.
+-- Members remaining: (BR, 13) (NC, 11) (LJ, 14) (MC, 9) (JT, 17) (SP, 15) (KS, 7) (RK, 6) (MCW, 9) (JH, 7) (FD, 6) (CS, 6) (EP, 18) (KJ, 12) (RR, 12) and total is 15.
+    195     1807.2       9700      311  -14    2969   15     13     3.2e-03  2.26e-02  8.43e-02  3.677e+01     46%
+    196    1726.94       9500      354   43    2984   15      0     3.0e-03  1.52e-02  7.08e-02  3.685e+01     43%
+    197    1703.46      10700      297  -57    2999   15      0     2.7e-03  1.77e-02  5.69e-02  3.693e+01     53%
+    198       1700      10100      320   23    3014   15      0     2.8e-03  1.47e-02  6.58e-02  3.702e+01     50%
+    199       1700       9100      336   16    3029   15      0     2.3e-03  1.56e-02  7.84e-02  3.711e+01     49%
+-- Fixed for [BR: 1] at level 0.75.
+-- Fixed to zero for [BR: 1, LJ: 2, MC: 1, JT: 1, SP: 1, KS: 5, JH: 1, FD: 1, CS: 1, EP: 2, KJ: 1, RR: 2] at level 0.05.
+-- Members remaining: (BR, 6) (NC, 11) (LJ, 12) (MC, 9) (JT, 15) (SP, 16) (KS, 6) (RK, 9) (MCW, 10) (JH, 10) (FD, 9) (CS, 5) (EP, 16) (KJ, 14) (RR, 14) and total is 15.
+    200    1707.49       9500      329   -7    2934   15     30     4.7e-03  2.02e-02  6.83e-02  3.721e+01     46%
+  Iter |       Objective      |    Problem   |    Pool   | Fixed  |                  Time                  | Frac. |
+       |    frac.     rounded |   size  diff | size gen. |        |    fix       gen     solve   tot. cum. |       |
+    201       1700       9700      303  -26    2949   15      0     3.4e-03  1.42e-02  6.61e-02  3.729e+01     53%
+    202       1700       9300      357   54    2964   15      0     2.2e-03  2.04e-02  7.29e-02  3.739e+01     45%
+    203       1700      10100      334  -23    2979   15      0     2.2e-03  1.67e-02  6.65e-02  3.747e+01     48%
+-- Fixed for [EP: 3, KJ: 1] at level 0.75.
+-- Fixed to zero for [LJ: 1, KS: 2, RK: 1, JH: 2, FD: 1, KJ: 1, RR: 1] at level 0.05.
+-- Members remaining: (BR, 8) (NC, 12) (LJ, 14) (MC, 9) (JT, 15) (SP, 15) (KS, 6) (RK, 11) (MCW, 12) (JH, 8) (FD, 10) (CS, 5) (EP, 3) (KJ, 10) (RR, 13) and total is 15.
+    204    2023.18       7900      333   -1    2930   15     44     4.0e-03  1.10e-02  5.37e-02  3.754e+01     42%
+    205    1817.38       9400      318  -15    2945   15      0     2.7e-03  3.45e-02  6.29e-02  3.764e+01     46%
+    206    1742.99      10900      307  -11    2960   15      0     2.4e-03  1.93e-02  5.82e-02  3.772e+01     47%
+    207    1712.34       9100      349   42    2975   15      0     2.7e-03  1.37e-02  7.02e-02  3.781e+01     44%
+    208       1700       9100      326  -23    2990   15      0     3.1e-03  2.95e-02  7.50e-02  3.792e+01     48%
+    209       1700      10100      371   45    3005   15      0     3.5e-03  3.10e-02  1.03e-01  3.805e+01     42%
+    210       1700       8700      352  -19    3020   15      0     3.6e-03  1.53e-02  7.34e-02  3.815e+01     45%
+-- Fixed for [JT: 1] at level 0.75.
+-- Fixed to zero for [NC: 1, JT: 2, SP: 1, KS: 8, RK: 1, MCW: 1, JH: 1, FD: 1, CS: 5, KJ: 1] at level 0.05.
+-- Members remaining: (BR, 10) (NC, 10) (LJ, 14) (MC, 12) (JT, 12) (SP, 14) (KS, 5) (RK, 15) (MCW, 13) (JH, 11) (FD, 13) (CS, 8) (EP, 7) (KJ, 8) (RR, 12) and total is 15.
+    211       1700       8100      342  -10    2963   15     21     5.4e-03  2.14e-02  7.36e-02  3.825e+01     46%
+-- Fixed for [MC: 1] at level 0.75.
+-- Fixed to zero for [FD: 2] at level 0.05.
+-- Members remaining: (BR, 11) (NC, 14) (LJ, 13) (MC, 9) (JT, 12) (SP, 13) (KS, 6) (RK, 14) (MCW, 12) (JH, 9) (FD, 14) (CS, 10) (EP, 7) (KJ, 8) (RR, 10) and total is 15.
+    212       1700       9500      338   -4    2945   15     28     4.9e-03  2.58e-02  9.48e-02  3.837e+01     45%
+    213       1700      10100      345    7    2960   15      0     3.3e-03  2.76e-02  6.78e-02  3.849e+01     45%
+    214       1700       9100      355   10    2975   15      0     3.3e-03  2.73e-02  5.25e-02  3.857e+01     43%
+-- Fixed for [MC: 1] at level 0.75.
+-- Fixed to zero for [JT: 2, KS: 1, MCW: 1, CS: 1, EP: 1] at level 0.05.
+-- Members remaining: (BR, 8) (NC, 12) (LJ, 16) (MC, 6) (JT, 11) (SP, 15) (KS, 6) (RK, 13) (MCW, 10) (JH, 9) (FD, 12) (CS, 11) (EP, 8) (KJ, 9) (RR, 11) and total is 15.
+    215    1719.46       8700      354   -1    2966   15     12     4.3e-03  2.26e-02  8.06e-02  3.868e+01     42%
+    216       1700       8300      311  -43    2981   15      0     3.6e-03  1.53e-02  6.19e-02  3.876e+01     49%
+    217       1700       7900      384   73    2996   15      0     3.7e-03  2.45e-02  9.10e-02  3.888e+01     41%
+-- Fixed for [RK: 1] at level 0.75.
+-- Fixed to zero for [BR: 2, MC: 1, JT: 2, FD: 1, CS: 2, KJ: 1] at level 0.05.
+-- Members remaining: (BR, 12) (NC, 13) (LJ, 17) (MC, 6) (JT, 11) (SP, 17) (KS, 8) (RK, 7) (MCW, 12) (JH, 10) (FD, 14) (CS, 7) (EP, 8) (KJ, 7) (RR, 8) and total is 15.
+    218    1720.85       8900      331  -53    2959   15     16     5.4e-03  1.66e-02  6.61e-02  3.897e+01     45%
+    219       1700       9700      325   -6    2974   15      0     2.7e-03  1.54e-02  6.05e-02  3.905e+01     47%
+    220       1700       9900      376   51    2989   15      0     3.4e-03  1.85e-02  8.37e-02  3.916e+01     41%
+-- Fixed for [EP: 1] at level 0.75.
+-- Fixed to zero for [BR: 1, NC: 1, MC: 1, JT: 1, KS: 1, MCW: 1, CS: 2, EP: 2, RR: 2] at level 0.05.
+-- Members remaining: (BR, 11) (NC, 14) (LJ, 15) (MC, 9) (JT, 11) (SP, 15) (KS, 7) (RK, 9) (MCW, 10) (JH, 15) (FD, 12) (CS, 7) (EP, 3) (KJ, 8) (RR, 11) and total is 15.
+    221    1725.66       8500      348  -28    2954   15     11     4.4e-03  1.93e-02  6.91e-02  3.925e+01     42%
+    222       1700       8300      336  -12    2969   15      0     3.5e-03  1.27e-02  6.01e-02  3.933e+01     45%
+    223       1700       8100      371   35    2984   15      0     3.2e-03  1.60e-02  8.37e-02  3.943e+01     42%
+    224       1700       8500      391   20    2999   15      0     3.0e-03  1.58e-02  6.60e-02  3.952e+01     40%
+    225       1700       9100      378  -13    3014   15      0     2.5e-03  2.00e-02  7.69e-02  3.962e+01     40%
+    226       1700       6300      403   25    3029   15      0     2.7e-03  1.46e-02  6.64e-02  3.970e+01     38%
+-- Fixed for [NC: 1, JT: 1, EP: 1] at level 0.75.
+-- Fixed to zero for [MC: 1, JT: 1, RK: 1, MCW: 1, FD: 1, CS: 1, RR: 2] at level 0.05.
+-- Members remaining: (BR, 10) (NC, 11) (LJ, 15) (MC, 9) (JT, 9) (SP, 16) (KS, 6) (RK, 8) (MCW, 13) (JH, 11) (FD, 13) (CS, 8) (EP, 5) (KJ, 9) (RR, 11) and total is 15.
+    227    1747.04       9500      400   -3    2986   15     44     3.5e-03  2.63e-02  6.03e-02  3.979e+01     37%
+    228       1700       8900      342  -58    3001   15      0     3.3e-03  1.04e-02  7.31e-02  3.988e+01     44%
+    229       1700       8300      370   28    3016   15      0     3.3e-03  1.23e-02  6.68e-02  3.996e+01     41%
+    230       1700       7300      380   10    3031   15      0     2.5e-03  1.71e-02  7.19e-02  4.005e+01     40%
+-- Fixed for [NC: 1] at level 0.75.
+-- Fixed to zero for [RK: 1, EP: 1] at level 0.05.
+-- Members remaining: (BR, 9) (NC, 6) (LJ, 15) (MC, 10) (JT, 8) (SP, 14) (KS, 6) (RK, 13) (MCW, 11) (JH, 12) (FD, 14) (CS, 8) (EP, 9) (KJ, 8) (RR, 12) and total is 15.
+    231       1700       9100      413   33    3031   15     15     3.6e-03  1.45e-02  7.39e-02  4.015e+01     37%
+-- Fixed for [BR: 1, MCW: 1] at level 0.75.
+-- Members remaining: (BR, 5) (NC, 7) (LJ, 14) (MC, 8) (JT, 12) (SP, 17) (KS, 9) (RK, 9) (MCW, 5) (JH, 14) (FD, 16) (CS, 7) (EP, 9) (KJ, 9) (RR, 9) and total is 15.
+    232       1700       9900      386  -27    3002   15     44     3.3e-03  1.53e-02  6.47e-02  4.023e+01     38%
+    233       1700       8700      340  -46    3017   15      0     2.7e-03  1.82e-02  4.83e-02  4.030e+01     44%
+-- Fixed for [JH: 1, FD: 1] at level 0.75.
+-- Fixed to zero for [MC: 1, RK: 1, EP: 1] at level 0.05.
+-- Members remaining: (BR, 9) (NC, 7) (LJ, 15) (MC, 10) (JT, 11) (SP, 15) (KS, 12) (RK, 14) (MCW, 8) (JH, 9) (FD, 6) (CS, 8) (EP, 10) (KJ, 6) (RR, 10) and total is 15.
+    234       1700       8100      374   34    2982   15     50     3.7e-03  1.16e-02  6.39e-02  4.038e+01     40%
+    235       1700       9300      371   -3    2997   15      0     3.5e-03  1.37e-02  7.41e-02  4.047e+01     40%
+-- Fixed for [CS: 1] at level 0.75.
+-- Fixed to zero for [BR: 1, LJ: 1, MCW: 1] at level 0.05.
+-- Members remaining: (BR, 6) (NC, 9) (LJ, 14) (MC, 10) (JT, 11) (SP, 15) (KS, 6) (RK, 12) (MCW, 8) (JH, 10) (FD, 10) (CS, 5) (EP, 9) (KJ, 11) (RR, 14) and total is 15.
+    236       1700      10100      359  -12    2976   15     24     4.5e-03  1.20e-02  6.21e-02  4.055e+01     41%
+    237       1700       9300      376   17    2991   15      0     3.0e-03  1.30e-02  5.56e-02  4.062e+01     39%
+-- Fixed for [JT: 1, FD: 3] at level 0.75.
+-- Fixed to zero for [LJ: 1, RK: 1, EP: 1, KJ: 1] at level 0.05.
+-- Members remaining: (BR, 9) (NC, 7) (LJ, 12) (MC, 10) (JT, 10) (SP, 19) (KS, 9) (RK, 14) (MCW, 8) (JH, 10) (FD, 2) (CS, 6) (EP, 8) (KJ, 9) (RR, 11) and total is 15.
+    238     1867.8       6900      378    2    2955   15     36     4.3e-03  1.89e-02  5.06e-02  4.070e+01     34%
+    239    1733.29       7100      288  -90    2970   15      0     3.2e-03  2.07e-02  4.93e-02  4.077e+01     47%
+    240    1700.73       7700      294    6    2985   15      0     2.7e-03  2.08e-02  7.51e-02  4.087e+01     46%
+    241       1700       8900      306   12    3000   15      0     2.5e-03  1.50e-02  5.19e-02  4.094e+01     45%
+-- Fixed for [BR: 1] at level 0.75.
+-- Fixed to zero for [MC: 1, JT: 1, EP: 2, KJ: 2] at level 0.05.
+-- Members remaining: (BR, 4) (NC, 10) (LJ, 19) (MC, 8) (JT, 10) (SP, 15) (KS, 8) (RK, 12) (MCW, 8) (JH, 10) (FD, 3) (CS, 5) (EP, 11) (KJ, 9) (RR, 10) and total is 15.
+    242    1703.75       6700      361   55    2977   15     27     5.2e-03  1.33e-02  5.66e-02  4.101e+01     37%
+    243       1700       7700      291  -70    2992   15      0     3.3e-03  9.56e-03  4.91e-02  4.108e+01     47%
+    244       1700       7700      360   69    3007   15      0     3.5e-03  1.67e-02  5.48e-02  4.115e+01     39%
+-- Fixed for [BR: 2] at level 0.75.
+-- Fixed to zero for [EP: 1] at level 0.05.
+-- Members remaining: (BR, 2) (NC, 9) (LJ, 12) (MC, 10) (JT, 10) (SP, 15) (KS, 12) (RK, 14) (MCW, 9) (JH, 12) (FD, 4) (CS, 5) (EP, 12) (KJ, 10) (RR, 8) and total is 15.
+    245       1700       8700      369    9    3009   15     13     3.4e-03  1.43e-02  4.38e-02  4.121e+01     38%
+-- Fixed for [NC: 2] at level 0.75.
+-- Fixed to zero for [RR: 1] at level 0.05.
+-- Members remaining: (BR, 4) (NC, 4) (LJ, 14) (MC, 7) (JT, 11) (SP, 16) (KS, 11) (RK, 16) (MCW, 10) (JH, 8) (FD, 4) (CS, 7) (EP, 13) (KJ, 10) (RR, 8) and total is 15.
+    246    1724.42       7500      336  -33    2995   15     21     3.8e-03  1.65e-02  4.97e-02  4.128e+01     40%
+    247       1700       6900      312  -24    3010   15      0     2.9e-03  1.19e-02  5.75e-02  4.136e+01     44%
+    248       1700       7300      345   33    3025   15      0     2.5e-03  1.23e-02  6.02e-02  4.143e+01     40%
+-- Fixed for [LJ: 1, KS: 3, JH: 1, CS: 1] at level 0.75.
+-- Fixed to zero for [BR: 1, KJ: 1] at level 0.05.
+-- Members remaining: (BR, 2) (NC, 6) (LJ, 10) (MC, 8) (JT, 9) (SP, 18) (KS, 3) (RK, 13) (MCW, 10) (JH, 6) (FD, 6) (CS, 3) (EP, 12) (KJ, 12) (RR, 10) and total is 15.
+    249    1907.24       6900      304  -41    2930   15     99     4.9e-03  1.07e-02  4.07e-02  4.149e+01     39%
+    250    1818.36       8300      295   -9    2945   15      0     2.7e-03  1.60e-02  3.63e-02  4.154e+01     42%
+    251    1726.49       6700      272  -23    2960   15      0     3.1e-03  1.76e-02  3.97e-02  4.160e+01     46%
+    252       1700       7900      294   22    2975   15      0     2.7e-03  3.51e-02  3.37e-02  4.168e+01     45%
+    253       1700       7100      311   17    2990   15      0     2.5e-03  2.13e-02  3.76e-02  4.174e+01     43%
+    254       1700       8300      293  -18    3005   15      0     2.3e-03  1.16e-02  4.55e-02  4.180e+01     45%
+-- Fixed to zero for [BR: 1, RK: 1, MCW: 1, JH: 1, FD: 2, EP: 1, KJ: 1] at level 0.05.
+-- Fixed for [LJ: 1, MC: 2, JT: 1, SP: 1, RK: 1, JH: 10, EP: 2, RR: 1] at level 0.675.
+-- Members remaining: (BR, 3) (NC, 7) (LJ, 10) (MC, 2) (JT, 4) (SP, 12) (KS, 8) (RK, 9) (MCW, 7) (FD, 7) (CS, 3) (EP, 4) (KJ, 14) (RR, 5) and total is 14.
+    255    2665.74       6900      189 -104    2733   14    265     4.5e-03  1.56e-02  2.33e-02  4.184e+01     43%
+    256    2409.56       5900      204   15    2746   13      0     3.2e-03  2.35e-02  2.65e-02  4.190e+01     44%
+    257    2116.72       7100      201   -3    2760   14      0     3.0e-03  1.88e-02  2.24e-02  4.194e+01     45%
+    258    1999.19       5900      213   12    2774   14      0     3.1e-03  9.45e-03  1.86e-02  4.199e+01     46%
+    259    1871.23       7300      217    4    2788   14      0     2.8e-03  7.64e-03  2.25e-02  4.203e+01     48%
+    260    1758.82       6500      213   -4    2802   14      0     3.1e-03  1.34e-02  2.09e-02  4.207e+01     50%
+    261     1721.8       6900      210   -3    2816   14      0     3.3e-03  1.60e-02  2.38e-02  4.212e+01     48%
+    262       1700       6100      213    3    2830   14      0     2.8e-03  1.12e-02  3.04e-02  4.217e+01     51%
+    263       1700       5700      247   34    2844   14      0     3.4e-03  2.48e-02  3.03e-02  4.224e+01     44%
+-- Fixed for [MC: 2, KS: 2, KJ: 2, RR: 1] at level 0.75.
+-- Fixed to zero for [BR: 2, NC: 2, MC: 1, JT: 2, SP: 1, RK: 2, JH: 3, FD: 2, CS: 1, EP: 4, KJ: 1, RR: 3] at level 0.05.
+-- Members remaining: (BR, 7) (NC, 9) (LJ, 6) (MC, 3) (JT, 6) (SP, 9) (KS, 2) (RK, 12) (MCW, 11) (FD, 11) (CS, 6) (EP, 8) (KJ, 6) (RR, 4) and total is 14.
+    264    1846.57       7300      195  -52    2761   14     64     1.0e-02  2.23e-02  2.45e-02  4.230e+01     45%
+    265    1789.34       6100      223   28    2775   14      0     4.1e-03  1.56e-02  2.63e-02  4.234e+01     42%
+    266       1700       7700      198  -25    2789   14      0     2.5e-03  1.66e-02  2.68e-02  4.239e+01     52%
+    267       1700       6300      222   24    2803   14      0     3.3e-03  1.34e-02  4.37e-02  4.245e+01     47%
+-- Fixed for [LJ: 1, RK: 2] at level 0.75.
+-- Fixed to zero for [NC: 1, LJ: 1, JT: 1, MCW: 1, JH: 1, FD: 1, EP: 1] at level 0.05.
+-- Members remaining: (BR, 6) (NC, 10) (LJ, 7) (MC, 4) (JT, 8) (SP, 9) (KS, 5) (RK, 5) (MCW, 10) (FD, 12) (CS, 6) (EP, 9) (KJ, 8) (RR, 6) and total is 14.
+    268    1783.56       5100      206  -16    2776   14     34     4.7e-03  1.38e-02  2.02e-02  4.249e+01     46%
+    269    1702.86       5100      207    1    2790   14      0     3.3e-03  2.15e-02  2.14e-02  4.254e+01     45%
+    270       1700       7700      212    5    2803   13      0     7.1e-03  4.73e-02  5.94e-02  4.265e+01     47%
+    271       1700       5900      235   23    2817   14      0     3.5e-03  9.24e-03  3.26e-02  4.271e+01     44%
+-- Fixed for [MC: 3, SP: 1, RK: 1, FD: 2] at level 0.75.
+-- Fixed to zero for [BR: 2, MC: 1, RK: 1, JH: 1, EP: 1] at level 0.05.
+-- Members remaining: (BR, 7) (NC, 10) (LJ, 8) (MC, 2) (JT, 10) (SP, 5) (KS, 5) (RK, 4) (MCW, 14) (FD, 4) (CS, 4) (EP, 8) (KJ, 9) (RR, 5) and total is 14.
+    272    1900.72       4900      194  -41    2761   12     65     4.7e-03  1.70e-02  4.16e-02  4.277e+01     42%
+    273    1797.92       5700      221   27    2775   14      0     3.2e-03  3.20e-02  3.95e-02  4.285e+01     40%
+    274    1730.39       5500      193  -28    2789   14      0     3.5e-03  2.08e-02  2.62e-02  4.290e+01     47%
+    275    1705.97       6100      211   18    2803   14      0     2.9e-03  4.52e-02  2.37e-02  4.298e+01     44%
+    276       1700       5700      202   -9    2815   12      0     3.0e-03  2.62e-02  2.11e-02  4.303e+01     47%
+    277       1700       5500      223   21    2828   13      0     3.3e-03  2.16e-02  2.11e-02  4.307e+01     44%
+    278       1700       6100      217   -6    2841   13      0     9.7e-03  1.61e-02  2.39e-02  4.312e+01     46%
+    279       1700       5100      266   49    2854   13      0     3.5e-03  2.92e-02  3.10e-02  4.319e+01     37%
+-- Fixed for [LJ: 1, JT: 1, KJ: 1, RR: 1] at level 0.75.
+-- Fixed to zero for [BR: 2, NC: 2, LJ: 2, MC: 2, JT: 2, SP: 4, KS: 3, RK: 1, MCW: 1, JH: 6, FD: 3, CS: 3, EP: 2, KJ: 2, RR: 2] at level 0.05.
+-- Members remaining: (BR, 5) (NC, 10) (LJ, 6) (MC, 5) (JT, 5) (SP, 7) (KS, 9) (RK, 10) (MCW, 11) (FD, 6) (CS, 5) (EP, 7) (KJ, 7) (RR, 4) and total is 14.
+    280    1752.58       6300      202  -64    2773   13     39     7.8e-03  2.07e-02  3.37e-02  4.325e+01     44%
+    281       1700       5500      217   15    2785   12      0     3.6e-03  2.62e-02  2.45e-02  4.332e+01     43%
+    282       1700       4500      216   -1    2798   13      0     4.1e-03  1.38e-02  2.04e-02  4.336e+01     44%
+    283       1700       5700      228   12    2812   14      0     2.8e-03  1.78e-02  1.96e-02  4.340e+01     41%
+-- Fixed for [EP: 2] at level 0.75.
+-- Fixed to zero for [BR: 1, NC: 2, LJ: 1, JT: 1, SP: 2, MCW: 1, EP: 1, KJ: 1, RR: 1] at level 0.05.
+-- Members remaining: (BR, 5) (NC, 9) (LJ, 9) (MC, 3) (JT, 6) (SP, 8) (KS, 8) (RK, 8) (MCW, 9) (FD, 8) (CS, 6) (EP, 3) (KJ, 9) (RR, 8) and total is 14.
+    284    1703.15       5900      207  -21    2775   11     24     5.1e-03  1.70e-02  1.86e-02  4.344e+01     43%
+    285       1700       5500      213    6    2788   13      0     4.0e-03  1.02e-02  1.63e-02  4.347e+01     42%
+    286       1700       5100      221    8    2802   14      0     3.8e-03  3.83e-02  2.13e-02  4.354e+01     42%
+-- Fixed for [JT: 1, CS: 2, RR: 2] at level 0.75.
+-- Fixed to zero for [BR: 1, MC: 1, JH: 2, CS: 1, EP: 2, KJ: 1] at level 0.05.
+-- Members remaining: (BR, 6) (NC, 7) (LJ, 10) (MC, 5) (JT, 4) (SP, 8) (KS, 7) (RK, 7) (MCW, 9) (FD, 9) (CS, 3) (EP, 4) (KJ, 8) (RR, 3) and total is 14.
+    287    1782.28       4500      201  -20    2755   14     53     2.0e-02  1.43e-02  3.61e-02  4.362e+01     41%
+    288    1743.12       4900      205    4    2769   14      0     4.9e-03  8.20e-03  1.63e-02  4.365e+01     41%
+    289       1700       4500      185  -20    2783   14      0     3.9e-03  1.57e-02  1.85e-02  4.369e+01     47%
+    290       1700       4300      203   18    2796   13      0     3.4e-03  6.57e-03  1.99e-02  4.373e+01     42%
+    291       1700       4700      216   13    2809   13      0     3.6e-03  1.06e-02  2.09e-02  4.378e+01     40%
+-- Fixed for [BR: 2, JT: 1, EP: 1, KJ: 4] at level 0.75.
+-- Fixed to zero for [NC: 1, LJ: 1, MC: 3, JT: 4, SP: 2, KS: 2, RK: 2, JH: 8, EP: 2, KJ: 1] at level 0.05.
+-- Members remaining: (BR, 2) (NC, 9) (LJ, 7) (MC, 6) (JT, 4) (SP, 6) (KS, 5) (RK, 9) (MCW, 9) (FD, 7) (CS, 5) (EP, 4) (KJ, 2) (RR, 4) and total is 14.
+    292    1986.32       4700      175  -41    2752   13     55     7.0e-03  1.10e-02  1.96e-02  4.381e+01     40%
+    293    1869.45       5300      180    5    2766   14      0     4.9e-03  1.74e-02  2.26e-02  4.386e+01     41%
+    294    1767.77       5700      187    7    2779   13      0     5.2e-03  1.12e-02  1.88e-02  4.390e+01     40%
+    295    1712.52       4100      196    9    2793   14      0     4.6e-03  1.50e-02  1.66e-02  4.393e+01     40%
+    296       1700       4100      187   -9    2806   13      0     3.1e-03  7.03e-03  2.01e-02  4.396e+01     42%
+    297       1700       5100      189    2    2818   12      0     2.9e-03  6.61e-03  1.94e-02  4.399e+01     41%
+    298       1700       4500      199   10    2832   14      0     3.2e-03  1.23e-02  2.31e-02  4.403e+01     40%
+-- Fixed for [BR: 2, NC: 1, LJ: 1, MC: 1, SP: 3, RK: 1] at level 0.75.
+-- Fixed to zero for [NC: 1, LJ: 2, MC: 3, SP: 1, KS: 1, RK: 2, JH: 4, CS: 2, EP: 2, RR: 3] at level 0.05.
+-- Members remaining: (NC, 5) (LJ, 7) (MC, 3) (JT, 6) (SP, 2) (KS, 9) (RK, 4) (MCW, 7) (FD, 7) (CS, 5) (EP, 8) (KJ, 4) (RR, 5) and total is 13.
+    299    1843.83       4500      168  -31    2710   11    115     6.6e-03  1.95e-02  1.53e-02  4.408e+01     41%
+    300    1809.83       4100      167   -1    2722   12      0     3.0e-03  1.30e-02  1.66e-02  4.411e+01     40%
+  Iter |       Objective      |    Problem   |    Pool   | Fixed  |                  Time                  | Frac. |
+       |    frac.     rounded |   size  diff | size gen. |        |    fix       gen     solve   tot. cum. |       |
+    301       1700       3900      154  -13    2734   12      0     3.5e-03  7.79e-03  1.73e-02  4.415e+01     45%
+    302       1700       4100      196   42    2746   12      0     3.0e-03  8.65e-03  3.05e-02  4.420e+01     37%
+    303       1700       3900      184  -12    2755    9      0     3.6e-03  2.07e-02  1.64e-02  4.424e+01     40%
+-- Fixed for [LJ: 3, SP: 2, KS: 6, RK: 1, MCW: 2, EP: 2, KJ: 2] at level 0.75.
+-- Fixed to zero for [NC: 1, LJ: 2, SP: 1, KS: 3, RK: 1, FD: 1, EP: 1, KJ: 1] at level 0.05.
+-- Members remaining: (NC, 9) (LJ, 2) (MC, 5) (JT, 5) (SP, 3) (RK, 3) (MCW, 4) (FD, 8) (CS, 3) (EP, 2) (KJ, 2) (RR, 7) and total is 12.
+    304    2135.88       3100      120  -64    2615   10    137     5.0e-03  8.81e-03  1.41e-02  4.427e+01     35%
+    305    1993.02       3500      127    7    2626   11      0     3.4e-03  9.63e-03  1.33e-02  4.429e+01     37%
+    306     1844.9       3500      121   -6    2637   11      0     3.0e-03  1.36e-02  1.29e-02  4.432e+01     40%
+    307       1700       3300      129    8    2649   12      0     3.1e-03  1.59e-02  1.21e-02  4.436e+01     40%
+    308       1700       3100      143   14    2660   11      0     3.2e-03  9.96e-03  1.37e-02  4.438e+01     37%
+    309       1700       3500      141   -2    2671   11      0     3.9e-03  1.77e-02  1.62e-02  4.443e+01     36%
+-- Fixed for [SP: 1, MCW: 1, CS: 1, KJ: 1, RR: 1] at level 0.75.
+-- Fixed to zero for [BR: 2, LJ: 2, MC: 3, JT: 3, SP: 1, RK: 1, KJ: 2, RR: 1] at level 0.05.
+-- Members remaining: (NC, 5) (LJ, 5) (MC, 5) (JT, 4) (SP, 4) (KS, 3) (RK, 5) (MCW, 2) (FD, 11) (CS, 2) (EP, 2) (KJ, 2) (RR, 3) and total is 13.
+    310    1706.33       3500      129  -12    2636   11     39     1.6e-02  1.04e-02  1.72e-02  4.448e+01     37%
+    311       1700       3300      133    4    2647   11      0     3.1e-03  1.76e-02  1.32e-02  4.451e+01     37%
+    312       1700       3500      129   -4    2658   11      0     5.7e-03  1.14e-02  1.44e-02  4.455e+01     38%
+-- Fixed for [NC: 1, LJ: 1, MC: 1, JT: 1, KS: 1, RR: 1] at level 0.75.
+-- Fixed to zero for [RK: 2, EP: 3] at level 0.05.
+-- Members remaining: (NC, 3) (LJ, 2) (MC, 4) (JT, 4) (SP, 5) (KS, 2) (RK, 6) (MCW, 2) (FD, 7) (CS, 2) (EP, 3) (KJ, 2) (RR, 3) and total is 13.
+    313    1725.93       3500      105  -24    2605   11     62     1.9e-02  1.14e-02  1.45e-02  4.460e+01     37%
+    314       1700       3300      104   -1    2616   11      0     3.6e-03  1.02e-02  1.11e-02  4.462e+01     42%
+    315       1700       2100      113    9    2626   10      0     4.1e-03  5.86e-03  1.15e-02  4.465e+01     39%
+    316       1700       2900      122    9    2637   11      0     3.0e-03  8.89e-03  2.96e-02  4.469e+01     38%
+-- Fixed for [MC: 1, EP: 2] at level 0.75.
+-- Fixed to zero for [MC: 1, JT: 1, RK: 2, FD: 1, RR: 1] at level 0.05.
+-- Members remaining: (NC, 5) (LJ, 2) (MC, 2) (JT, 6) (SP, 4) (KS, 3) (RK, 4) (MCW, 4) (FD, 7) (CS, 2) (EP, 3) (KJ, 2) (RR, 4) and total is 13.
+    317       1700       2500      122    0    2628   10     17     6.9e-03  6.97e-03  1.29e-02  4.472e+01     32%
+-- Fixed for [LJ: 2, SP: 1, KS: 1, RK: 2, MCW: 1, EP: 1] at level 0.75.
+-- Fixed to zero for [EP: 1, RR: 1] at level 0.05.
+-- Members remaining: (NC, 2) (LJ, 2) (MC, 2) (JT, 4) (SP, 4) (KS, 2) (RK, 3) (MCW, 3) (FD, 7) (CS, 2) (EP, 3) (KJ, 4) (RR, 3) and total is 13.
+    318       1700       3100       95  -27    2598    9     39     9.8e-03  8.81e-03  1.15e-02  4.475e+01     34%
+    319       1700       1900       96    1    2605    7      0     4.7e-03  4.97e-03  1.35e-02  4.479e+01     35%
+    320       1700       2500       99    3    2614    9      0     3.2e-03  5.49e-03  1.69e-02  4.483e+01     36%
+-- Fixed to zero for [SP: 1, KS: 1, EP: 2, KJ: 2] at level 0.05.
+-- Fixed for [MC: 1, JT: 1, SP: 2, KS: 1, FD: 3, EP: 1] at level 0.6075.
+-- Members remaining: (NC, 4) (LJ, 2) (JT, 3) (RK, 3) (MCW, 2) (CS, 2) (EP, 2) (KJ, 2) (RR, 4) and total is 9.
+    321       1900       1900       64  -35    2546    6     73     8.9e-03  2.58e-02  1.27e-02  4.489e+01     22%
+    322       1825       1900       69    5    2553    7      0     3.2e-03  1.57e-02  1.18e-02  4.494e+01     21%
+    323       1800       2000       74    5    2560    7      0     5.8e-03  2.03e-02  1.25e-02  4.499e+01     20%
+    324       1700       1900       73   -1    2565    5      0     5.2e-03  6.90e-03  1.20e-02  4.501e+01     28%
+    325       1700       2100       76    3    2573    8      0     2.9e-03  2.57e-03  1.37e-02  4.505e+01     13%
+    326       1700       2100       66  -10    2575    2      0     7.7e-03  1.00e-02  1.15e-02  4.508e+01     24%
+    327       1700       2100       69    3    2578    3      0     3.1e-03  1.11e-02  9.37e-03  4.511e+01     16%
+-- Fixed for [NC: 1, LJ: 1, JT: 3, RK: 1, MCW: 1, CS: 1, EP: 2, RR: 1] at level 0.75.
+-- Fixed to zero for [BR: 1, NC: 2, LJ: 7, MC: 2, SP: 3, KS: 1, MCW: 1, CS: 1, EP: 2, KJ: 3, RR: 2] at level 0.05.
+-- Members remaining: (NC, 2) (LJ, 2) (RK, 2) (MCW, 2) (FD, 2) (KJ, 2) (RR, 2) and total is 7.
+    328       1700       2100       33  -36    2513    3     61     1.1e-02  9.90e-03  9.42e-03  4.515e+01     29%
+-- Fixed to zero for [LJ: 1, JT: 1, SP: 1, KS: 1, EP: 1] at level 0.05.
+-- Fixing column 6540 to 1 for member LJ, was 0.5
+-- Members remaining: (NC, 2) (LJ, 2) (RK, 2) (MCW, 2) (FD, 2) (KJ, 2) (RR, 2) and total is 7.
+    329       1700       1900       34    1    2515    2      1     8.9e-03  6.25e-03  9.42e-03  4.518e+01     12%
+-- Fixed for [NC: 2, LJ: 1, MCW: 2, FD: 1, KJ: 1] at level 0.75.
+-- Fixed to zero for [BR: 1, LJ: 1, JT: 2, RK: 1] at level 0.05.
+-- Members remaining: (RK, 2) (FD, 2) (RR, 2) and total is 3.
+    330       1700       1900       22  -12    2500    3     17     6.6e-03  6.24e-03  1.38e-02  4.522e+01     16%
+-- Fixed for [RK: 1] at level 0.75.
+-- Fixed to zero for [BR: 1, RK: 1, MCW: 2] at level 0.05.
+-- Members remaining: (RK, 2) (FD, 2) (RR, 2) and total is 3.
+    331       1700       1900       19   -3    2494    1      7     1.2e-02  4.40e-03  1.04e-02  4.524e+01     17%
+-- Fixing column 7011 to 1 for member RR, was 0.5
+-- Members remaining: (RK, 2) (FD, 2) (RR, 2) and total is 3.
+    332       1700       1700       19    0    2494    0      1     5.2e-03  5.11e-03  8.57e-03  4.526e+01      0%
+-- Stopping. Objective change is 0 with an integer feasible solution.
+Colgen done.
+. . . . . . . . DS DS OC . . . . DS FS WRM . . . . . WRM FS WRM . . . . FS . FBS WDS WDS . . . . . . . . . . . . . . . . OC . . . . . . . . . . . . . BS . . . . . . . BS . . . 
+. DS . . . . . BS . WRM . FOC WOC WOC . . . . . . . . . . . . . . OC . . . . . . BS . WRM . DS . . OC . WRM . . . . BS . WRM . . . . OC . FS . WRM . . BS . WRM . DS . . OC . DS . . . . 
+DS WRM . . . . . . . . . . . . FS BS . . . . . WRM . . . . . . WRM FS . . . . . FS WRM . . . . . WRM DS . . . . . . FS . . . . . . BS . . . . . DS FS . . . . . . . . . . . . 
+. . . . WRM . . . OC . DS DS . . . . . . . . . . OC . WRM FS . . . . OC . WRM . . . . DS BS . . . . BS . BS . WOC WOC . . . . . . . . . . . . . . . . . . FOC . . . . . . . . . 
+. . . . FOC WOC WOC . . . . . . . . . . . . . . . BS . BS FOC . . . . . OC . . . . . . . . . . . . DS . FOC . . DS OC . WRM . . . . . BS FS FS . . WRM . . BS . WDS WDS . . . . . . . 
+BS . BS OC . . . . . . . . . . . . . . . . . FS . FS OC . . . DS . DS . FOC WOC WOC . . . . . . . BS . BS OC . . . FS . . OC . . . DS DS DS . FOC WOC WOC . . . . . . . . . . . . . . 
+FS . . . . . . WRM FS . WRM . . . . . . . . . . DS DS . DS . . . FS WRM . BS . . . OC . . OC . . . . . . . . . . . WRM . . FBS WDS WDS . WRM . . . . . FS WRM . DS . . . DS BS . DS . . . 
+. . . FS . . . . BS . BS FS . . DS FS . . FBS WDS WDS . . . . . . . . . . . . . . . OC . WRM FS . . FS OC . FS WRM . . . . . . DS . . BS OC . . FBS WDS WDS . . . . . . . . DS . WRM . . . 
+. . . . . . . . . . . . . . BS OC . BS FS . . OC . OC . FBS WDS WDS . . . . . . . . FS BS . . . . . . . DS DS . . . . BS . FOC WOC WOC . . . . . . . . DS FS . . . . FS OC . . DS . . 
+. FS WRM . . . . . . . . . . . . . DS . . . . . WRM DS . . . . . DS BS . . . . . BS FS . . . . . WRM FS . . . . . . DS . . . . . FS . . . . . . OC . . . . . . FS WRM . . . . 
+. . . WRM FS . . DS . . FS WRM . . WRM . . . FOC WOC WOC . . . . . . . BS . . . . . . . . . DS . . . . . . . . . . WRM . . FS FS . . . . . BS . . . . . . . . WOC WOC . . . . FOC . . 
+. OC . BS . . . . . . . . . . . WRM . DS WRM . . . . . . . . . . BS . FS FS . . . . . . FOC WOC WOC . . . . . . . . DS . DS WRM . . . . . . . . . . . . . . . . . WRM . FS WRM . . 
+WRM BS . . FBS WDS WDS . . . . . . . . . . . . . . . . . . . . . . . WRM DS DS . . WRM . . FS WRM . . . . . WRM . . . OC . . BS . . . FS . . DS DS . . OC . DS FS . . . WRM . BS . . . . 
+. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . FS WOC WOC 
+OC . FS . . . . . . . . . . . OC . BS . DS . . BS FS BS . DS WOC WOC . . . . . . . . . . . . . . DS FS OC . FS . . . BS FS . . . . . . . . . . . . . OC . WRM . . . . FS . FBS WDS WDS 
+. . DS DS DS . . OC . BS . FBS WDS WDS . . . . . . . . . . . . . . . OC . WRM . . . DS DS OC . FBS WDS WDS . . . . FBS WDS WDS . . . . . . . WRM . WRM . . . . . BS . . FBS . . BS . . . . . . 
+Final solution (checked for feasibility): 1700
+-- Cover costs  : 1700
+-- Roster costs : 0
+Elapsed time : 45.6592s.

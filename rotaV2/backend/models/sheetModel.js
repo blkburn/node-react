@@ -8,6 +8,7 @@ const sheetSchema = mongoose.Schema(
       unique: true,
     },
     sheet: {
+      // the URL of the sheet
       type: String,
       required: true,
     },

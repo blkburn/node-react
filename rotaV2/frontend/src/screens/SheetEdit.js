@@ -31,6 +31,7 @@ const SheetEdit = ({ match, history }) => {
 
   useEffect(() => {
     if (successUpdate) {
+      console.log('sheet updated - push to /schedule')
       dispatch({ type: SHEET_UPDATE_RESET })
       history.push('/schedule')
     } else {

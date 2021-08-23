@@ -35,6 +35,8 @@ const SheetNew = ({ location, history }) => {
     dispatch(addSheet(name, sheet, false))
   }
 
+  const [verify, setVerify] = useState(false)
+
   return (
     <>
       <h2>Add New Sheet</h2>
@@ -61,7 +63,7 @@ const SheetNew = ({ location, history }) => {
           ></Form.Control>
         </Form.Group>
         <Button className='my-3' type='submit' variant='primary'>
-          Add
+          {verify ? 'Add' : 'Verify'}
         </Button>
       </Form>
     </>

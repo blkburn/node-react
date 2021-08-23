@@ -18,6 +18,46 @@ import {
   SHEET_UPDATE_SUCCESS,
 } from '../constants/userConstants'
 
+export const verfiySheet =
+  (name, sheet, isPublished) => async (dispatch, getState) => {
+    try {
+      dispatch({
+        type: SHEET_ADD_REQUEST,
+      })
+
+      const {
+        userLogin: { userInfo },
+      } = getState()
+
+      const config = {
+        headers: {
+          Authorization: `Bearer ${userInfo.token}`,
+        },
+      }
+
+      const { data } = await axios.post(
+        '/api/sheets/add',
+        { name, sheet, isPublished },
+        config
+      )
+
+      dispatch({
+        type: SHEET_ADD_SUCCESS,
+        payload: data,
+      })
+
+      localStorage.setItem('sheetInfo', JSON.stringify(data))
+    } catch (error) {
+      console.log(error)
+      dispatch({
+        type: SHEET_ADD_FAIL,
+        payload:
+          error.response && error.response.data.message
+            ? error.response.data.message
+            : error.message,
+      })
+    }
+  }
 export const addSheet =
   (name, sheet, isPublished) => async (dispatch, getState) => {
     try {

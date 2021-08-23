@@ -63,16 +63,28 @@ class channel_message:
                                    properties=pika.BasicProperties(correlation_id = self.props.correlation_id),
                                    body=str(message))
 
+
+def shift_times(df, value):
+    hr_min = df[df['ShiftID']==value]['StartTime'].values[0].split(':')
+    start = timedelta(hours=int(hr_min[0]), minutes=int(hr_min[1]))
+    hr_min = df[df['ShiftID']==value]['EndTime'].values[0].split(':')
+    if ('+1' in hr_min[1]):
+        end = timedelta(days=1, hours=int(hr_min[0]), minutes=int(hr_min[1][:-2]))
+    else:
+        end = timedelta(hours=int(hr_min[0]), minutes=int(hr_min[1]))
+    return start, end
+
+
 def run(ch, method, props, body):
     # global command
-    log = open("log.txt", "w")
-    log.close()
+    # log = open("log.txt", "w")
+    # log.close()
     if False: #command == 'none':
         command = body.decode('UTF-8')
         print(command)
         ch.basic_ack(delivery_tag=method.delivery_tag)
     else:
-        log = open("log.txt", "w")
+        # log = open("log.txt", "w")
         param = json.loads(body.decode('UTF-8'))
         command = param['command']
         print(param)
@@ -117,70 +129,70 @@ def run(ch, method, props, body):
             if staff_hours is None:
                 return
 
-            if (command == 'GET_SCHEDULE' or command == 'GET_REQUESTS'):
+            if (command == 'GET_SCHED_REQS' or command == 'GET_SCHEDULE' or command == 'GET_REQUESTS'):
 
+                # requests are pulled from the objective page - the iniital setup
+                # with schedule is pulled from the objective sheet - after the optimisation
                 objective = gsheets.pull('Objective', False)
                 if objective is None:
                     return
                 objective = pd.DataFrame(objective[1:raw.shape[0]+1], columns=objective[0])
 
-                if (command == 'GET_SCHEDULE'):
-                    obj = objective.copy()
-                    respText = 'schedule'
-                    offCheck = 'OFF'
-                else:
-                    obj = raw.copy()
-                    respText = 'requests'
-                    offCheck = ''
 
-                cols = obj.columns[2:]
-                dates = [obj.columns[0], obj.columns[1]]
-                for d in cols:
-                    dates.append(datetime.strptime(d, '%d/%m/%y'))
-                obj.columns=dates
-
-                cnt = 0
-                keys = ['title', 'staff', 'shift', 'startDate', 'endDate', 'id']
-                ssKeys = ['text', 'id', 'color', 'isChecked']
-                # keys = ['title', 'location', 'startDate', 'endDate', 'id']
                 scheduleJson = []
+                requestsJson = []
+                data=[{'obj': objective.copy(), 'respText': 'schedule', 'offCheck': 'OFF', 'json': scheduleJson},
+                      {'obj': raw.copy(), 'respText': 'requests', 'offCheck': '', 'json': requestsJson}]
+
+                for dic in data:
+
+                    obj = dic['obj'].copy()
+                    respText = dic['respText']
+                    offCheck = dic['offCheck']
+                    dataJson = []
+
+                    # convert df columns to dates
+                    cols = obj.columns[2:]
+                    dates = [obj.columns[0], obj.columns[1]]
+                    for d in cols:
+                        dates.append(datetime.strptime(d, '%d/%m/%y'))
+                    obj.columns=dates
+
+                    # create the multiple data structure to send to the frontend to display the schedule/requests
+                    # generated from the selected sheet
+                    cnt = 0
+                    keys = ['title', 'staff', 'shift', 'startDate', 'endDate', 'id']
+
+                    # create a schedule or request data frame to be displayed in the frontend schedule
+                    for index, row in obj.iterrows():
+                        for idx, value in row.iteritems():
+                            if (isinstance(idx, datetime)):
+                                if (value.endswith('r')):
+                                    value = value[:-1]
+                                if (any(shifts['ShiftID']==value)):
+                                    start, end = shift_times(shifts, value)
+                                    shName = shifts[shifts['ShiftID']==value]['ShiftName'].values[0]
+                                    stName = staff_hours[staff_hours['ID']==row.ID]['Name'].values[0]
+
+                                    dataJson.append(dict(zip(keys, [shName + ' : ' + stName, row.ID, value, (idx+start).isoformat(), (idx+end).isoformat(), cnt])))
+                                    cnt += 1
+                                elif (value!=offCheck and any(shifts_nc['ShiftID']==value)):
+                                    start, end = shift_times(shifts_nc, value)
+                                    shName = shifts_nc[shifts_nc['ShiftID']==value]['ShiftName'].values[0]
+                                    stName = staff_hours[staff_hours['ID']==row.ID]['Name'].values[0]
+
+                                    dataJson.append(dict(zip(keys, [shName + ' : ' + stName, row.ID, value, (idx+start).isoformat(), (idx+end).isoformat(), cnt])))
+                                    cnt += 1
+
+                    dic['json'] = dataJson.copy()
+                scheduleJson = data[0]['json']
+                requestsJson = data[1]['json']
+
+                # return the shift and staff info with color codes - is checked = true is used by the frontend to display the
+                # selected staff's shilfts
+                ssKeys = ['text', 'id', 'color', 'isChecked']
                 staffJson = []
                 shiftJson = []
-
-                for index, row in obj.iterrows():
-                    for idx, value in row.iteritems():
-
-                        # if (idx == 'ID'):
-                        #     id = value
-                        if (isinstance(idx, datetime)):
-                            if (value.endswith('r')):
-                                value = value[:-1]
-                            if (any(shifts['ShiftID']==value)):
-                                hr_min = shifts[shifts['ShiftID']==value]['StartTime'].values[0].split(':')
-                                start = timedelta(hours=int(hr_min[0]), minutes=int(hr_min[1]))
-                                hr_min = shifts[shifts['ShiftID']==value]['EndTime'].values[0].split(':')
-                                if ('+1' in hr_min[1]):
-                                    end = timedelta(days=1, hours=int(hr_min[0]), minutes=int(hr_min[1][:-2]))
-                                else:
-                                    end = timedelta(hours=int(hr_min[0]), minutes=int(hr_min[1]))
-                                shName = shifts[shifts['ShiftID']==value]['ShiftName'].values[0]
-                                stName = staff_hours[staff_hours['ID']==row.ID]['Name'].values[0]
-
-                                scheduleJson.append(dict(zip(keys, [shName + ' : ' + stName, row.ID, value, (idx+start).isoformat(), (idx+end).isoformat(), cnt])))
-                                cnt += 1
-                            elif (value!=offCheck and any(shifts_nc['ShiftID']==value)):
-                                hr_min = shifts_nc[shifts_nc['ShiftID']==value]['StartTime'].values[0].split(':')
-                                start = timedelta(hours=int(hr_min[0]), minutes=int(hr_min[1]))
-                                hr_min = shifts_nc[shifts_nc['ShiftID']==value]['EndTime'].values[0].split(':')
-                                if ('+1' in hr_min[1]):
-                                    end = timedelta(days=1, hours=int(hr_min[0]), minutes=int(hr_min[1][:-2]))
-                                else:
-                                    end = timedelta(hours=int(hr_min[0]), minutes=int(hr_min[1]))
-                                shName = shifts_nc[shifts_nc['ShiftID']==value]['ShiftName'].values[0]
-                                stName = staff_hours[staff_hours['ID']==row.ID]['Name'].values[0]
-
-                                scheduleJson.append(dict(zip(keys, [shName + ' : ' + stName, row.ID, value, (idx+start).isoformat(), (idx+end).isoformat(), cnt])))
-                                cnt += 1
 
                 for index, row in staff_hours.iterrows():
                     staffJson.append(dict(zip(ssKeys, [row.Name, row.ID, row.Color, False])))
@@ -189,7 +201,8 @@ def run(ch, method, props, body):
                 for index, row in shifts_nc.iterrows():
                     shiftJson.append(dict(zip(ssKeys, [row.ShiftName, row.ShiftID, row.Color, False])))
 
-                cm.send(json.dumps(dict({'isLocked':isLocked, 'startDate':startDate, 'endDate':endDate,'staff':staffJson, 'shift':shiftJson, respText:scheduleJson})))
+                cm.send(json.dumps(dict({'isLocked':isLocked, 'startDate':startDate, 'endDate':endDate,'staff':staffJson,
+                                         'shift':shiftJson, 'schedule':scheduleJson, 'requests':requestsJson})))
                 cm.send('Complete')
 
             else: # assume RUN_MODEL received
@@ -297,21 +310,10 @@ def run(ch, method, props, body):
                     f = open("output.txt","w")
                     f.write("SECTION_HORIZON\n# The horizon length in days:\n")
                     f.write("%d\n\n" % rota_days)
-                    # log.write("SECTION_HORIZON\n# The horizon length in days:\n")
-                    # log.write("%d\n\n" % rota_days)
-
                     f.write("SECTION_SHIFTS\n# ShiftID, Length in mins, Shifts which cannot follow this shift | separated\n")
                     f.write(shifts.iloc[:,1:4].to_csv(header=False, index=False))
-                    # log.write("SECTION_SHIFTS\n# ShiftID, Length in mins, Shifts which cannot follow this shift | separated\n")
-                    # log.write(shifts.iloc[:,1:4].to_csv(header=False, index=False))
-                    # log.write("\n\n")
-
                     f.write("\nSECTION_STAFF\n# ID, MaxShifts, MaxTotalMinutes, MinTotalMinutes, MaxConsecutiveShifts, MinConsecutiveShifts, MinConsecutiveDaysOff, MaxWeekends\n")
                     f.write(df.to_csv(header=False, index=False))
-                    # log.write("\nSECTION_STAFF\n# ID, MaxShifts, MaxTotalMinutes, MinTotalMinutes, MaxConsecutiveShifts, MinConsecutiveShifts, MinConsecutiveDaysOff, MaxWeekends\n")
-                    # log.write(df.to_csv(header=False, index=False))
-                    # log.write("\n\n")
-
                     f.write("\nSECTION_DAYS_OFF\n# EmployeeID, DayIndexes (start at zero)\n")
 
                     write = csv.writer(f)
@@ -319,20 +321,13 @@ def run(ch, method, props, body):
 
                     f.write("\nSECTION_SHIFT_ON_REQUESTS\n# EmployeeID, Day, ShiftID, Weight\n")
                     f.write(shift_on_request.to_csv(header=False, index=False))
-
                     f.write("\nSECTION_SHIFT_OFF_REQUESTS\n# EmployeeID, Day, ShiftID, Weight\n")
                     f.write(shift_off_request.to_csv(header=False, index=False))
-
                     f.write("\nSECTION_COVER\n# Day, ShiftID, Requirement, Weight for under, Weight for over\n")
                     f.write(shift_cover.to_csv(header=False, index=False))
-
                     f.close()
-                    # log.write("\n Running Optimisation...\n")
-                    # log.close()
-                    os.system('../monolith/bin/shift_scheduling_colgen output.txt  >> log.txt 2>&1')
+                    os.system('../monolith/bin/shift_scheduling_colgen output.txt  > log.txt 2>&1')
                     # os.system('../monolith/bin/shift_scheduling output.txt >> log.txt 2>&1')
-                    # log = open("log.txt", "a")
-                    # log.write('\nOptimisation finished\n')
 
                     obj = raw[dates].copy()
                     f= open("colgen_output.txt","r")
@@ -355,6 +350,7 @@ def run(ch, method, props, body):
                         a=raw.loc[idx][2:]==row[2:]
                         row[2:][a] = row[2:][a].values+'r'
 
+                cm.send('Generating metrics')
                 obj_pas = obj[dates].copy()
                 #iterate over obj
                 for idx, row in obj_pas.iterrows():
@@ -414,8 +410,9 @@ def run(ch, method, props, body):
                 wks.set_dataframe(worked_shifts, start=(2*(len(obj)+3)+len(staff_pas)+4+3,1))
                 wks.update_row(2*(len(obj)+3)+len(staff_pas)+4+3+len(worked_shifts)+1, ws_cnt)
 
+                cm.send('sheet updated')
                 if (param['doConditioanlFormatting']):
-                    print('sheet updated... adding conditional formatting')
+                    cm.send(': adding conditional formatting')
                     for idx, (a, r) in enumerate(zip(cnt[2:],required_pas[2:])):
                         col = 2*(len(obj)+3)-1
                         if a != r:
@@ -455,10 +452,10 @@ def run(ch, method, props, body):
                                     if r in negs:
                                         wks.add_conditional_formatting((index+2, idx+3), (index+2, idx+3), 'TEXT_NOT_CONTAINS', {'backgroundColor':{'red':1,'green':1}}, [o])
                                         print(obj['Name'][index] + ' ' + row.index[idx] + ' requested: ' + o + ' rostered: ' + r)
-                                        log.write('\n' + obj['Name'][index] + ' ' + row.index[idx] + ' requested: ' + o + ' rostered: ' + r)
+                                        # log.write('\n' + obj['Name'][index] + ' ' + row.index[idx] + ' requested: ' + o + ' rostered: ' + r)
                                 elif o != r:
                                     wks.add_conditional_formatting((index+2, idx+3), (index+2, idx+3), 'TEXT_NOT_CONTAINS', {'backgroundColor':{'red':1}}, [o])
-                                    log.write('\n' + obj['Name'][index] + ' ' + row.index[idx] + ' requested: ' + o + ' rostered: ' + r)
+                                    # log.write('\n' + obj['Name'][index] + ' ' + row.index[idx] + ' requested: ' + o + ' rostered: ' + r)
                                     print(obj['Name'][index] + ' ' + row.index[idx] + ' requested: ' + o + ' rostered: ' + r)
 
                 cm.send('Complete')

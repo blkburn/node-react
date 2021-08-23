@@ -18,6 +18,8 @@ import {
   ROTA_SET_NAME,
   ROTA_SUCCESS_SET,
   ROTA_SET_DATES,
+  ROTA_SUCCESS_CLEAR,
+  ROTA_RUN_VERIFY,
 } from '../constants/userConstants'
 import moment, { now } from 'moment'
 
@@ -63,6 +65,7 @@ export const setSchedule = (data) => async (dispatch, getState) => {
     } = getState()
     const schedule = data.scheduleData
 
+    console.log(schedule.staff)
     if (schedule) {
       const staff = schedule.staff.filter((s) => {
         if (userInfo.name === s.text) {
@@ -246,35 +249,37 @@ export const setSheetName = (name) => async (dispatch) => {
 }
 
 const updateStatus = (data) => (dispatch, getState) => {
-  const {
-    sheetDetails: { sheet },
-  } = getState()
+  try {
+    const {
+      sheetDetails: { sheet },
+    } = getState()
 
-  console.log('update status')
-  console.log(sheet.name)
-  dispatch(clearRotaCount())
-  dispatch(stopRotaRunning())
-  dispatch(setRotaLocked(data.locked === 'TRUE'))
-  if (data.locked === 'TRUE') {
-    console.log('sheet locked')
-    dispatch(appendRotaMessage('Sheet is LOCKED'))
-  } else {
-    console.log('sheet unlocked')
-    dispatch(appendRotaMessage('Sheet is UNLOCKED'))
+    console.log('update status')
+    console.log(sheet.name)
+    console.log(data)
+    // dispatch(clearRotaCount())
+    dispatch(stopRotaRunning())
+    if (data.isLocked) {
+      dispatch(setRotaLocked(data.isLocked === 'TRUE'))
+    }
+    dispatch(setDates(data))
+    dispatch(setSheetName(sheet.name))
+
+    if (data.scheduleData && data.scheduleData !== '') {
+      console.log('set schedule data')
+      dispatch(setSchedule(data))
+    }
+    dispatch({ type: ROTA_SUCCESS_SET })
+  } catch (error) {
+    const message =
+      error.response && error.response.data.message
+        ? error.response.data.message
+        : error.message
+    dispatch({
+      type: ROTA_APPEND_MESSAGE,
+      payload: message,
+    })
   }
-  // dispatch(setSartDate(data.startDate))
-  // dispatch(setEndDate(data.endDate))
-  dispatch(setDates(data))
-  dispatch(setSheetName(sheet.name))
-  dispatch(appendRotaMessage(`Rota start date : ${data.startDate}`))
-  dispatch(appendRotaMessage(`Rota end date : ${data.endDate}`))
-  if (data.scheduleData && data.scheduleData !== '') {
-    console.log('set schedule data')
-    dispatch(setSchedule(data))
-  }
-  // dispatch(appendRotaMessage(data.message))
-  dispatch(validRotaSheet(true))
-  dispatch({ type: ROTA_SUCCESS_SET })
 }
 
 export const checkRotaStatus = () => async (dispatch, getState) => {
@@ -320,11 +325,9 @@ export const checkRotaStatus = () => async (dispatch, getState) => {
 export const verifyRotaSheet = (sheet) => async (dispatch, getState) => {
   try {
     console.log('verfy sheet')
-    dispatch(clearRotaCount())
-    dispatch(clearRotaMessage())
-    dispatch(setRotaRunning())
-    dispatch(validRotaSheet(false))
-
+    dispatch({
+      type: ROTA_RUN_VERIFY,
+    })
     const {
       userLogin: { userInfo },
       rota,
@@ -341,13 +344,11 @@ export const verifyRotaSheet = (sheet) => async (dispatch, getState) => {
 
     const { data } = await axios.post(
       `/api/rota/verify`,
-      { sheet: spreadsheetId },
+      { sheet: spreadsheetId, command: 'VERIFY_SHEET' },
       config
     )
-    // console.log(data)
     if (data.running) {
       dispatch(incRotaCount())
-      dispatch(validRotaSheet(false))
       if (data.message !== '') {
         dispatch(appendRotaMessage(data.message))
       }
@@ -370,10 +371,9 @@ export const verifyRotaSheet = (sheet) => async (dispatch, getState) => {
 export const runRotaSheet = (condFormatting) => async (dispatch, getState) => {
   try {
     console.log('run sheet')
-    dispatch(clearRotaCount())
-    // dispatch(clearRotaMessage())
-    dispatch(setRotaRunning())
-    // dispatch(validRotaSheet(false))
+    dispatch({
+      type: ROTA_RUN_VERIFY,
+    })
 
     const {
       userLogin: { userInfo },
@@ -393,12 +393,12 @@ export const runRotaSheet = (condFormatting) => async (dispatch, getState) => {
       `/api/rota/run`,
       {
         sheet: spreadsheetId,
+        command: 'RUN_MODEL',
         locked: rota.locked ? 'true' : 'false',
         doConditioanlFormatting: condFormatting,
       },
       config
     )
-    // console.log(data)
     if (data.running) {
       dispatch(incRotaCount())
       if (data.message !== '') {
@@ -423,10 +423,12 @@ export const runRotaSheet = (condFormatting) => async (dispatch, getState) => {
 export const getSchedule = () => async (dispatch, getState) => {
   try {
     console.log('get rota schedule')
-    dispatch(clearRotaCount())
-    dispatch(clearRotaMessage())
-    dispatch(setRotaRunning())
-    // dispatch(validRotaSheet(false))
+    dispatch({ type: ROTA_RUN_VERIFY })
+    // dispatch(clearRotaMessage())
+    // dispatch(setRotaRunning())
+    // // dispatch(validRotaSheet(false))
+    // dispatch({ type: ROTA_SUCCESS_CLEAR })
+
     const {
       userLogin: { userInfo },
       sheetDetails: { sheet },
@@ -483,6 +485,8 @@ export const getRequests = () => async (dispatch, getState) => {
     dispatch(clearRotaCount())
     dispatch(clearRotaMessage())
     dispatch(setRotaRunning())
+    dispatch({ type: ROTA_SUCCESS_CLEAR })
+
     // dispatch(validRotaSheet(false))
     const {
       userLogin: { userInfo },

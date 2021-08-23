@@ -11,6 +11,7 @@ import {
 } from '../actions/sheetActions'
 import BootstrapTable from 'react-bootstrap-table-next'
 import {
+  ROTA_SUCCESS_CLEAR,
   ROTA_UPDATE_SCHEDULE,
   SHEET_DETAILS_RESET,
 } from '../constants/userConstants'
@@ -38,7 +39,7 @@ const SheetListAdmin = ({ type, history }) => {
   }, [dispatch, history, successDelete, userInfo])
 
   useEffect(() => {
-    if (listsSuccess) {
+    if (listsSuccess && rota.success) {
       if (sheets[0]) {
         dispatch(getSheetDetails(sheets[0]._id))
       }
@@ -59,7 +60,7 @@ const SheetListAdmin = ({ type, history }) => {
       if (e.target.cellIndex < 2) {
         console.log(sheets[rowIndex])
         dispatch(getSheetDetails(sheets[rowIndex]._id))
-        // dispatch({ type: ROTA_UPDATE_SCHEDULE })
+        dispatch({ type: ROTA_SUCCESS_CLEAR })
       }
     },
   }
