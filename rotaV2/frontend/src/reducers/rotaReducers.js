@@ -25,7 +25,11 @@ import {
   ROTA_SHEET_VALID,
   ROTA_STOP_RUNNING,
   ROTA_SUCCESS_CLEAR,
+  ROTA_SUCCESS_SCHEDULE_CLEAR,
+  ROTA_SUCCESS_SCHEDULE_SET,
   ROTA_SUCCESS_SET,
+  ROTA_SUCCESS_VERIFY_CLEAR,
+  ROTA_SUCCESS_VERIFY_SET,
   ROTA_UPDATE_CHECKED_VIEW,
   ROTA_UPDATE_SCHEDULE,
 } from '../constants/userConstants'
@@ -56,7 +60,15 @@ export const rotaSheetReducer = (state = { message: [] }, action) => {
         scheduleDate: scheduleDateUpdate,
       }
     case ROTA_RUN_VERIFY:
-      return { ...state, count: 0, message: [], running: true, success: false }
+      return {
+        ...state,
+        count: 0,
+        message: [],
+        running: true,
+        success: false,
+        successSchedule: false,
+        successVerify: false,
+      }
 
     // case ROTA_SET_RUNNING:
     //   return { ...state, running: true }
@@ -117,6 +129,14 @@ export const rotaSheetReducer = (state = { message: [] }, action) => {
       return { ...state, success: true }
     case ROTA_SUCCESS_CLEAR:
       return { ...state, success: false }
+    case ROTA_SUCCESS_SCHEDULE_SET:
+      return { ...state, successSchedule: true }
+    case ROTA_SUCCESS_SCHEDULE_CLEAR:
+      return { ...state, successSchedule: false }
+    case ROTA_SUCCESS_VERIFY_SET:
+      return { ...state, successVerify: true }
+    case ROTA_SUCCESS_VERIFY_CLEAR:
+      return { ...state, successVerify: false }
     default:
       return state
   }

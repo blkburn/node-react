@@ -20,6 +20,8 @@ import {
   ROTA_SET_DATES,
   ROTA_SUCCESS_CLEAR,
   ROTA_RUN_VERIFY,
+  ROTA_SUCCESS_SCHEDULE_SET,
+  ROTA_SUCCESS_VERIFY_SET,
 } from '../constants/userConstants'
 import moment, { now } from 'moment'
 
@@ -65,7 +67,7 @@ export const setSchedule = (data) => async (dispatch, getState) => {
     } = getState()
     const schedule = data.scheduleData
 
-    console.log(schedule.staff)
+    // console.log(schedule.staff)
     if (schedule) {
       const staff = schedule.staff.filter((s) => {
         if (userInfo.name === s.text) {
@@ -256,7 +258,7 @@ const updateStatus = (data) => (dispatch, getState) => {
 
     console.log('update status')
     console.log(sheet.name)
-    console.log(data)
+    // console.log(data)
     // dispatch(clearRotaCount())
     dispatch(stopRotaRunning())
     if (data.isLocked) {
@@ -269,7 +271,14 @@ const updateStatus = (data) => (dispatch, getState) => {
       console.log('set schedule data')
       dispatch(setSchedule(data))
     }
-    dispatch({ type: ROTA_SUCCESS_SET })
+    if (data.command === 'RUN_MODEL') {
+      dispatch({ type: ROTA_SUCCESS_SET })
+    } else if (data.command === 'VERIFY_SHEET') {
+      dispatch({ type: ROTA_SUCCESS_VERIFY_SET })
+    } else {
+      // assume get schedule/requests/etc
+      dispatch({ type: ROTA_SUCCESS_SCHEDULE_SET })
+    }
   } catch (error) {
     const message =
       error.response && error.response.data.message
@@ -420,7 +429,7 @@ export const runRotaSheet = (condFormatting) => async (dispatch, getState) => {
   }
 }
 
-export const getSchedule = () => async (dispatch, getState) => {
+export const getSchedule = (forceUpdate) => async (dispatch, getState) => {
   try {
     console.log('get rota schedule')
     dispatch({ type: ROTA_RUN_VERIFY })
@@ -438,7 +447,7 @@ export const getSchedule = () => async (dispatch, getState) => {
         Authorization: `Bearer ${userInfo.token}`,
       },
     }
-    console.log(sheet)
+    // console.log(sheet)
     let spreadsheetId = new RegExp('/spreadsheets/d/([a-zA-Z0-9-_]+)').exec(
       sheet.sheet
     )[1]
@@ -450,10 +459,10 @@ export const getSchedule = () => async (dispatch, getState) => {
         sheet: spreadsheetId,
         sheet_id: sheet._id,
         command: 'GET_SCHEDULE',
-        updatePublished: sheet.isPubUpdate,
-        reloadPublished: sheet.isPubReload,
-        updateRequests: sheet.isReqUpdate,
-        reloadRequests: sheet.isReqReload,
+        updatePublished: forceUpdate ? true : sheet.isPubUpdate,
+        reloadPublished: forceUpdate ? true : sheet.isPubReload,
+        updateRequests: forceUpdate ? true : sheet.isReqUpdate,
+        reloadRequests: forceUpdate ? true : sheet.isReqReload,
       },
       config
     )
@@ -497,7 +506,7 @@ export const getRequests = () => async (dispatch, getState) => {
         Authorization: `Bearer ${userInfo.token}`,
       },
     }
-    console.log(sheet)
+    // console.log(sheet)
     let spreadsheetId = new RegExp('/spreadsheets/d/([a-zA-Z0-9-_]+)').exec(
       sheet.sheet
     )[1]

@@ -36,7 +36,7 @@ class fVerifyData {
     }
   }
   set(data) {
-    console.log(data)
+    // console.log(data)
     this.startDate = data.startDate
     this.endDate = data.endDate
     this.isLocked = data.isLocked
@@ -44,6 +44,7 @@ class fVerifyData {
   }
   get() {
     return {
+      command: this.params.command,
       startDate: this.startDate,
       endDate: this.endDate,
       isLocked: this.isLocked,
@@ -68,7 +69,7 @@ class fRunData {
     this.message = data.message || ''
   }
   get() {
-    return { message: this.message }
+    return { command: this.params.command, message: this.message }
   }
 }
 
@@ -93,6 +94,7 @@ class fScheduleData {
   }
   get() {
     return {
+      command: this.params.command,
       startDate: this.startDate,
       endDate: this.endDate,
       isLocked: this.isLocked,
@@ -142,76 +144,82 @@ const getRotaStatus = asyncHandler(async (req, res) => {
     }
   } else {
     console.log('status response - not running')
-    console.log(deque.toString().split(',').join('\n'))
+    // console.log(deque.toString().split(',').join('\n'))
     fRabbitData.message = deque.toString().split(',').join('\n')
+
+    updatePublished = fRabbitData.params.updatePublished
+    reloadPublished = fRabbitData.params.reloadPublished
+    if (updatePublished && reloadPublished) {
+      const data = fRabbitData.get()
+      const scheduleData = data.scheduleData
+      const sheet_id = fRabbitData.params.sheet_id
+      console.log('updating schedule data in database')
+      console.log(sheet_id)
+      const { staff, shift, schedule, requests } = scheduleData
+
+      let sheet = await Sheet.findById(sheet_id)
+      // console.log(req)
+      if (sheet) {
+        sheet.startDate = data.startDate
+        sheet.endDate = data.endDate
+        sheet = await sheet.save()
+        console.log(sheet)
+      }
+
+      let results = await CacheSheetStaff.deleteMany({
+        sheet_id: sheet_id,
+      })
+      results = await Promise.all(
+        staff.map(async (req) => {
+          // console.log(req)
+          let r = await CacheSheetStaff.create({
+            ...req,
+            sheet_id: sheet_id,
+          })
+          // console.log(requests)
+        })
+      )
+      results = await CacheSheetShifts.deleteMany({
+        sheet_id: sheet_id,
+      })
+      results = await Promise.all(
+        shift.map(async (req) => {
+          // console.log(req)
+          let r = await CacheSheetShifts.create({
+            ...req,
+            sheet_id: sheet_id,
+          })
+          // console.log(requests)
+        })
+      )
+      results = await CacheSheetSchedule.deleteMany({
+        sheet_id: sheet_id,
+      })
+      // console.log(schedule)
+      results = await Promise.all(
+        schedule.map(async (req) => {
+          // console.log(req)
+          let r = await CacheSheetSchedule.create({
+            ...req,
+            sheet_id: sheet_id,
+          })
+          // console.log(requests)
+        })
+      )
+      results = await CacheSheetDetails.deleteMany({
+        sheet_id: sheet_id,
+      })
+      // console.log(schedule)
+      results = await CacheSheetDetails.create({
+        sheet: 'sheet name',
+        isLocked: data.isLocked === 'TRUE',
+        startDate: data.startDate, //moment.utc(startDate, 'DD/MM/YY').toDate(),
+        endDate: data.endDate, //moment.utc(endDate, 'DD/MM/YY').toDate(),
+        sheet_id: sheet_id,
+      })
+    }
+
     res.status(200).json(fRabbitData.get())
-
-    // if (updatePublished && reloadPublished) {
-    //   console.log('updating schedule data in database')
-    //   console.log(sheet_id)
-    //   const { staff, shift, schedule, requests } = JSON.parse(scheduleData)
-
-    //   let sheet = await Sheet.findById(sheet_id)
-    //   console.log(req)
-    //   if (sheet) {
-    //     sheet.startDate = startDate
-    //     sheet.endDate = endDate
-    //     sheet = await sheet.save()
-    //     console.log(sheet)
-    //   }
-
-    //   let results = await CacheSheetStaff.deleteMany({
-    //     sheet_id: sheet_id,
-    //   })
-    //   results = await Promise.all(
-    //     staff.map(async (req) => {
-    //       // console.log(req)
-    //       let r = await CacheSheetStaff.create({
-    //         ...req,
-    //         sheet_id: sheet_id,
-    //       })
-    //       // console.log(requests)
-    //     })
-    //   )
-    //   results = await CacheSheetShifts.deleteMany({
-    //     sheet_id: sheet_id,
-    //   })
-    //   results = await Promise.all(
-    //     shift.map(async (req) => {
-    //       // console.log(req)
-    //       let r = await CacheSheetShifts.create({
-    //         ...req,
-    //         sheet_id: sheet_id,
-    //       })
-    //       // console.log(requests)
-    //     })
-    //   )
-    //   results = await CacheSheetSchedule.deleteMany({
-    //     sheet_id: sheet_id,
-    //   })
-    //   // console.log(schedule)
-    //   results = await Promise.all(
-    //     schedule.map(async (req) => {
-    //       // console.log(req)
-    //       let r = await CacheSheetSchedule.create({
-    //         ...req,
-    //         sheet_id: sheet_id,
-    //       })
-    //       // console.log(requests)
-    //     })
-    //   )
-    //   results = await CacheSheetDetails.deleteMany({
-    //     sheet_id: sheet_id,
-    //   })
-    //   // console.log(schedule)
-    //   results = await CacheSheetDetails.create({
-    //     sheet: 'sheet name',
-    //     isLocked: locked === 'TRUE',
-    //     startDate: startDate, //moment.utc(startDate, 'DD/MM/YY').toDate(),
-    //     endDate: endDate, //moment.utc(endDate, 'DD/MM/YY').toDate(),
-    //     sheet_id: sheet_id,
-    //   })
-    // }
 
     // res.status(200).json({
     //   running: running,
@@ -313,7 +321,7 @@ const startAmqp = (req, res) => {
                 } else {
                   if (IsJsonString(msg.content)) {
                     // const resp = JSON.parse(msg.content)
-                    console.log(JSON.parse(msg.content))
+                    // console.log(JSON.parse(msg.content))
                     fRabbitData.set(JSON.parse(msg.content))
                     // locked = resp['isLocked']
                     // startDate = resp['startDate']

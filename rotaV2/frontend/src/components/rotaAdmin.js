@@ -16,6 +16,7 @@ import {
   verifyRotaSheet,
   runRotaSheet,
   setRotaName,
+  getSchedule,
 } from '../actions/rotaActions'
 import { ROTA_CLEAR_UPDATE_SCHEDULE } from '../constants/userConstants'
 
@@ -53,6 +54,13 @@ const RotaAdmin = (props) => {
   useEffect(() => {
     dispatch({ type: ROTA_CLEAR_UPDATE_SCHEDULE })
   }, [sheet.sheet, dispatch])
+
+  useEffect(() => {
+    if (rota.success) {
+      console.log('update getSchedule()')
+      dispatch(getSchedule(true))
+    }
+  }, [rota.success, dispatch])
 
   const handleChange = (name) => (event) => {
     // localStorage.setItem([name], event.target.value)
@@ -140,7 +148,7 @@ const RotaAdmin = (props) => {
         </Form.Group>
         <Button
           className='my-2'
-          disabled={rota.running || !rota.success}
+          disabled={rota.running || !rota.successVerify}
           type='submit'
           variant='primary'
         >
