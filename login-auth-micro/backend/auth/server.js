@@ -6,7 +6,7 @@ import morgan from 'morgan'
 // import { notFound, errorHandler } from './middleware/errorMiddleware.js'
 // import connectDB from '../utils/config/db.js'
 
-import authRoutes from "./routes/authRoutes.js";
+import authRoutes from './routes/authRoutes.js'
 
 // dotenv.config()
 
