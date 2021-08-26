@@ -2,6 +2,7 @@ import jwt from 'jsonwebtoken'
 import asyncHandler from 'express-async-handler'
 import User from '../models/userModel.js'
 import {readFileSync } from 'fs'
+import axios from "axios";
 
 const keypub = readFileSync('key.pub', {encoding:'utf8', flag:'r'})
 
@@ -15,7 +16,9 @@ const protect = asyncHandler(async (req, res, next) => {
     try {
       token = req.headers.authorization.split(' ')[1]
 
-      const decoded = jwt.verify(token, keypub, { algorithm: "RS256"})
+      const { data } = await axios.get(`http://localhost:${process.env.AUTH_PORT}/api/auth/pubkey`, {})
+      const pubkey = data.pubkey
+      const decoded = jwt.verify(token, pubkey, { algorithm: "RS256"})
 
       req.user = await User.findById(decoded.id).select('-password')
 
