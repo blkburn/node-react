@@ -5,13 +5,11 @@ import mongoose from 'mongoose'
 import NodeCache from 'node-cache'
 // import datapoint from '../datapoint/datapoint.js'
 
-// metoffice key d9a4455e-9005-4abc-8566-5c6b81a4fc03
 
 const maxRps = 10 // max requests per second for throttling
 const throttleInterval = 1000 / maxRps
 
 // let dp = new datapoint()
-// dp.set_key('d9a4455e-9005-4abc-8566-5c6b81a4fc03')
 
 const myCache = new NodeCache({stdTTL: 60 * 60 * 1})
 
