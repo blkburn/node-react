@@ -1,0 +1,37 @@
+{
+  "name": "jwt-auth",
+  "version": "1.0.0",
+  "description": "Demo login with Auth",
+  "main": "server.js",
+  "scripts": {
+    "start": "node backend/server/server",
+    "server": "nodemon backend/server/server",
+    "auth": "nodemon backend/auth/server",
+    "client": "npm start --prefix frontend",
+    "dev": "concurrently \"npm run server\" \"npm run auth\" \"npm run client\"",
+    "data:import": "node backend/seeder",
+    "data:destroy": "node backend/seeder -d",
+    "heroku-postbuild": "NPM_CONFIG_PRODUCTION=false npm install --prefix frontend && npm run build --prefix frontend"
+  },
+  "dependencies": {
+    "axios": "^0.21.1",
+    "axios-debug-log": "^0.8.4",
+    "bcryptjs": "^2.4.3",
+    "colors": "^1.4.0",
+    "dotenv": "^10.0.0",
+    "express": "^4.17.1",
+    "express-async-handler": "^1.1.4",
+    "google-spreadsheet": "^3.1.15",
+    "jsonwebtoken": "^8.5.1",
+    "mongoose": "^5.13.3",
+    "morgan": "^1.10.0",
+    "node-cache": "^5.1.2",
+    "node-rsa": "^1.1.1",
+    "xmlhttprequest": "^1.8.0"
+  },
+  "devDependencies": {
+    "concurrently": "^6.2.0",
+    "nodemon": "^2.0.12",
+    "prettier": "2.3.2"
+  }
+}
